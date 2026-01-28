@@ -259,9 +259,3 @@ void Scene1p::Render() const {
 
 	glUseProgram(0);
 }
-
-
-// END
-
-
-
