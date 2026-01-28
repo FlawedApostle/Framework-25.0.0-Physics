@@ -1,0 +1,117 @@
+Sun Aug  3 19:59:35 2025
+[INFO]: Starting the SceneManager
+[INFO]: OpenGL version: 4.6.0 NVIDIA 576.88
+[INFO]: Graphics card vendor NVIDIA Corporation
+[INFO]: Graphics card name NVIDIA GeForce RTX 3060/PCIe/SSE2
+[INFO]: GLSL Version 4.60 NVIDIA
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[WARNING]: Light_Position0 :No such uniform name in file: E:\Documents\Humber Courses\ComponentFramework25.0.0_Physics\ComponentFramework25.0.0_Physics\ComponentFramework\Shader.cpp on line: 245
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene2p: 
+[INFO]: Loading assets Scene2p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene2p: 
+[INFO]: Deleted Scene2p: 
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene2p: 
+[INFO]: Loading assets Scene2p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene2p: 
+[INFO]: Deleted Scene2p: 
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene2p: 
+[INFO]: Loading assets Scene2p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene2p: 
+[INFO]: Deleted Scene2p: 
+[INFO]: Created Scene0: 
+[INFO]: Loading assets Scene0: 
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+
+[INFO]: Deleting assets Scene0: 
+[INFO]: Deleted Scene0: 
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene2p: 
+[INFO]: Loading assets Scene2p: 
+[INFO]: Uniforms:
+"lightPos" loc:0
+"modelMatrix" loc:1
+"projectionMatrix" loc:2
+"viewMatrix" loc:3
+
+[INFO]: Deleting the SceneManager
+[INFO]: Deleting assets Scene2p: 
+[INFO]: Deleted Scene2p: 
