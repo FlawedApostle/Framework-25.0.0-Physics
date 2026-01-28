@@ -1,0 +1,9 @@
+# Ignore Visual Studio Build Outputs
+Debug/
+Release/
+x64/
+*.exe
+*.pdb
+*.user
+*.obj
+.vs/
