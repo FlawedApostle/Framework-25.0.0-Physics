@@ -20,16 +20,16 @@ public:	/// making Physics public for now, cause I want to get it done....howver
 	Vec3 vel;
 	Vec3 accel;
 	float mass;
+	Vec3 angularVelocity;
+	Vec3 angularAcceleration;
+	Matrix3 rotationalInertia;
+	float radius = 1.0f;
 
 	Quaternion orientation;
 	//Quaternion position;
 	Vec3 upVector;								/// Up vector for the ball, to solve the angle
-	Vec3 angularVelocity;
-	Vec3 angularAcceleration;
 	Vec3 displacement;							/// track the ball ? can this determine velocity && acceleration ?
 	Vec3 angularDisplacement;					/// track the ball ? can this determine velocity && acceleration ?
-	float radius;
-	Matrix3 rotationalInertia;
 
 private: /// Physics stuff
 	/// put physics vars private, and set getters for them
@@ -46,19 +46,19 @@ public:
 	void Update(float deltaTime);
 	void Render() const;
 
-	void ApplyForce(Vec3 force);
 	void setAccel(const Vec3 &accel_) { accel = accel_;}
-	
+	void ApplyForce(Vec3 force);
 	void ApplyTourque(Vec3 Torque);
+	// Update
 	void UpdateOrientation(float deltatime);
 	void UpdateAngularVelocity(float deltaTime);
 	void UpdateAngularAcceleration(float deltaTime);
-	/// get Model Matrix
-	const Matrix4 getModelMatrix() const;
-	
 	void UpdatePos(float deltaTime);
 	void UpdateVel(float deltaTime);
 	void UpdateAccel(float deltaTime);
+	/// get Model Matrix
+	const Matrix4 getModelMatrix() const;
+	
 
 	/// Calculator test to ensure the radians_to_degrees is working...
 	void converttoRads(float omega , float deltatime)

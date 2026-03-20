@@ -37,34 +37,15 @@ void Body::ApplyForce(Vec3 force) {
 /// Physics Functions - Update !
 void Body::ApplyTourque(Vec3 Torque)
 {
-	/// Hollow sphere = 2.3mr^2
+	// Hollow sphere = I = 2/3(mass * radi) ^ 2			 2 / 3 = 0.666667
+	// Solid sphere =  I = 2/5(mass * radi) ^ 2			 2 / 5 = 0.4
+	float Hvalue = 0.4 * mass * (radius * radius);
+	float Svalue = 2/3 * mass * (radius * radius);
 	// tourque slides rotational inertia
-	rotationalInertia[0] = 2.3f * pow(2,mass + radius) + mass + radius;
-	rotationalInertia[1] = 0.0f;
-	rotationalInertia[2] = 0.0f;
-	
-	rotationalInertia[3] = 0.0f;
-	rotationalInertia[4] = 2.3f * pow(2, mass + radius) + mass + radius;
-	rotationalInertia[5] = 0.0f;
-						 
-	rotationalInertia[6] = 0.0f;
-	rotationalInertia[7] = 0.0f;
-	rotationalInertia[8] = 2.3f * pow(2, mass + radius) + mass + radius;
-	
-	/// Solid sphere = 2.5mr^2
-	/*
-	rotationalInertia[0] = 2.5f * pow(2, mass + radius) + mass + radius;
-	rotationalInertia[1] = 0.0f;
-	rotationalInertia[2] = 0.0f;
+	rotationalInertia[0] = Hvalue;		rotationalInertia[1] = 0.0f;		rotationalInertia[2] = 0.0f; 
+	rotationalInertia[3] = 0.0f;		rotationalInertia[4] = Hvalue;		rotationalInertia[5] = 0.0f;
+	rotationalInertia[6] = 0.0f;		rotationalInertia[7] = 0.0f;		rotationalInertia[8] = Hvalue;
 
-	rotationalInertia[3] = 0.0f;
-	rotationalInertia[4] = 2.5f * pow(2, mass + radius) + mass + radius;
-	rotationalInertia[5] = 0.0f;
-
-	rotationalInertia[6] = 0.0f;
-	rotationalInertia[7] = 0.0f;
-	rotationalInertia[8] = 2.5f * pow(2, mass + radius) + mass + radius;
-	*/
 
 }
 void Body::UpdateOrientation(float deltatime)
@@ -73,7 +54,7 @@ void Body::UpdateOrientation(float deltatime)
 	// need angle and axis	-> slides Velocity
 	float angularSpeed = VMath::mag(angularVelocity);
 	// Failsafe obj does not have a 'FULL' vector only direction, but no Mag , therefore it will crash
-	/// I want more clarification on this !! - Vector requers a direction and a Mag , with no Mag its has nothing, therefore it will fail
+	/// I want more clarification on this - Vector requers a direction and a Mag , with no Mag its has nothing, therefore it will fail
 	if (angularSpeed < VERY_SMALL)
 	{
 		return;
