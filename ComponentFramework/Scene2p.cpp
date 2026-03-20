@@ -44,7 +44,7 @@ bool Scene2p::OnCreate() {
 	normalScale = 2.0f;																	// normal scale for shader
 	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");				// Cache the uniform location for the light position in the shader
 	
-	upVector = { 0.0f,1.0f,0.0f };														/// generate the upVector
+	//upVector = { 0.0f,1.0f,0.0f };													/// generate the upVector
 
 	/// Plane
 	planeBody = new Body();
@@ -52,7 +52,7 @@ bool Scene2p::OnCreate() {
 	planeBody->radius = 2.0f;
 	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0)); 
 	planeNormal = Vec3(0.0f, 1.0f, 0.0f);
-	/*planeNormal = QMath::rotate(planeNormal, planeBody->orientation);*/
+	planeNormal = QMath::rotate(Vec3(0,1,0), planeBody->orientation);					// No Drift - Fixed Base to start off
 
 	/// Sphere
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
@@ -61,8 +61,7 @@ bool Scene2p::OnCreate() {
 	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
 	sphereBody->angularVelocity = Vec3(1.0f, 0.0f, 0.0f);								// starts at 0 for rest
 	sphereBody->radius = 1;
-	sphereBody->angularAcceleration = Vec3(10.0f, 0.0f, 0.0f);							// SPEED  - starts at 0 for rest
-	planeNormal = QMath::rotate(Vec3(0,1,0), planeBody->orientation);					// No Drift - Fixed Base to start off
+	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);							// SPEED  - starts at 0 for rest
 
 	// ----- 3D
 	// PLANE
@@ -91,10 +90,11 @@ bool Scene2p::OnCreate() {
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 10.0f);
+	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
 	Matrix4 T = MMath::translate(cameraPosition);
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);
-	viewMatrix = MMath::inverse(R) * MMath::inverse(T);		// why inverse ? - check slides , check cat slides
+	viewMatrix = MMath::inverse(R) * MMath::inverse(T);	
 	
 	return true;
 }
@@ -117,8 +117,10 @@ void Scene2p::OnDestroy() {
 	/// ----------- SHADERS
 	shader->OnDestroy();
 	delete shader;									// Shader 1
+	
 	shader_normals_face->OnDestroy();				// Shader 2
 	delete shader_normals_face;
+	
 	shader_normals_line->OnDestroy();				// Shader 3
 	delete shader_normals_line;
 }
@@ -229,7 +231,7 @@ void Scene2p::Update(const float deltaTime)
 	// force = torqueMagnitude
 	// pivot is the upVector || is it the planeNormal
 	*/
-	planeNormal = QMath::rotate(planeNormal, planeBody->orientation);				// ----- PLANE NORMAL ------		MUST update the plane normal for 'punctual' rolling
+	upVector = { 0.0f,1.0f,0.0f };													// GENERATE UPVECTOR ----- MORE RESPOSNIVE ??
 	float cosTheta = VMath::dot(planeNormal, upVector);								// ----- ANGULAR ACCELERATION ------ FIND the angle between PLANE normal and UPVECTOR to distinguish angular acceleration
 	float theta = acos(cosTheta);
 	float distanceToPivot = sphereBody->radius * sin(theta);
