@@ -1,0 +1,66 @@
+# Visual Studio cache
+.vs/
+*.user
+*.userosscache
+*.suo
+
+# Build directories
+Debug/
+Release/
+x64/
+x86/
+bin/
+obj/
+out/
+build/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# Compiled binaries
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.exp
+
+# Logs and temp files
+*.log
+*.tlog
+*.tmp
+*.cache
+*.db
+
+# Generated project files
+*.opensdf
+*.sdf
+*.ipch
+
+# Packages
+packages/
+*.nupkg
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Backup files
+*.bak
+*.old
+*.orig
+
+# Shader cache
+*.spv
+*.cache
+
+# Ignore your engine/framework build output
+ComponentFramework/Debug/
+ComponentFramework/Release/
+ComponentFramework/x64/
+ComponentFramework/bin/
+ComponentFramework/obj/
+
+
+**/.vs/
+

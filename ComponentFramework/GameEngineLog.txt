@@ -1,0 +1,8 @@
+Thu Mar 19 19:59:18 2026
+[INFO]: Starting the SceneManager
+[INFO]: OpenGL version: 4.6.0 - Build 32.0.101.6790
+[INFO]: Graphics card vendor Intel
+[INFO]: Graphics card name Intel(R) UHD Graphics
+[INFO]: GLSL Version 4.60 - Build 32.0.101.6790
+[INFO]: Created Scene2p: 
+[INFO]: Loading assets Scene2p: 
