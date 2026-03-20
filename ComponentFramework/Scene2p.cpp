@@ -10,8 +10,7 @@
 #include <QMath.h>
 #include "Quaternion.h"
 
-//Body bodyAdmin;
-// initializer
+
 Scene2p::Scene2p() :
 
 	  drawInWireMode	{ false }
@@ -29,8 +28,6 @@ Scene2p::Scene2p() :
 {
 	Debug::Info("Created Scene2p: ", __FILE__, __LINE__);
 }
-
-// DESTROY
 Scene2p::~Scene2p() 
 {
 	Debug::Info("Deleted Scene2p: ", __FILE__, __LINE__);
@@ -39,31 +36,32 @@ Scene2p::~Scene2p()
 bool Scene2p::OnCreate() {
 	Debug::Info("Loading assets Scene2p: ", __FILE__, __LINE__);
 
-
 	/// Trackball
 	trackball = new Trackball();
 
 	/// UNIFORMS
-	lightPos = Vec3(10.0f, 10.0f, 0.0f);										// light position for shader
-	normalScale = 2.0f;															// normal scale for shader
-	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");		// Cache the uniform location for the light position in the shader
+	lightPos = Vec3(10.0f, 10.0f, 0.0f);												// light position for shader
+	normalScale = 2.0f;																	// normal scale for shader
+	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");				// Cache the uniform location for the light position in the shader
 	
+	upVector = { 0.0f,1.0f,0.0f };														/// generate the upVector
+
 	/// Plane
 	planeBody = new Body();
 	planeBody->OnCreate();
 	planeBody->radius = 2.0f;
 	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0)); 
 	planeNormal = Vec3(0.0f, 1.0f, 0.0f);
-	planeNormal = QMath::rotate(planeNormal, planeBody->orientation);
+	/*planeNormal = QMath::rotate(planeNormal, planeBody->orientation);*/
 
 	/// Sphere
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
 	sphereBody = new Body();
 	sphereBody->OnCreate();
 	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
-	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);								// starts at 0 for rest
+	sphereBody->angularVelocity = Vec3(1.0f, 0.0f, 0.0f);								// starts at 0 for rest
 	sphereBody->radius = 1;
-	sphereBody->angularAcceleration = Vec3(0.0f, 0.0f, 0.0f);							// SPEED  - starts at 0 for rest
+	sphereBody->angularAcceleration = Vec3(10.0f, 0.0f, 0.0f);							// SPEED  - starts at 0 for rest
 	planeNormal = QMath::rotate(Vec3(0,1,0), planeBody->orientation);					// No Drift - Fixed Base to start off
 
 	// ----- 3D
@@ -166,25 +164,33 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			printf("UP\n");
 			rotation = QMath::angleAxisRotation(2.0f, axis_PitchUp);
 			planeBody->orientation = rotation * planeBody->orientation;
-			planeNormal = QMath::rotate(planeNormal, rotation);
+			//planeNormal = QMath::rotate(planeNormal, rotation);
+			planeNormal = QMath::rotate(Vec3(0, 1, 0), planeBody->orientation);
+
 			break;
 		case SDL_SCANCODE_A:
 			printf("LEFT\n");
 			rotation = QMath::angleAxisRotation(2.0f, axis_Left);
 			planeBody->orientation = rotation * planeBody->orientation;
-			planeNormal = QMath::rotate(planeNormal, rotation);
+			//planeNormal = QMath::rotate(planeNormal, rotation);
+			planeNormal = QMath::rotate(Vec3(-1, 0, 0), planeBody->orientation);
+
 			break;
 		case SDL_SCANCODE_D:
 			printf("RIGHT\n");
 			rotation = QMath::angleAxisRotation(2.0f, axis_Right);
 			planeBody->orientation = rotation * planeBody->orientation;
-			planeNormal = QMath::rotate(planeNormal, rotation);
+			//planeNormal = QMath::rotate(planeNormal, rotation);
+			planeNormal = QMath::rotate(Vec3(1, 0, 0), planeBody->orientation);
+
 			break;
 		case SDL_SCANCODE_S:
 			printf("DOWN\n"); planeNormal.print();
 			rotation = QMath::angleAxisRotation(2.0f, axis_PitchDown);
 			planeBody->orientation = rotation * planeBody->orientation;
-			planeNormal = QMath::rotate(planeNormal, rotation);
+			//planeNormal = QMath::rotate(planeNormal, rotation);
+			planeNormal = QMath::rotate(Vec3(0, -1, 0), planeBody->orientation);
+
 			break;
 		}
 		break;
@@ -223,9 +229,10 @@ void Scene2p::Update(const float deltaTime)
 	// force = torqueMagnitude
 	// pivot is the upVector || is it the planeNormal
 	*/
-	upVector = { 0.0f,1.0f,0.0f };														/// generate the upVector
-	angle = VMath::dot(planeNormal, upVector);					/// acos(planeNormal DOT upVector)	/// not the right angle set to avoid error
-	float distanceToPivot = sphereBody->radius * sin(angle);
+	planeNormal = QMath::rotate(planeNormal, planeBody->orientation);				// ----- PLANE NORMAL ------		MUST update the plane normal for 'punctual' rolling
+	float cosTheta = VMath::dot(planeNormal, upVector);								// ----- ANGULAR ACCELERATION ------ FIND the angle between PLANE normal and UPVECTOR to distinguish angular acceleration
+	float theta = acos(cosTheta);
+	float distanceToPivot = sphereBody->radius * sin(theta);
 
 	/// DIRECTION , FIND DIRECTION USING CROSS PRODUCT
 	// Find mag of torque
@@ -234,41 +241,43 @@ void Scene2p::Update(const float deltaTime)
 	// torqueMagnitude is the weight of the ball - we need a direction and a Magnitude 
 	// weight * distance to pivot
 	torque = VMath::cross(upVector, planeNormal);
+	Vec3 torqueDir = VMath::normalize(torque);
 	torqueMagnitude = VMath::mag(torque);
 	torqueMagnitude = torqueMagnitude * distanceToPivot;
+	Vec3 torqueFinal = torqueDir * torqueMagnitude;
 	//printf("Torque Magnitude = %f\n", torqueMagnitude);
 
 	/// BALL MOVING
-	sphereBody->ApplyTourque(torque);
+	sphereBody->ApplyTourque(torqueFinal);
 	sphereBody->UpdateAngularVelocity(deltaTime);
 
 	/// Change the orientation using quaternion.
 	sphereBody->UpdateOrientation(deltaTime);
 	/// velocityMag = angularVelocity  * radius
 	velocityMagnitutde = VMath::mag(sphereBody->angularVelocity * sphereBody->radius);
-	/// Velocity Direction
-	// velocityDirection = angularVelocityDirection CROSS planeNormal
-	velocityDirection = VMath::cross(sphereBody->angularVelocity, planeNormal);
-	/// set the sphereBody velocity to velocityMagnitude * velocityDirection
-	// mag is the speed , velocity is the direction
+	/* Velocity Direction
+	// - velocityDirection = angularVelocityDirection CROSS planeNormal
+	// - set the sphereBody velocity to velocityMagnitude * velocityDirection mag is the speed , velocity is the direction */
+	velocityDirection = VMath::normalize(VMath::cross(sphereBody->angularVelocity, planeNormal));
 	sphereBody->vel = velocityMagnitutde * velocityDirection;
-	sphereBody->Update(deltaTime);
+	//sphereBody->Update(deltaTime);
 
 
-	/// Starting camera position , the vector location of the sphere's body's position
-	cameraPosition = cameraPosition - sphereBody->pos;
+	// TRACKBALL - SYNTHETIC CAMERA
+	// Starting camera position
+	//cameraPosition = cameraPosition - sphereBody->pos;
+	cameraPosition = cameraPosition - planeBody->pos;
 
 	// WHY INVERSE ! ...... looking down the neg z axis !
 	// initial is getQuat() in handle events, gets the inital position of the orientation of the quat
-	// trackball.HandleEvents(sdlEvent) is sandwiched in between to gather controler input
-	// final is is getQuat() is the orientation after movement 
+	// trackball.HandleEvents(sdlEvent) is sandwiched in between to gather controler input - final is is getQuat() is the orientation after movement 
 	Quaternion changeInTrackballOrientation = finalTrackballOrientation * QMath::inverse(initialTrackballOrientation);
 	// cam orientation will equal the finalOrientaion *= inverseOrientaion(initial) 
 	// then correct the rotate of the cam position in relation to the change in trackball orientaion 
 	cameraOrientation *= changeInTrackballOrientation;
 	cameraPosition = QMath::rotate(cameraPosition, changeInTrackballOrientation);
-	/// Explanation
-	cameraPosition = cameraPosition + sphereBody->pos;
+	
+
 	/// MATRIX
 	Matrix4 T = MMath::translate(cameraPosition);
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);

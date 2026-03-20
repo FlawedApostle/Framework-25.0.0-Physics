@@ -1,5 +1,4 @@
-﻿  Body.cpp
+﻿  Scene2p.cpp
   This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
   This questionable: Vec4 inverse(const Vec4& v)
-E:\Documents\GithubDir\Framework-25.0.0-Physics\ComponentFramework\Body.cpp(42,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
   ComponentFramework.vcxproj -> E:\Documents\GithubDir\Framework-25.0.0-Physics\Debug\ComponentFramework.exe

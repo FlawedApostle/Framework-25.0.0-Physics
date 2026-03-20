@@ -4,7 +4,11 @@
 #include "MMath.h"
 #include "QMath.h"
 #include "Scene1p.h"
-/// INIT
+
+// tHEta : is the total angle of distance							- DISPLACEMENT
+// oMEGa : is how fast you're rotating								- ANGULAR VELOCITY
+// aLPHa : is how much rout rotation is spinning fast or slow		- ANGULAR ACCELERATION
+
 Body::Body(): 
 	mesh{nullptr},
 	texture{nullptr},
@@ -12,7 +16,7 @@ Body::Body():
 	pos{}, 
 	vel{}, 
 	accel{}, 
-	mass{1.0f},		// mass set from 0 to 1.0
+	mass{1.0f},														// mass set from 0 to 1.0
 	radius{1.0f},
 	rotationalInertia{ },
 	angularAcceleration{},
@@ -21,7 +25,7 @@ Body::Body():
 	angularDisplacement {}
 { 
 }
-/// Destructor
+
 Body::~Body() {}
 
 void Body::Update(float deltaTime) {
@@ -34,18 +38,38 @@ void Body::ApplyForce(Vec3 force) {
 	accel = force / mass;
 }
 
-/// Physics Functions - Update !
+// ----- NEW PHYSICS
 void Body::ApplyTourque(Vec3 Torque)
 {
-	// Hollow sphere = I = 2/3(mass * radi) ^ 2			 2 / 3 = 0.666667
-	// Solid sphere =  I = 2/5(mass * radi) ^ 2			 2 / 5 = 0.4
+	/* TORQUE SLDES - rotational inertia
+	 Hollow sphere = I = 2/3(mass * radi) ^ 2			 2 / 3 = 0.666667
+	 Solid sphere =  I = 2/5(mass * radi) ^ 2			 2 / 5 = 0.4													*/
+	
+	float Svalue = 0.6666667 * mass * (radius * radius);
 	float Hvalue = 0.4 * mass * (radius * radius);
-	float Svalue = 2/3 * mass * (radius * radius);
-	// tourque slides rotational inertia
-	rotationalInertia[0] = Hvalue;		rotationalInertia[1] = 0.0f;		rotationalInertia[2] = 0.0f; 
-	rotationalInertia[3] = 0.0f;		rotationalInertia[4] = Hvalue;		rotationalInertia[5] = 0.0f;
-	rotationalInertia[6] = 0.0f;		rotationalInertia[7] = 0.0f;		rotationalInertia[8] = Hvalue;
+	rotationalInertia[0] = Svalue;		rotationalInertia[1] = 0.0f;		rotationalInertia[2] = 0.0f;
+	rotationalInertia[3] = 0.0f;		rotationalInertia[4] = Svalue;		rotationalInertia[5] = 0.0f;
+	rotationalInertia[6] = 0.0f;		rotationalInertia[7] = 0.0f;		rotationalInertia[8] = Svalue;
 
+	/* 2. Calculate Angular Acceleration
+	// alpha = Inverse(I) * Torque
+	// Since this is a diagonal matrix where all diagonal values are the same (iValue),
+	// the inverse matrix simply has (1.0f / iValue) on the diagonals.													*/
+
+	// Failsafe to prevent divide by zero if mass or radius is 0
+	if (Hvalue < VERY_SMALL || Svalue < VERY_SMALL) {
+		angularAcceleration = Vec3(0.0f, 0.0f, 0.0f);
+		return;
+	}
+
+	float inverseIValue = 1.0f / Svalue;
+
+
+	/* Multiply the Inverse Matrix by the Torque Vector
+	// Because all non-diagonal elements are 0, the matrix multiplication simplifies to:								*/
+	angularAcceleration.x = inverseIValue * Torque.x;
+	angularAcceleration.y = inverseIValue * Torque.y;
+	angularAcceleration.z = inverseIValue * Torque.z;
 
 }
 void Body::UpdateOrientation(float deltatime)
@@ -111,9 +135,7 @@ void Body::UpdatePos(float deltaTime)
 /// LINEAR VELOCITY		-- test !
 void Body::UpdateVel(float deltaTime)
 {
-	/// Why Angular_Acceleration and not Theta ? - clarification please ! 
-	/// ... is it bcuz we do not have a starting angle (theta) so we will start based off its acceleration ?
-	/// ... these questions sound dumb, but these things throw me off.. in the slides its different - w = theta / time
+	
 	// velocity = d / t - displacement / time 
 	vel += accel * deltaTime;
 
