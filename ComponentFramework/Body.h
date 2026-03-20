@@ -23,7 +23,7 @@ public:	/// making Physics public for now, cause I want to get it done....howver
 	Vec3 angularVelocity;
 	Vec3 angularAcceleration;
 	Matrix3 rotationalInertia;
-	float radius = 1.0f;
+	float radius = 1.0f; 
 
 	Quaternion orientation;
 	//Quaternion position;
@@ -59,6 +59,9 @@ public:
 	/// get Model Matrix
 	const Matrix4 getModelMatrix() const;
 	
+	/// Get Radius
+	Vec3 GetRadius() { return Vec3(radius , radius, radius); };
+
 
 	/// Calculator test to ensure the radians_to_degrees is working...
 	void converttoRads(float omega , float deltatime)

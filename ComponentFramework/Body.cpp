@@ -34,6 +34,7 @@ void Body::Update(float deltaTime) {
 	vel += accel * deltaTime;
 }
 
+/// ------- TEST
 void Body::ApplyForce(Vec3 force) {
 	accel = force / mass;
 }
@@ -74,8 +75,10 @@ void Body::ApplyTourque(Vec3 Torque)
 }
 void Body::UpdateOrientation(float deltatime)
 {
-	// Update the orientation using angular velocity
-	// need angle and axis	-> slides Velocity
+	// 1. Rotate your orientation quaternion using the angular velocity  [slides Velocity]
+	// 2. Find the axis you are rotating about by normalizing the angular velocity vector
+	// 3. Calculate the angle you need to rotate using angle = magnitude of the angular velocity *  deltaTime.
+	//Vec3 angularVelocityNormalize = VMath::normalize(angularVelocity);																				// Using this I get weird results
 	float angularSpeed = VMath::mag(angularVelocity);
 	// Failsafe obj does not have a 'FULL' vector only direction, but no Mag , therefore it will crash
 	/// I want more clarification on this - Vector requers a direction and a Mag , with no Mag its has nothing, therefore it will fail
@@ -92,24 +95,17 @@ void Body::UpdateOrientation(float deltatime)
 	// Combine quaternions my multiplying
 	orientation *= rotation;
 }
-/// AngularVelocity
-// angularVel = theta / time
+
+
 void Body::UpdateAngularVelocity(float deltaTime)
 {
 	// AV = W = theta / t 
-	/// final angularVel = initial angular Vel + angular accell * deltaTime 
-	//angularVelocity = angularVelocity + angularAcceleration * deltaTime;
-
-	/// NO WAY ITS JUST THIS....
-	//angularVelocity = angularDisplacement / deltaTime;
 	angularVelocity = angularVelocity + angularAcceleration * deltaTime;
 }
-/// Angular Acceleration - angularAccel = change in angular Vel / time
-// linear Acceleration	 - angularAccel * radius 
 void Body::UpdateAngularAcceleration(float deltaTime)
 {
 	// TODO for YOU
-	// Code up Umer's scribbles (also in circularMotion slides)
+	// circularMotion slides
 	// final angular_vel = initial angular_vel + angular_acc * deltaTime
 	// angularVel = s(theta) / t
 
@@ -124,7 +120,11 @@ const Matrix4 Body::getModelMatrix() const
 	Matrix4 scale = MMath::scale(radius, radius, radius);
 	// scale * rotate * translate == translate * rotate * scale
 	// read right to left Hebrew style
-	return translate * rotation * scale;
+	//return translate * rotation * scale;
+
+	// PRO ORDER (Hebrew Style / Right-to-Left):
+	// Translate * Rotate * Scale
+	return MMath::translate(pos) * MMath::toMatrix4(orientation) * MMath::scale(radius, radius, radius);
 }
 
 /// Physics 1
@@ -132,7 +132,7 @@ void Body::UpdatePos(float deltaTime)
 {
 	pos += vel * deltaTime;
 }
-/// LINEAR VELOCITY		-- test !
+/// LINEAR VELOCITY
 void Body::UpdateVel(float deltaTime)
 {
 	
@@ -168,10 +168,8 @@ void Body::UpdateAccel(float deltaTime)
 bool Body::OnCreate() {
 	return true;
 }
-
 void Body::OnDestroy() {
 }
-
 void Body::Render() const {
 }
 

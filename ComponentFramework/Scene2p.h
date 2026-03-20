@@ -63,6 +63,7 @@ private:
 	Vec3 torque;
 	Vec3 velocityDirection;
 	float velocityMagnitutde;
+	Vec3 linearVelocity;
 
 	/// Uniforms
 	Vec3 lightPos;

@@ -51,15 +51,15 @@ bool Scene2p::OnCreate() {
 	planeBody->OnCreate();
 	planeBody->radius = 2.0f;
 	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0)); 
-	planeNormal = Vec3(0.0f, 1.0f, 0.0f);
-	planeNormal = QMath::rotate(Vec3(0,1,0), planeBody->orientation);					// No Drift - Fixed Base to start off
+	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
+	planeNormal = QMath::rotate(Vec3(0.0f,0.0f,1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
 
 	/// Sphere
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
 	sphereBody = new Body();
 	sphereBody->OnCreate();
 	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
-	sphereBody->angularVelocity = Vec3(1.0f, 0.0f, 0.0f);								// starts at 0 for rest
+	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 1.0f);								// starts at 0 for rest
 	sphereBody->radius = 1;
 	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);							// SPEED  - starts at 0 for rest
 
@@ -235,6 +235,9 @@ void Scene2p::Update(const float deltaTime)
 	float cosTheta = VMath::dot(planeNormal, upVector);								// ----- ANGULAR ACCELERATION ------ FIND the angle between PLANE normal and UPVECTOR to distinguish angular acceleration
 	float theta = acos(cosTheta);
 	float distanceToPivot = sphereBody->radius * sin(theta);
+	
+	//float heightAbovePlane = sphereBody->radius;
+	//sphereBody->pos = planeBody->pos + (planeNormal * heightAbovePlane);
 
 	/// DIRECTION , FIND DIRECTION USING CROSS PRODUCT
 	// Find mag of torque
@@ -247,22 +250,33 @@ void Scene2p::Update(const float deltaTime)
 	torqueMagnitude = VMath::mag(torque);
 	torqueMagnitude = torqueMagnitude * distanceToPivot;
 	Vec3 torqueFinal = torqueDir * torqueMagnitude;
-	//printf("Torque Magnitude = %f\n", torqueMagnitude);
+	
+	if (VMath::mag(torqueFinal) > 0.001f) {
+		// If this prints, the ball SHOULD be rolling.
+		 printf("Torque detected! %f\n", VMath::mag(torqueFinal)); 
+	}
 
 	/// BALL MOVING
 	sphereBody->ApplyTourque(torqueFinal);
 	sphereBody->UpdateAngularVelocity(deltaTime);
+	sphereBody->UpdateOrientation(deltaTime);														/// Change the orientation using quaternion.
 
-	/// Change the orientation using quaternion.
-	sphereBody->UpdateOrientation(deltaTime);
-	/// velocityMag = angularVelocity  * radius
-	velocityMagnitutde = VMath::mag(sphereBody->angularVelocity * sphereBody->radius);
+	/// Liner Velocity = angularVelocity  * radius
+	//velocityMagnitutde = VMath::mag(sphereBody->angularVelocity * sphereBody->radius);
+	//linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
+	
+	//sphereBody->vel = VMath::cross(sphereBody->angularVelocity, sphereBody->GetRadius());
+	//sphereBody->vel = VMath::cross(sphereBody->angularVelocity, planeNormal) * sphereBody->radius;
+	
+	//sphereBody->UpdatePos(deltaTime);
+
+
+
 	/* Velocity Direction
 	// - velocityDirection = angularVelocityDirection CROSS planeNormal
 	// - set the sphereBody velocity to velocityMagnitude * velocityDirection mag is the speed , velocity is the direction */
-	velocityDirection = VMath::normalize(VMath::cross(sphereBody->angularVelocity, planeNormal));
-	sphereBody->vel = velocityMagnitutde * velocityDirection;
-	//sphereBody->Update(deltaTime);
+	//velocityDirection = VMath::normalize(VMath::cross(sphereBody->angularVelocity, planeNormal));
+	//sphereBody->vel = velocityMagnitutde * velocityDirection;
 
 
 	// TRACKBALL - SYNTHETIC CAMERA
