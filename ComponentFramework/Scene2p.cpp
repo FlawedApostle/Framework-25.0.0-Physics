@@ -307,22 +307,32 @@ void Scene2p::Render() const {
 
 	if (drawInNormalsFace) {
 		glUseProgram(shader_normals_face->GetProgram());
+		// 2. Send matrices to Face Shader
+		glUniformMatrix4fv(shader_normals_face->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
+		glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+		// 3. Render Plane with Face Shader
+		glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
+		planeMesh->Render(GL_TRIANGLES);
+
 	}
-	else {
+	else 
+	{
+		// Default Shader
 		glUseProgram(shader->GetProgram());
 		glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
+
+		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
+		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+		
+		// PLANE
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
+		planeMesh->Render(GL_TRIANGLES);
+
+		// SPHERE
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
+		sphereMesh->Render(GL_TRIANGLES);
+
 	}
-
-	// PLANE
-	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-	planeMesh->Render(GL_TRIANGLES);
-
-	// SPHERE
-	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
-	sphereMesh->Render(GL_TRIANGLES);
-
 	// ============================
 	// PASS 2 — NORMAL LINES
 	// ============================

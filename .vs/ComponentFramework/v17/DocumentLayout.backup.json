@@ -1,10 +1,14 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\",
+  "WorkspaceRootPath": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene2p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene2p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,20 +18,43 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Scene2p.h",
+              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.h",
+              "RelativeDocumentMoniker": "ComponentFramework\\Scene2p.h",
+              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.h",
+              "RelativeToolTip": "ComponentFramework\\Scene2p.h",
+              "ViewState": "AgIAAAAAAAAAAAAAAADwvxQAAAAVAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-03-20T12:58:18.665Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Scene2p.cpp",
-              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
+              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
               "RelativeDocumentMoniker": "ComponentFramework\\Scene2p.cpp",
-              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
+              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
               "RelativeToolTip": "ComponentFramework\\Scene2p.cpp",
-              "ViewState": "AgIAAD8AAAAAAAAAAADwv80AAAArAAAAAAAAAA==",
+              "ViewState": "AgIAADQBAAAAAAAAAAAUwEwBAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-03-20T12:38:38.59Z",
               "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             }
           ]
         }

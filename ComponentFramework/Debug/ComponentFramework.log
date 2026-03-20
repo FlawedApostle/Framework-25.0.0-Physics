@@ -1,5 +1,4 @@
 ﻿  Scene2p.cpp
   This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
   This questionable: Vec4 inverse(const Vec4& v)
-  LINK : C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\Debug\ComponentFramework.exe not found or not built by the last incremental link; performing full link
-  ComponentFramework.vcxproj -> C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\Debug\ComponentFramework.exe
+  ComponentFramework.vcxproj -> E:\Documents\GithubDir\Framework-25.0.0-Physics\Debug\ComponentFramework.exe
