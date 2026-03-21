@@ -36,7 +36,7 @@
               "RelativeDocumentMoniker": "ComponentFramework\\Body.cpp",
               "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp",
               "RelativeToolTip": "ComponentFramework\\Body.cpp",
-              "ViewState": "AgIAAB8AAAAAAAAAAAAiwHMAAAAqAAAAAAAAAA==",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAiwB4AAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-03-20T13:16:24.656Z",
               "IsPinned": true,
@@ -50,7 +50,7 @@
               "RelativeDocumentMoniker": "ComponentFramework\\Scene2p.cpp",
               "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
               "RelativeToolTip": "ComponentFramework\\Scene2p.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAACoAAAAwAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-03-20T12:38:38.59Z",
               "IsPinned": true,
@@ -66,8 +66,7 @@
               "RelativeToolTip": "ComponentFramework\\Scene2p.h",
               "ViewState": "AgIAABgAAAAAAAAAAAAAAEEAAAAUAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-03-20T12:58:18.665Z",
-              "EditorCaption": ""
+              "WhenOpened": "2026-03-20T12:58:18.665Z"
             },
             {
               "$type": "Document",
