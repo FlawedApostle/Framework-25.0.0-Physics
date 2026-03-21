@@ -132,6 +132,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 	trackball->HandleEvents(sdlEvent);
 	finalTrackballOrientation = trackball->getQuat();
 	
+
 	switch (sdlEvent.type) {
 	case SDL_KEYDOWN:
 		switch (sdlEvent.key.keysym.scancode) {
@@ -153,9 +154,9 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 
 			// PLANE DETAILS
 		case SDL_SCANCODE_P:
-			planeNormal.print("planeNormal"); 
-			upVector.print("upVector"); 
+			planeNormal.print("planeNormal");  upVector.print("upVector"); 
 			sphereBody->vel.print("sphereBody->vel");
+
 			printf("torqueMagnitude %f\n", torqueMagnitude);
 			printf("velocityMagnitutde %f\n", velocityMagnitutde);
 			printf("velocityDirection (%f,%f,%f)\n", velocityDirection.x , velocityDirection.y , velocityDirection.z);
@@ -167,7 +168,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			rotation = QMath::angleAxisRotation(2.0f, axis_PitchUp);
 			planeBody->orientation = rotation * planeBody->orientation;
 			//planeNormal = QMath::rotate(planeNormal, rotation);
-			planeNormal = QMath::rotate(Vec3(0, 1, 0), planeBody->orientation);
+			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
 
 			break;
 		case SDL_SCANCODE_A:
@@ -175,7 +176,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			rotation = QMath::angleAxisRotation(2.0f, axis_Left);
 			planeBody->orientation = rotation * planeBody->orientation;
 			//planeNormal = QMath::rotate(planeNormal, rotation);
-			planeNormal = QMath::rotate(Vec3(-1, 0, 0), planeBody->orientation);
+			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
 
 			break;
 		case SDL_SCANCODE_D:
@@ -183,7 +184,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			rotation = QMath::angleAxisRotation(2.0f, axis_Right);
 			planeBody->orientation = rotation * planeBody->orientation;
 			//planeNormal = QMath::rotate(planeNormal, rotation);
-			planeNormal = QMath::rotate(Vec3(1, 0, 0), planeBody->orientation);
+			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
 
 			break;
 		case SDL_SCANCODE_S:
@@ -191,7 +192,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 			rotation = QMath::angleAxisRotation(2.0f, axis_PitchDown);
 			planeBody->orientation = rotation * planeBody->orientation;
 			//planeNormal = QMath::rotate(planeNormal, rotation);
-			planeNormal = QMath::rotate(Vec3(0, -1, 0), planeBody->orientation);
+			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
 
 			break;
 		}
@@ -213,6 +214,8 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene2p::Update(const float deltaTime)
 {	
+	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);				/// PLANE NORMAL - MAKE SURE IT MATCHES OnCreate planeNormal(s)
+
 	// TODO for YOU
 	/*
 	// Calculate torqueMag using forceMag * distance to pivot
@@ -251,25 +254,40 @@ void Scene2p::Update(const float deltaTime)
 	torqueMagnitude = torqueMagnitude * distanceToPivot;
 	Vec3 torqueFinal = torqueDir * torqueMagnitude;
 	
-	if (VMath::mag(torqueFinal) > 0.001f) {
+	// --------- DEBUG
+	/*if (VMath::mag(torqueFinal) > 0.001f) {
 		// If this prints, the ball SHOULD be rolling.
 		 printf("Torque detected! %f\n", VMath::mag(torqueFinal)); 
-	}
+	}*/
 
 	/// BALL MOVING
 	sphereBody->ApplyTourque(torqueFinal);
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime);														/// Change the orientation using quaternion.
 
-	/// Liner Velocity = angularVelocity  * radius
-	//velocityMagnitutde = VMath::mag(sphereBody->angularVelocity * sphereBody->radius);
-	//linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
 	
+	linearVelocity = sphereBody->angularVelocity  * sphereBody->radius;
+	velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);
 	//sphereBody->vel = VMath::cross(sphereBody->angularVelocity, sphereBody->GetRadius());
-	//sphereBody->vel = VMath::cross(sphereBody->angularVelocity, planeNormal) * sphereBody->radius;
-	
-	//sphereBody->UpdatePos(deltaTime);
+	/*sphereBody->vel = VMath::cross(sphereBody->angularVelocity, planeNormal) * sphereBody->radius;*/
 
+	Vec3 gravity(0.0f, -1.0f, 0.0f);
+
+	// Project gravity onto plane
+	Vec3 downhill = gravity - VMath::dot(gravity, planeNormal) * planeNormal;
+
+	if (VMath::mag(downhill) > VERY_SMALL) {
+		Vec3 direction = VMath::normalize(downhill);
+		float speed = VMath::mag(sphereBody->angularVelocity) * sphereBody->radius;
+		sphereBody->vel = direction * speed;
+	}
+	else {
+		sphereBody->vel = Vec3(0.0f, 0.0f, 0.0f);
+	}
+	
+	sphereBody->UpdatePos(deltaTime);
+	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	sphereBody->pos -= planeNormal * (planeDist - sphereBody->radius);
 
 
 	/* Velocity Direction
