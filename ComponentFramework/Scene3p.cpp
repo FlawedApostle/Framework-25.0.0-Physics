@@ -513,28 +513,6 @@ Vec3 Scene3p::ComputeRollingVelocity(const Vec3& downhill)
 
 
 
-bool Scene3p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed , const float _time)
-{
-	if (onPlane) {
-		// --- rolling on plane ---
-		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
-		//Vec3 downhill = gravity - gravityNormalComp;
-
-		if (VMath::mag(_downHill) > VERY_SMALL) {
-			Vec3 downhillDir = VMath::normalize(_downHill);
-			_angSpeed = VMath::mag(_body1->angularVelocity);
-			_speed = _angSpeed * _body1->radius;
-			return linearVelocity = downhillDir * _speed;
-		}
-	}
-	else {
-		// --- free fall ---
-		_body1->vel += _gravity * _time;
-		return linearVelocity = _body1->vel;
-	}
-
-	//return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
-}
 
 Vec3 Scene3p::ComputeLinearVelocity(
     bool onPlane,
@@ -561,6 +539,61 @@ Vec3 Scene3p::ComputeLinearVelocity(
         body->vel += gravity * deltaTime;
         return body->vel;
     }
+}
+
+
+void Scene3p::UpdateLinearVelocity(
+	bool onPlane,
+	Body* body,
+	const Vec3& gravity,
+	const Vec3& downhill,
+	float deltaTime,
+	Vec3& outLinearVelocity)
+{
+	if (onPlane)
+	{
+		if (VMath::mag(downhill) > VERY_SMALL)
+		{
+			Vec3 downhillDir = VMath::normalize(downhill);
+			float angSpeed = VMath::mag(body->angularVelocity);
+			float speed = angSpeed * body->radius;
+
+			outLinearVelocity = downhillDir * speed;
+		}
+		else
+		{
+			outLinearVelocity = Vec3(0.0f, 0.0f, 0.0f);
+		}
+	}
+	else
+	{
+		body->vel += gravity * deltaTime;
+		outLinearVelocity = body->vel;
+	}
+}
+
+
+bool Scene3p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed , const float _time)
+{
+	if (onPlane) {
+		// --- rolling on plane ---
+		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
+		//Vec3 downhill = gravity - gravityNormalComp;
+
+		if (VMath::mag(_downHill) > VERY_SMALL) {
+			Vec3 downhillDir = VMath::normalize(_downHill);
+			_angSpeed = VMath::mag(_body1->angularVelocity);
+			_speed = _angSpeed * _body1->radius;
+			return linearVelocity = downhillDir * _speed;
+		}
+	}
+	else {
+		// --- free fall ---
+		_body1->vel += _gravity * _time;
+		return linearVelocity = _body1->vel;
+	}
+
+	//return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 }
 
 void Scene3p::ApplyAngularDamping(float deltaTime)

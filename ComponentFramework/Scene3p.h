@@ -92,14 +92,25 @@ public:
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
 	
 	/// PHYSICS ---- ROLLING FUNCTIONS
-	Vec3 ComputeRollingVelocity(const Vec3& downhill);
-	bool IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time);
 	Vec3 ComputeLinearVelocity(
 		bool onPlane,
 		Body* body,
 		const Vec3& gravity,
 		const Vec3& downhill,
 		float deltaTime);
+	
+	void UpdateLinearVelocity(
+		bool onPlane,
+		Body* body,
+		const Vec3& gravity,
+		const Vec3& downhill,
+		float deltaTime,
+		Vec3& outLinearVelocity);
+
+	Vec3 ComputeRollingVelocity(const Vec3& downhill);
+	bool IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time);
+	
+	
 	/// ARCADE ---- ANGULAR DAMPNING1
 	void ApplyAngularDamping(float deltaTime);
 
