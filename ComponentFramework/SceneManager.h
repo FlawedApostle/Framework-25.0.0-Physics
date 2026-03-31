@@ -17,6 +17,7 @@ private:
 		SCENE0p = 0,
 		SCENE1p = 1,			// Physics Toruqe Ball Part 2
 		SCENE2p = 2,			// Physics Toruqe Ball Part 3
+		SCENE3p = 3,			// Physics Toruqe Ball Part 3
 	};
 
 	class Scene* currentScene;

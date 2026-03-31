@@ -5,7 +5,7 @@
 #include "Vector.h"
 #include <Matrix.h>
 #include "Quaternion.h"
-#include "Trackball.h"			/// Trackball .. why you scared  ..
+#include "Trackball.h"
 
 using namespace MATH;
 
@@ -19,33 +19,43 @@ class Scene3p : public Scene
 {
 private:
 	bool drawInWireMode;
+	bool drawInNormalsFace;
+	bool drawInNormalsLine = true;
 	Shader* shader;
-	/// Sphere
+	Shader* shader_normals_face;
+	Shader* shader_normals_line;
+	/// SPHERE OG
 	Body* sphereBody;
 	Mesh* sphereMesh;
-	/// Plane
+	Vec3 sphereNormal;
+	/// SPHERE COLLISION
+	Body* sphereCollision0_Body;
+	Mesh* sphereCollision0_Mesh;
+	Vec3 sphereCollision0_Normal;
+	/// PLANE
 	Body* planeBody;
 	Mesh* planeMesh;
 	Vec3  planeNormal;
+
 	/// CAMERA - PHYSICS
 	Vec3 cameraPosition;
 	Quaternion cameraOrientation;
 	Quaternion rotation;
-	/// Graphics
+	/// GRAPHICS
 	Matrix4 projectionMatrix;
 	Matrix4 viewMatrix;
 	Matrix4 modelMatrix;
-	/// TrackBall
+	/// TRACKBALL
 	Trackball* trackball;
-	//Quaternion changeInTrackballOrientation;
+	//	QUATERNION - changeInTrackballOrientation;
 	Quaternion initialTrackballOrientation;
 	Quaternion finalTrackballOrientation;
-	/// HANDLE EVENTS AXIS MOVEMENT
+	/// CONTROLS - AXIS EVENTS - MOVEMENT
 	Vec3 axis_Left = Vec3(0.0f, 0.0f, 1.0f);
 	Vec3 axis_Right = Vec3(0.0f, 0.0f, -1.0f);
 	Vec3 axis_PitchUp = Vec3(-1.0f, 0.0f, 0.0f);
 	Vec3 axis_PitchDown = Vec3(1.0f, 0.0f, 0.0f);
-	
+
 
 
 	/// PHYSICS - Toruqe
@@ -57,22 +67,16 @@ private:
 	Vec3 torque;
 	Vec3 velocityDirection;
 	float velocityMagnitutde;
+	Vec3 linearVelocity;
 
 	/// Uniforms
-	Vec4 SPECULAR[2];
-	Vec4 DIFFUSE[2];
-	Vec4 AMBIENT[2];
-	Vec3 LIGHT_POSITION[2];
-
-	int index_0;
-	int index_1;
+	Vec3 lightPos;
+	float normalScale;
+	float lightPosLoc;
 
 
 public:	/// again this up vector is set public for speed...
 
-	//Texture* mario_main;
-	// Physics 3 equations
-	//Vec3 torqueDir;
 
 public:
 	explicit Scene3p();
@@ -83,8 +87,9 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
+
 };
 
 
-#endif // SCENE2p_P
+#endif // SCENE3p_P
 

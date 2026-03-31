@@ -13,13 +13,11 @@
 #include "Scene7g.h"			// Graphics - Fresnal PT 2
 #include "Scene8g.h"			// Graphics - Tesselation
 /// Physics
-#include "Scene1p.h"			// physics Part 1 ball rolling
-#include "Scene2p.h"			// physics Part 2 ball rolling
-#include "Scene3p.h"			// physics Part 3 ball rolling
+#include "Scene1p.h"			// Rolling Ball at slant
+#include "Scene2p.h"			// Rotation Ball on plane
+#include "Scene3p.h"			// Collisions Ball-to-Ball
 
-/// <HANDLE EVENTS  CHANGED>
-///		NOTE:: CHANGED THE SCENES FROM F5 TO NUMERICAL 5
-/// 
+
 SceneManager::SceneManager(): 
 	currentScene{nullptr}, window{nullptr}, timer{nullptr},
 	fps(60), isRunning{false}, fullScreen{false} {
@@ -46,7 +44,7 @@ SceneManager::~SceneManager() {
 	}
 	
 }
-/// Change which scene to init
+/// ------ CHANGE SCENE
 bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 
 	window = new Window();
@@ -64,12 +62,12 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	/********************************   Default first scene   ***********************/
 	//BuildNewScene(SCENE_NUMBER::SCENE0p);				
 	//BuildNewScene(SCENE_NUMBER::SCENE1p);
-	BuildNewScene(SCENE_NUMBER::SCENE2p);
+	//BuildNewScene(SCENE_NUMBER::SCENE2p);
+	BuildNewScene(SCENE_NUMBER::SCENE3p);
 	/********************************************************************************/
 	return true;
 }
-
-/// THIS RUNS THE WHOLE GAME
+///------ RUNS GAME
 void SceneManager::Run() {
 	timer->Start();
 	isRunning = true;
@@ -107,43 +105,25 @@ void SceneManager::HandleEvents() {
 					"Scene 0p (1) - Physics Baseline\n"
 					"Scene 1p (2) - Ball Rolling\n"
 					"Scene 2p (3) - Ball & Plane \n"
+					"Scene 3p (4) - Collision \n"
 				);
 				break;
 			case SDL_SCANCODE_1:
-				printf("Scene 0p - Graphics Phong Lighting Baseline\n");
+				printf("Scene 0p - BASELINE\n");
 				BuildNewScene(SCENE_NUMBER::SCENE0p);
 				break;
 			case SDL_SCANCODE_2:
-				printf("Scene 1p - Ball Rolling\n");
+				printf("Scene 1p - ROTATIONS - BALL ON SLANT\n");
 				BuildNewScene(SCENE_NUMBER::SCENE1p);
 				break;
 			case SDL_SCANCODE_3:
-				printf("Scene 2p - Ball & Plane\n");
+				printf("Scene 2p - ROTATIONS - BALL ON FLAT PLANE\n");
 				BuildNewScene(SCENE_NUMBER::SCENE2p);
 				break;
-		//	case SDL_SCANCODE_4:	// phong lighting refined pt 1
-		//		printf("Scene 4g - Skull Texture Model Matrix PT0\n");
-		//		BuildNewScene(SCENE_NUMBER::SCENE4g);
-		//		break;
-		//	case SDL_SCANCODE_5:	// Skybox fresnal pt 0
-		//		printf("Scene 5g - Graphics - Skybox TEST\n");
-		//		BuildNewScene(SCENE_NUMBER::SCENE5g);
-		//		break;
-		//	case SDL_SCANCODE_6:	// Skybox Fresnal pt 1 - Assignment (finished)
-		//		printf("Scene 6g - SkyBox Fresnal - Assignemnt (finished)\n");
-		//		BuildNewScene(SCENE_NUMBER::SCENE6g);
-		//		break;
-		//case SDL_SCANCODE_7:		// skybox Water Pt 0
-		//		printf("Scene 7g - SkyBox water pt 0\n");
-		//		BuildNewScene(SCENE_NUMBER::SCENE7g);
-		//		break;	
-		//	case SDL_SCANCODE_8:	// empty
-		//		printf("Scene 8g - Tesselation\n");
-		//		BuildNewScene(SCENE_NUMBER::SCENE8g);
-		//		break;	
-		//	case SDL_SCANCODE_9:
-		//		printf("scancode 9\n");
-		//		break;
+			case SDL_SCANCODE_4:
+				printf("Scene 3p - COLLISIONS - BALL-TO-BALL");
+				BuildNewScene(SCENE_NUMBER::SCENE3p);
+				break;
 
 			default:
 				break;
@@ -178,6 +158,10 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 	case SCENE_NUMBER::SCENE2p:
 		currentScene = new Scene2p();
+		status = currentScene->OnCreate();
+		break;
+	case SCENE_NUMBER::SCENE3p:
+		currentScene = new Scene3p();
 		status = currentScene->OnCreate();
 		break;
 

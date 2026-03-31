@@ -3,20 +3,28 @@
   "WorkspaceRootPath": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene2p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene3p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Body.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene2p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Collision.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Body.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene3p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -25,8 +33,8 @@
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "DockedWidth": 321,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
@@ -36,7 +44,7 @@
               "RelativeDocumentMoniker": "ComponentFramework\\Body.cpp",
               "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp",
               "RelativeToolTip": "ComponentFramework\\Body.cpp",
-              "ViewState": "AgIAAAcAAAAAAAAAAAAiwB4AAAAQAAAAAAAAAA==",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAAwAAAAOAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-03-20T13:16:24.656Z",
               "IsPinned": true,
@@ -44,46 +52,73 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "Scene2p.cpp",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
-              "RelativeDocumentMoniker": "ComponentFramework\\Scene2p.cpp",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.cpp",
-              "RelativeToolTip": "ComponentFramework\\Scene2p.cpp",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAlAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2026-03-20T12:38:38.59Z",
-              "IsPinned": true,
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Scene2p.h",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.h",
-              "RelativeDocumentMoniker": "ComponentFramework\\Scene2p.h",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene2p.h",
-              "RelativeToolTip": "ComponentFramework\\Scene2p.h",
-              "ViewState": "AgIAABgAAAAAAAAAAAAAAEEAAAAUAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-03-20T12:58:18.665Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Body.h",
               "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h",
               "RelativeDocumentMoniker": "ComponentFramework\\Body.h",
               "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h",
               "RelativeToolTip": "ComponentFramework\\Body.h",
-              "ViewState": "AgIAACoAAAAAAAAAAAAAAD4AAAA8AAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-03-20T13:16:25.399Z"
+              "WhenOpened": "2026-03-20T13:16:25.399Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Collision.cpp",
+              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp",
+              "RelativeDocumentMoniker": "ComponentFramework\\Collision.cpp",
+              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp",
+              "RelativeToolTip": "ComponentFramework\\Collision.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-30T20:44:09.521Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Collision.h",
+              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h",
+              "RelativeDocumentMoniker": "ComponentFramework\\Collision.h",
+              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h",
+              "RelativeToolTip": "ComponentFramework\\Collision.h",
+              "ViewState": "AgIAAAMAAAAAAAAAAAAAAA8AAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-03-30T20:41:51.441Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Scene3p.cpp",
+              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp",
+              "RelativeDocumentMoniker": "ComponentFramework\\Scene3p.cpp",
+              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp",
+              "RelativeToolTip": "ComponentFramework\\Scene3p.cpp",
+              "ViewState": "AgIAAF0AAAAAAAAAAAAAAHwAAABLAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2026-03-30T20:07:32.895Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Scene3p.h",
+              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h",
+              "RelativeDocumentMoniker": "ComponentFramework\\Scene3p.h",
+              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h",
+              "RelativeToolTip": "ComponentFramework\\Scene3p.h",
+              "ViewState": "AgIAABAAAAAAAAAAAAAWwB8AAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
+              "WhenOpened": "2026-03-30T21:04:22.689Z",
+              "EditorCaption": ""
             }
           ]
         },
         {
-          "DockedWidth": 200,
+          "DockedWidth": 79,
           "SelectedChildIndex": -1,
           "Children": [
             {
