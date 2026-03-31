@@ -67,7 +67,6 @@ bool Scene3p::OnCreate() {
 	/// Plane
 	planeBody = new Body();
 	planeBody->OnCreate();
-	planeBody->radius = 2.0f;
 	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));
 	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
@@ -129,7 +128,7 @@ bool Scene3p::OnCreate() {
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
 
 	// ----- FIND POINT BETWEEN TWO POSITIONS
-	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
+	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
 
 	return true;
 }
@@ -252,7 +251,12 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 
 void Scene3p::Update(const float deltaTime)
 {
+	// ----- FIND POINT BETWEEN TWO POSITIONS
+	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
+	
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);				/// PLANE NORMAL - MAKE SURE IT MATCHES OnCreate planeNormal(s)
+	
+
 
 	/*
 	// Calculate torqueMag using forceMag * distance to pivot
@@ -307,7 +311,7 @@ void Scene3p::Update(const float deltaTime)
 	velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);
 
 	Vec3 gravity(0.0f, -1.0f, 0.0f);
-	// Project gravity onto plane
+	// Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	Vec3 downhill = gravity - VMath::dot(gravity, planeNormal) * planeNormal;
 
 	if (VMath::mag(downhill) > VERY_SMALL) {
@@ -321,7 +325,11 @@ void Scene3p::Update(const float deltaTime)
 
 	sphereBody->UpdatePos(deltaTime);
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
-	sphereBody->pos -= planeNormal * (planeDist - sphereBody->radius);
+	if (planeDist < sphereBody->radius)
+	{
+		float penetration = sphereBody->radius - planeDist;
+		sphereBody->pos += planeNormal * penetration;
+	}
 
 
 	// Velocity Direction
