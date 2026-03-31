@@ -289,12 +289,12 @@ void Scene3p::Update(const float deltaTime)
 	 weight * distance to pivot 
 	 */
 	torque = VMath::cross(upVector, planeNormal);
-	if(VMath::mag(torque) < VERY_SMALL)
+	if(VMath::mag(torque) > VERY_SMALL)
 	{
 	Vec3 torqueDir = VMath::normalize(torque);
-	//torqueMagnitude = VMath::mag(torque);
-	torqueMagnitude = distanceToPivot * sphereBody->mass; // simple proportional model
-	//torqueMagnitude = torqueMagnitude * distanceToPivot;
+	//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
+	torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
+	//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
 	Vec3 torqueFinal = torqueDir * torqueMagnitude;
 
 	sphereBody->ApplyTourque(torqueFinal);
@@ -313,7 +313,8 @@ void Scene3p::Update(const float deltaTime)
 	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;					// Remove component along plane normal → get tangent component
 	Vec3 downhill = gravity - gravityNormalComp;
 
-	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		// already set to zero in constructor
+	// EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
+	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		
 	/*Vec3 linearVel(0.0f, 0.0f, 0.0f);
 	//linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
 	//velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);  */
@@ -330,7 +331,6 @@ void Scene3p::Update(const float deltaTime)
 	}
 	
 	/// 6. ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
-	//sphereBody->vel = Vec3(0.0f, 0.0f, 0.0f);
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
 	

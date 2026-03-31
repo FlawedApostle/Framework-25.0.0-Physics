@@ -23,7 +23,7 @@ public:	/// public for now
 	Vec3 angularVelocity;
 	Vec3 angularAcceleration;
 	Matrix3 rotationalInertia;
-	float radius = 1.0f; 
+	float radius; 
 
 	Quaternion orientation;
 	//Quaternion position;

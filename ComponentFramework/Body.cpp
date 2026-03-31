@@ -10,19 +10,19 @@
 // aLPHa : is how much rout rotation is spinning fast or slow		- ANGULAR ACCELERATION
 
 Body::Body(): 
-	mesh	{nullptr},
-	texture	{nullptr},
-	upVector{0.0f, 1.0f, 0.0f},
-	pos{}, 
-	vel{}, 
-	accel{}, 
-	mass{1.0f},														// mass set from 0 to 1.0
-	radius{1.0f},
-	rotationalInertia{ },
-	angularAcceleration{},
-	angularVelocity {},
-	displacement {} ,
-	angularDisplacement {}
+	mesh					{nullptr},
+	texture					{nullptr},
+	upVector				{0.0f, 1.0f, 0.0f},
+	pos						{}, 
+	vel						{}, 
+	accel					{}, 
+	mass					{1.0f},		// mass set from 0 to 1.0
+	radius					{1.0f},
+	rotationalInertia		{ },
+	angularAcceleration		{},
+	angularVelocity			{},
+	displacement			{} ,
+	angularDisplacement		{}
 { 
 }
 
