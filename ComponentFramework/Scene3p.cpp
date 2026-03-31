@@ -307,28 +307,28 @@ void Scene3p::Update(const float deltaTime)
 	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
 	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		
 
-	/// ----- GLOBAL ----- SIGNED DISTANCE VARS
+	/// ----- GLOBAL ----- SPHERE ON PLANE
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	const float CONTACT_EPS = 0.01f;
-	//bool onPlane = fabs(planeDist - sphereBody->radius) < CONTACT_EPS;					// DEPRECAED
 	bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
-
+	//bool onPlane = fabs(planeDist - sphereBody->radius) < CONTACT_EPS;					// DEPRECAED
 	
+	// ------ GLOBAL ----- GRAVITY
+	Vec3 gravity(0.0f, -9.8f, 0.0f);
+	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;					// Remove component along plane normal → get tangent component
+	Vec3 downhill = gravity - gravityNormalComp;
+	float angSpeed = VMath::mag(sphereBody->angularVelocity);
+	float speed = angSpeed * sphereBody->radius;
 	
 	/// 5. GRAVITY AND DOWNHILL DIRECTION ON PLANE
 	/* 
 	Remove component along plane normal → get tangent component
 	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
-
-	Vec3 gravity(0.0f, -9.8f, 0.0f);
-	//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;					// Remove component along plane normal → get tangent component
-	//Vec3 downhill = gravity - gravityNormalComp;
-
 	if (onPlane) {
 		// --- rolling on plane ---
-		Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
-		Vec3 downhill = gravity - gravityNormalComp;
+		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
+		//Vec3 downhill = gravity - gravityNormalComp;
 
 		if (VMath::mag(downhill) > VERY_SMALL) {
 			Vec3 downhillDir = VMath::normalize(downhill);
@@ -343,6 +343,8 @@ void Scene3p::Update(const float deltaTime)
 		linearVelocity = sphereBody->vel;
 	}
 
+	//IfOnPlane(onPlane, sphereBody, gravity, downhill, linearVelocity, angSpeed, speed, deltaTime);
+	ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
 
 
 	/*Vec3 linearVel(0.0f, 0.0f, 0.0f);
@@ -351,8 +353,9 @@ void Scene3p::Update(const float deltaTime)
 
 
 	// OLD CODE LOOP
+	//ComputeRollingVelocity(downhill);
 	/*
-	if (VMath::mag(downhill) > VERY_SMALL) 
+	if (VMath::mag(downhill) > VERY_SMALL)
 	{
 		Vec3 downhillDir = VMath::normalize(downhill);
 		
@@ -493,20 +496,78 @@ void Scene3p::Render() const {
 
 
 /// ----- SIGNED DISTANCE FUNCTIONS
-Vec3 Scene3p::SignedDistance_0(Vec3 D)
+Vec3 Scene3p::ComputeRollingVelocity(const Vec3& downhill)
 {
 
-	// OLD CODE LOOP
-if (VMath::mag(D) > VERY_SMALL)
+	if (VMath::mag(downhill) > VERY_SMALL)
+	{
+		Vec3 downhillDir = VMath::normalize(downhill);
+		float angSpeed = VMath::mag(sphereBody->angularVelocity);
+		float speed = angSpeed * sphereBody->radius;
+
+		return linearVelocity =  downhillDir * speed;
+	}
+
+	return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
+}
+
+
+
+bool Scene3p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed , const float _time)
 {
-	Vec3 downhillDir = VMath::normalize(D);
+	if (onPlane) {
+		// --- rolling on plane ---
+		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
+		//Vec3 downhill = gravity - gravityNormalComp;
 
-	// Rolling without slipping: v = ω × R (approx using |ω| * R along downhill)
-	float angSpeed = VMath::mag(sphereBody->angularVelocity);
-	float speed = angSpeed * sphereBody->radius;
+		if (VMath::mag(_downHill) > VERY_SMALL) {
+			Vec3 downhillDir = VMath::normalize(_downHill);
+			_angSpeed = VMath::mag(_body1->angularVelocity);
+			_speed = _angSpeed * _body1->radius;
+			return linearVelocity = downhillDir * _speed;
+		}
+	}
+	else {
+		// --- free fall ---
+		_body1->vel += _gravity * _time;
+		return linearVelocity = _body1->vel;
+	}
 
-	return linearVelocity = downhillDir * speed;
+	//return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 }
 
+Vec3 Scene3p::ComputeLinearVelocity(
+    bool onPlane,
+    Body* body,
+    const Vec3& gravity,
+    const Vec3& downhill,
+    float deltaTime)
+{
+    if (onPlane)
+    {
+        if (VMath::mag(downhill) > VERY_SMALL)
+        {
+            Vec3 downhillDir = VMath::normalize(downhill);
+            float angSpeed = VMath::mag(body->angularVelocity);
+            float speed = angSpeed * body->radius;
+
+            return downhillDir * speed;
+        }
+
+        return Vec3(0.0f, 0.0f, 0.0f);
+    }
+    else
+    {
+        body->vel += gravity * deltaTime;
+        return body->vel;
+    }
 }
+
+void Scene3p::ApplyAngularDamping(float deltaTime)
+{
+	const float damping = 0.95f; // 0.0 = instant stop, 1.0 = no damping
+	sphereBody->angularVelocity *= damping;
+}
+
+
 

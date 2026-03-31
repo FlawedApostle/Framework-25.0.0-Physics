@@ -90,11 +90,28 @@ public:
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
-	/// ----- SIGNED DISTANCE FUNCTIONS
-	Vec3 SignedDistance_0(Vec3 D);
+	
+	/// PHYSICS ---- ROLLING FUNCTIONS
+	Vec3 ComputeRollingVelocity(const Vec3& downhill);
+	bool IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time);
+	Vec3 ComputeLinearVelocity(
+		bool onPlane,
+		Body* body,
+		const Vec3& gravity,
+		const Vec3& downhill,
+		float deltaTime);
+	/// ARCADE ---- ANGULAR DAMPNING1
+	void ApplyAngularDamping(float deltaTime);
 
-};
 
 
+
+
+
+
+};		
 #endif // SCENE3p_P
+
+
+
 
