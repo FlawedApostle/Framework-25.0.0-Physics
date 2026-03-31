@@ -289,8 +289,7 @@ void Scene3p::Update(const float deltaTime)
 	 weight * distance to pivot 
 	 */
 	torque = VMath::cross(upVector, planeNormal);
-	if(VMath::mag(torque) > VERY_SMALL)
-	{
+	if(VMath::mag(torque) > VERY_SMALL) {
 	Vec3 torqueDir = VMath::normalize(torque);
 	//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
 	torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
@@ -303,22 +302,56 @@ void Scene3p::Update(const float deltaTime)
 	/// 4. UPDATE ANGULAR MOTION
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime);													// Change the orientation using quaternion.
+	
+	
+	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
+	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		
 
+	/// ----- GLOBAL ----- SIGNED DISTANCE VARS
+	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	const float CONTACT_EPS = 0.01f;
+	//bool onPlane = fabs(planeDist - sphereBody->radius) < CONTACT_EPS;					// DEPRECAED
+	bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
+
+	
+	
 	/// 5. GRAVITY AND DOWNHILL DIRECTION ON PLANE
 	/* 
 	Remove component along plane normal → get tangent component
 	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
-	Vec3 gravity(0.0f, -9.8f, 0.0f);
-	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;					// Remove component along plane normal → get tangent component
-	Vec3 downhill = gravity - gravityNormalComp;
 
-	// EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
-	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		
+	Vec3 gravity(0.0f, -9.8f, 0.0f);
+	//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;					// Remove component along plane normal → get tangent component
+	//Vec3 downhill = gravity - gravityNormalComp;
+
+	if (onPlane) {
+		// --- rolling on plane ---
+		Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
+		Vec3 downhill = gravity - gravityNormalComp;
+
+		if (VMath::mag(downhill) > VERY_SMALL) {
+			Vec3 downhillDir = VMath::normalize(downhill);
+			float angSpeed = VMath::mag(sphereBody->angularVelocity);
+			float speed = angSpeed * sphereBody->radius;
+			linearVelocity = downhillDir * speed;
+		}
+	}
+	else {
+		// --- free fall ---
+		sphereBody->vel += gravity * deltaTime;
+		linearVelocity = sphereBody->vel;
+	}
+
+
+
 	/*Vec3 linearVel(0.0f, 0.0f, 0.0f);
 	//linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
 	//velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);  */
 
+
+	// OLD CODE LOOP
+	/*
 	if (VMath::mag(downhill) > VERY_SMALL) 
 	{
 		Vec3 downhillDir = VMath::normalize(downhill);
@@ -329,13 +362,16 @@ void Scene3p::Update(const float deltaTime)
 
 		linearVelocity = downhillDir * speed;
 	}
-	
+	*/
+
+
+
 	/// 6. ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
 	
 	/// 7. PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
-	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	if (planeDist < sphereBody->radius)
 	{
 		float penetration = sphereBody->radius - planeDist;
@@ -455,4 +491,22 @@ void Scene3p::Render() const {
 
 
 
+
+/// ----- SIGNED DISTANCE FUNCTIONS
+Vec3 Scene3p::SignedDistance_0(Vec3 D)
+{
+
+	// OLD CODE LOOP
+if (VMath::mag(D) > VERY_SMALL)
+{
+	Vec3 downhillDir = VMath::normalize(D);
+
+	// Rolling without slipping: v = ω × R (approx using |ω| * R along downhill)
+	float angSpeed = VMath::mag(sphereBody->angularVelocity);
+	float speed = angSpeed * sphereBody->radius;
+
+	return linearVelocity = downhillDir * speed;
+}
+
+}
 
