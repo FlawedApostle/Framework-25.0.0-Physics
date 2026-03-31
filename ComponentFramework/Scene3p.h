@@ -58,13 +58,16 @@ private:
 
 
 
-	/// PHYSICS - Toruqe
+	/// ANGLE
 	Vec3 upVector;				/// Up Vector - for rolling the ball
 	float angle;
 	float distancetoPivot;		/// force of the ball 
+	// TORQUE
 	float torqueMagnitude;		/// speed of the ball 
 	Vec3 torqueDirection;		/// direction of the ball
 	Vec3 torque;
+	//Vec3 torqueDir;			// for update scene3.p
+	// VELOCITY
 	Vec3 velocityDirection;
 	float velocityMagnitutde;
 	Vec3 linearVelocity;

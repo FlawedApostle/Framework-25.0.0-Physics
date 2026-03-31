@@ -1,4 +1,88 @@
-﻿  Scene3p.cpp
+﻿  Body.cpp
   This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
   This questionable: Vec4 inverse(const Vec4& v)
-  ComponentFramework.vcxproj -> E:\Documents\GithubDir\Framework-25.0.0-Physics\Debug\ComponentFramework.exe
+  Camera.cpp
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Body.cpp(49,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Body.cpp(50,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Collision.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Debug.cpp
+  Mesh.cpp
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\tiny_obj_loader.h(1665,27): warning C4018: '<': signed/unsigned mismatch
+  (compiling source file 'Mesh.cpp')
+  
+  Scene0p.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene1g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene1p.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene1p.cpp(50,28): warning C4305: 'argument': truncation from 'double' to 'float'
+  Scene2g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene2g.cpp(77,20): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene2g.cpp(83,30): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene2g.cpp(89,25): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene2g.cpp(95,30): warning C4305: 'argument': truncation from 'double' to 'float'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene2g.cpp(95,25): warning C4305: 'argument': truncation from 'double' to 'float'
+  Scene2p.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene3g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene3p.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene4g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene4g.cpp(43,11): warning C4305: 'argument': truncation from 'double' to 'const float'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene4g.cpp(44,25): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene4g.cpp(49,11): warning C4305: 'argument': truncation from 'double' to 'const float'
+  Scene5g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene6g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene7g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Scene8g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene8g.cpp(168,27): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene8g.cpp(168,21): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Scene8g.cpp(168,15): warning C4305: 'argument': truncation from 'double' to 'GLclampf'
+  SceneManager.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Main.cpp
+  Scene0g.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+  Generating Code...
+  Compiling...
+  Shader.cpp
+  Noise.cpp
+  SkyBox.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\SkyBox.cpp(81,14): warning C4101: 'textureSurface': unreferenced local variable
+  Texture.cpp
+  Timer.cpp
+  Trackball.cpp
+  This is wrong: Vec4 cross(const Vec4& a, const Vec4& b)
+  This questionable: Vec4 inverse(const Vec4& v)
+C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\ComponentFramework\Trackball.cpp(57,14): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Window.cpp
+  Generating Code...
+  ComponentFramework.vcxproj -> C:\Users\JJaks\Documents\GitHubDir\Framework-25.0.0-Physics\Debug\ComponentFramework.exe

@@ -1,30 +1,30 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\",
+  "WorkspaceRootPath": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene3p.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Scene3p.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Body.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Collision.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Collision.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Body.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{614C2865-E38B-423B-8A72-E9D57BC43A73}|ComponentFramework\\ComponentFramework.vcxproj|solutionrelative:ComponentFramework\\Body.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     }
   ],
   "DocumentGroupContainers": [
@@ -38,11 +38,11 @@
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "Body.cpp",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp",
+              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp",
               "RelativeDocumentMoniker": "ComponentFramework\\Body.cpp",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp",
+              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.cpp",
               "RelativeToolTip": "ComponentFramework\\Body.cpp",
               "ViewState": "AgIAACUAAAAAAAAAAAAAAEsAAAAtAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
@@ -50,23 +50,24 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 2,
               "Title": "Body.h",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h",
+              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h",
               "RelativeDocumentMoniker": "ComponentFramework\\Body.h",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h",
+              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Body.h",
               "RelativeToolTip": "ComponentFramework\\Body.h",
-              "ViewState": "AgIAAAMAAAAAAAAAAAAAABEAAAAMAAAAAAAAAA==",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAABEAAAAMAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2026-03-31T12:07:07.847Z"
+              "WhenOpened": "2026-03-31T12:07:07.847Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "Collision.cpp",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp",
+              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp",
               "RelativeDocumentMoniker": "ComponentFramework\\Collision.cpp",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp",
+              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.cpp",
               "RelativeToolTip": "ComponentFramework\\Collision.cpp",
               "ViewState": "AgIAABUAAAAAAAAAAAAswCgAAAACAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
@@ -74,11 +75,11 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "Collision.h",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h",
+              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h",
               "RelativeDocumentMoniker": "ComponentFramework\\Collision.h",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h",
+              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Collision.h",
               "RelativeToolTip": "ComponentFramework\\Collision.h",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAAXAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
@@ -88,11 +89,11 @@
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "Scene3p.cpp",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp",
+              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp",
               "RelativeDocumentMoniker": "ComponentFramework\\Scene3p.cpp",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp",
+              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.cpp",
               "RelativeToolTip": "ComponentFramework\\Scene3p.cpp",
-              "ViewState": "AgIAADEBAAAAAAAAAAAcwEwBAAAUAAAAAAAAAA==",
+              "ViewState": "AgIAAEwBAAAAAAAAAAAgwGwBAAALAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-03-30T20:07:32.895Z",
               "EditorCaption": ""
@@ -101,24 +102,14 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "Scene3p.h",
-              "DocumentMoniker": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h",
+              "DocumentMoniker": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h",
               "RelativeDocumentMoniker": "ComponentFramework\\Scene3p.h",
-              "ToolTip": "E:\\Documents\\GithubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h",
+              "ToolTip": "C:\\Users\\JJaks\\Documents\\GitHubDir\\Framework-25.0.0-Physics\\ComponentFramework\\Scene3p.h",
               "RelativeToolTip": "ComponentFramework\\Scene3p.h",
-              "ViewState": "AgIAABMAAAAAAAAAAAAWwCAAAAAcAAAAAAAAAA==",
+              "ViewState": "AgIAADIAAAAAAAAAAAAWwEQAAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
               "WhenOpened": "2026-03-30T21:04:22.689Z",
               "EditorCaption": ""
-            }
-          ]
-        },
-        {
-          "DockedWidth": 79,
-          "SelectedChildIndex": -1,
-          "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{d78612c7-9962-4b83-95d9-268046dad23a}"
             }
           ]
         }

@@ -1,4 +1,4 @@
-#include <glew.h>
+﻿#include <glew.h>
 #include <iostream>
 #include <SDL.h>
 #include "Scene3p.h"			/// scene3p.h
@@ -254,76 +254,87 @@ void Scene3p::Update(const float deltaTime)
 	// ----- FIND POINT BETWEEN TWO POSITIONS
 	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
 	
-	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);				/// PLANE NORMAL - MAKE SURE IT MATCHES OnCreate planeNormal(s)
-	
-
-
-	/*
-	// Calculate torqueMag using forceMag * distance to pivot
-	// The force is the weight of the sphere
-	// The distance to the pivot relies on the angle
-	// between the weight and the normal
-	*/
-
-	/// ROTATION , BEGIN ROTATION
-	// UpVector is set in INIT - it is a const , should it be ?
-	// we know the perpendicular distance between pivot and force
-	/*
-	// Set the upVector
-	// Get the cos(angle) - planeNormal DOT up = cos(angle)
-	// Get perpendicular distance between pivot & force
-	// force = torqueMagnitude
-	// pivot is the upVector || is it the planeNormal
-	*/
+	/// 1. Recompute plane normal from orientation
+	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
+	planeNormal = VMath::normalize(planeNormal);
+	/// 2.
 	upVector = { 0.0f,1.0f,0.0f };																// GENERATE UPVECTOR ----- MORE RESPOSNIVE ??
-	float cosTheta = VMath::dot(planeNormal, upVector);											// ----- ANGULAR ACCELERATION ------ FIND the angle between PLANE normal and UPVECTOR to distinguish angular acceleration
+
+	/// 3. TORQUE - ROTATION , BEGIN ROTATION
+	/*  UpVector is set in INIT - it is a const , should it be ?
+	 we know the perpendicular distance between pivot and force
+	 ----- ANGULAR ACCELERATION 
+	 ------ FIND the angle between PLANE normal and UPVECTOR to distinguish angular acceleration
+	 Set the upVector
+	 Get the cos(angle) - planeNormal DOT up = cos(angle)
+	 Get perpendicular distance between pivot & force
+	 force = torqueMagnitude
+	 pivot is the upVector || is it the planeNormal
+
+	 Calculate torqueMag using forceMag * distance to pivot
+	 The force is the weight of the sphere
+	 The distance to the pivot relies on the angle
+	 between the weight and the normal
+	*/
+	float cosTheta = VMath::dot(planeNormal, upVector);
+	//cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
 	float theta = acos(cosTheta);
 	float distanceToPivot = sphereBody->radius * sin(theta);
 
-	//float heightAbovePlane = sphereBody->radius;
-	//sphereBody->pos = planeBody->pos + (planeNormal * heightAbovePlane);
-
-	/// DIRECTION , FIND DIRECTION USING CROSS PRODUCT
+	/// AXIS OF ROTATION : UP x NORMAL
 	/* Find mag of torque
-	// find axis of rotation
-	// torque = (UP CROSS planeNormal)
-	// torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
-	// weight * distance to pivot */
+	 find axis of rotation
+	 torque = (UP CROSS planeNormal)
+	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
+	 weight * distance to pivot 
+	 */
 	torque = VMath::cross(upVector, planeNormal);
+	if(VMath::mag(torque) < VERY_SMALL)
+	{
 	Vec3 torqueDir = VMath::normalize(torque);
-	torqueMagnitude = VMath::mag(torque);
-	torqueMagnitude = torqueMagnitude * distanceToPivot;
+	//torqueMagnitude = VMath::mag(torque);
+	torqueMagnitude = distanceToPivot * sphereBody->mass; // simple proportional model
+	//torqueMagnitude = torqueMagnitude * distanceToPivot;
 	Vec3 torqueFinal = torqueDir * torqueMagnitude;
 
-	// --------- DEBUG
-	/*if (VMath::mag(torqueFinal) > 0.001f) {
-		// If this prints, the ball SHOULD be rolling.
-		 printf("Torque detected! %f\n", VMath::mag(torqueFinal));
-	}*/
-
-	/// BALL MOVING
 	sphereBody->ApplyTourque(torqueFinal);
+	}
+
+	/// 4. UPDATE ANGULAR MOTION
 	sphereBody->UpdateAngularVelocity(deltaTime);
-	sphereBody->UpdateOrientation(deltaTime);													/// Change the orientation using quaternion.
+	sphereBody->UpdateOrientation(deltaTime);													// Change the orientation using quaternion.
 
+	/// 5. GRAVITY AND DOWNHILL DIRECTION ON PLANE
+	/* 
+	Remove component along plane normal → get tangent component
+	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
+	*/
+	Vec3 gravity(0.0f, -9.8f, 0.0f);
+	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;					// Remove component along plane normal → get tangent component
+	Vec3 downhill = gravity - gravityNormalComp;
 
-	linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
-	velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);
+	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		// already set to zero in constructor
+	/*Vec3 linearVel(0.0f, 0.0f, 0.0f);
+	//linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
+	//velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);  */
 
-	Vec3 gravity(0.0f, -1.0f, 0.0f);
-	// Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
-	Vec3 downhill = gravity - VMath::dot(gravity, planeNormal) * planeNormal;
+	if (VMath::mag(downhill) > VERY_SMALL) 
+	{
+		Vec3 downhillDir = VMath::normalize(downhill);
+		
+		// Rolling without slipping: v = ω × R (approx using |ω| * R along downhill)
+		float angSpeed = VMath::mag(sphereBody->angularVelocity);
+		float speed = angSpeed * sphereBody->radius;
 
-	if (VMath::mag(downhill) > VERY_SMALL) {
-		Vec3 direction = VMath::normalize(downhill);
-		float speed = VMath::mag(sphereBody->angularVelocity) * sphereBody->radius;
-		sphereBody->vel = direction * speed;
+		linearVelocity = downhillDir * speed;
 	}
-	else {
-		sphereBody->vel = Vec3(0.0f, 0.0f, 0.0f);
-	}
-
+	
+	/// 6. ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
+	//sphereBody->vel = Vec3(0.0f, 0.0f, 0.0f);
+	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
+	
+	/// 7. PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	if (planeDist < sphereBody->radius)
 	{
@@ -331,13 +342,14 @@ void Scene3p::Update(const float deltaTime)
 		sphereBody->pos += planeNormal * penetration;
 	}
 
+	// ------ Remove any velocity that pushes away from the plane (one‑way valve)
+	float vdot = VMath::dot(sphereBody->vel, planeNormal);
+	if (vdot > 0.0f) {
+		sphereBody->vel -= planeNormal * vdot;
+	}
 
-	// Velocity Direction
-	/* - velocityDirection = angularVelocityDirection CROSS planeNormal
-	// - set the sphereBody velocity to velocityMagnitude * velocityDirection mag is the speed , velocity is the direction */
 
-
-	// TRACKBALL - SYNTHETIC CAMERA - [Starting camera position]
+	// ------ TRACKBALL - SYNTHETIC CAMERA - [Starting camera position]
 	//cameraPosition = cameraPosition - sphereBody->pos;
 	cameraPosition = cameraPosition - planeBody->pos;
 
@@ -350,11 +362,9 @@ void Scene3p::Update(const float deltaTime)
 	cameraOrientation *= changeInTrackballOrientation;
 	cameraPosition = QMath::rotate(cameraPosition, changeInTrackballOrientation);
 
-
-	/// MATRIX
+	/// ----- MATRIX
 	Matrix4 T = MMath::translate(cameraPosition);
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);
-	// will place at the origin
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
 
 
@@ -384,7 +394,7 @@ void Scene3p::Render() const {
 	}
 
 	// ============================
-	// PASS 1 � BASE GEOMETRY
+	// PASS 1 — BASE GEOMETRY
 	// ============================
 
 	if (drawInNormalsFace) {
@@ -420,7 +430,7 @@ void Scene3p::Render() const {
 
 	}
 	// ============================
-	// PASS 2 � NORMAL LINES
+	// PASS 2 — NORMAL LINES
 	// ============================
 
 	if (drawInNormalsLine) {
