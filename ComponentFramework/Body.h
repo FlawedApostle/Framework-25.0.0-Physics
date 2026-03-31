@@ -15,7 +15,7 @@ class Body {
 public:
     Body();
     ~Body();
-public:	/// making Physics public for now, cause I want to get it done....howver yuck !!
+public:	/// public for now
 	Vec3 pos;
 	Vec3 vel;
 	Vec3 accel;

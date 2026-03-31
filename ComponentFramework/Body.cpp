@@ -10,8 +10,8 @@
 // aLPHa : is how much rout rotation is spinning fast or slow		- ANGULAR ACCELERATION
 
 Body::Body(): 
-	mesh{nullptr},
-	texture{nullptr},
+	mesh	{nullptr},
+	texture	{nullptr},
 	upVector{0.0f, 1.0f, 0.0f},
 	pos{}, 
 	vel{}, 
@@ -46,8 +46,8 @@ void Body::ApplyTourque(Vec3 Torque)
 	 Hollow sphere = I = 2/3(mass * radi) ^ 2			 2 / 3 = 0.666667
 	 Solid sphere =  I = 2/5(mass * radi) ^ 2			 2 / 5 = 0.4													*/
 	
-	float Svalue = 0.6666667 * mass * (radius * radius);
-	float Hvalue = 0.4 * mass * (radius * radius);
+	float Svalue = 0.6666667 * mass * (radius * radius);						// SOLID
+	float Hvalue = 0.4 * mass * (radius * radius);								// HOLLOW
 	rotationalInertia[0] = Svalue;		rotationalInertia[1] = 0.0f;		rotationalInertia[2] = 0.0f;
 	rotationalInertia[3] = 0.0f;		rotationalInertia[4] = Svalue;		rotationalInertia[5] = 0.0f;
 	rotationalInertia[6] = 0.0f;		rotationalInertia[7] = 0.0f;		rotationalInertia[8] = Svalue;

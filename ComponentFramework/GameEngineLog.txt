@@ -1,6 +1,6 @@
-Mon Mar 30 20:55:24 2026
+Tue Mar 31 08:55:33 2026
 [INFO]: Starting the SceneManager
-[INFO]: OpenGL version: 4.6.0 NVIDIA 591.74
+[INFO]: OpenGL version: 4.6.0 NVIDIA 591.86
 [INFO]: Graphics card vendor NVIDIA Corporation
 [INFO]: Graphics card name NVIDIA GeForce RTX 3060/PCIe/SSE2
 [INFO]: GLSL Version 4.60 NVIDIA

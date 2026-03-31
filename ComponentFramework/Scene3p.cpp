@@ -72,7 +72,7 @@ bool Scene3p::OnCreate() {
 	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
 
-	/// Sphere
+	/// Sphere 1.
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
 	sphereBody = new Body();
 	sphereBody->OnCreate();
@@ -80,16 +80,25 @@ bool Scene3p::OnCreate() {
 	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 1.0f);										// starts at 0 for rest
 	sphereBody->radius = 1;
 	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
+	
+	/// sphere .2 - COLLISIONS
+	sphereCollision0_Body = new Body();
+	sphereCollision0_Body->OnCreate();
+	sphereCollision0_Body->pos = Vec3(0.0f, 1.0, 0.0f);
+
 
 	// ----- 3D
 	// PLANE
 	planeMesh = new Mesh("meshes/Plane.obj");
 	planeMesh->OnCreate();
-	// SPHERE
+	// SPHERE 1.
 	sphereMesh = new Mesh("meshes/Sphere.obj");
 	sphereMesh->OnCreate();
+	// SPHERE 2.
+	sphereCollision0_Mesh = new Mesh("meshes/Sphere.obj");
+	sphereCollision0_Mesh->OnCreate();
 
-	/// ----- SHADER 1.
+	/// ----- SHADER 1. ---- DEFAULT.
 	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
 	shader->CheckShader(shader);										// added shader CHECK function to Shader.h
 	
@@ -108,7 +117,7 @@ bool Scene3p::OnCreate() {
 
 	
 	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 15.0f);
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 25.0f);
 	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 	
 	// ----- CAMERA
@@ -120,9 +129,7 @@ bool Scene3p::OnCreate() {
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
 
 	// ----- FIND POINT BETWEEN TWO POSITIONS
-	Vec2 p1 = Vec2(2, 2);
-	Vec2 p2 = Vec2(4, 4);
-	std::cout << Collision::SphereSphereCollisionDetected_test(p1, p2) <<"\n";
+	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
 
 	return true;
 }
@@ -130,11 +137,16 @@ bool Scene3p::OnCreate() {
 // DESTROY
 void Scene3p::OnDestroy() {
 	Debug::Info("Deleting assets Scene3p: ", __FILE__, __LINE__);
-	/// sphere
+	/// sphere 1.
 	sphereBody->OnDestroy();
 	delete sphereBody;
 	sphereMesh->OnDestroy();
 	delete sphereMesh;
+	/// Sphere 2.
+	sphereCollision0_Body->OnDestroy();
+	delete sphereCollision0_Body;
+	sphereCollision0_Mesh->OnDestroy();
+	delete sphereCollision0_Mesh;
 	/// plane
 	planeBody->OnDestroy();
 	delete planeBody;
@@ -145,10 +157,8 @@ void Scene3p::OnDestroy() {
 	/// ----------- SHADERS
 	shader->OnDestroy();
 	delete shader;									// Shader 1
-
 	shader_normals_face->OnDestroy();				// Shader 2
 	delete shader_normals_face;
-
 	shader_normals_line->OnDestroy();				// Shader 3
 	delete shader_normals_line;
 }
@@ -314,12 +324,12 @@ void Scene3p::Update(const float deltaTime)
 	sphereBody->pos -= planeNormal * (planeDist - sphereBody->radius);
 
 
-	/* Velocity Direction
-	// - velocityDirection = angularVelocityDirection CROSS planeNormal
+	// Velocity Direction
+	/* - velocityDirection = angularVelocityDirection CROSS planeNormal
 	// - set the sphereBody velocity to velocityMagnitude * velocityDirection mag is the speed , velocity is the direction */
 
 
-	// TRACKBALL - SYNTHETIC CAMERA - Starting camera position
+	// TRACKBALL - SYNTHETIC CAMERA - [Starting camera position]
 	//cameraPosition = cameraPosition - sphereBody->pos;
 	cameraPosition = cameraPosition - planeBody->pos;
 
@@ -392,9 +402,13 @@ void Scene3p::Render() const {
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
 		planeMesh->Render(GL_TRIANGLES);
 
-		// SPHERE
+		// SPHERE 1. ---- DEFAULT
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
 		sphereMesh->Render(GL_TRIANGLES);
+
+		// SPEHERE 2. - COLLISION
+		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereCollision0_Body->getModelMatrix());
+		sphereCollision0_Mesh->Render(GL_TRIANGLES);
 
 	}
 	// ============================
