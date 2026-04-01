@@ -107,6 +107,8 @@ public:
 		float deltaTime,
 		Vec3& outLinearVelocity);
 
+	Vec3 ComputeRollingVelocity_Cross(const Vec3& planeNormal);
+
 	Vec3 ComputeRollingVelocity(const Vec3& downhill);
 	bool IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time);
 	

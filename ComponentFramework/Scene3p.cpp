@@ -320,11 +320,24 @@ void Scene3p::Update(const float deltaTime)
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
 	
-	/// 5. GRAVITY AND DOWNHILL DIRECTION ON PLANE
+	/// 5. ROTATION - ANGULAR ACCELERATION / VELOCITY
 	/* 
 	Remove component along plane normal → get tangent component
 	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
+	if (onPlane)
+	{
+		linearVelocity = ComputeRollingVelocity_Cross(planeNormal);
+	}
+	else
+	{
+		sphereBody->vel += gravity * deltaTime;
+		linearVelocity = sphereBody->vel;
+	}
+
+
+	// DEPRECATED LOOP 2. 
+	/*
 	if (onPlane) {
 		// --- rolling on plane ---
 		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
@@ -342,17 +355,15 @@ void Scene3p::Update(const float deltaTime)
 		sphereBody->vel += gravity * deltaTime;
 		linearVelocity = sphereBody->vel;
 	}
+	*/
 
+
+	/// ------------- LOOP FUNCTIONS 1 , 2
 	//IfOnPlane(onPlane, sphereBody, gravity, downhill, linearVelocity, angSpeed, speed, deltaTime);
-	ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
+	//ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
 
 
-	/*Vec3 linearVel(0.0f, 0.0f, 0.0f);
-	//linearVelocity = sphereBody->angularVelocity * sphereBody->radius;
-	//velocityMagnitutde = VMath::mag(linearVelocity * sphereBody->radius);  */
-
-
-	// OLD CODE LOOP
+	// DEPRECATED LOOP 1. 
 	//ComputeRollingVelocity(downhill);
 	/*
 	if (VMath::mag(downhill) > VERY_SMALL)
@@ -495,7 +506,7 @@ void Scene3p::Render() const {
 
 
 
-/// ----- SIGNED DISTANCE FUNCTIONS
+/// ----- Linear Velocity
 Vec3 Scene3p::ComputeRollingVelocity(const Vec3& downhill)
 {
 
@@ -572,6 +583,17 @@ void Scene3p::UpdateLinearVelocity(
 	}
 }
 
+
+Vec3 Scene3p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
+{
+	// Contact vector (center → contact point)
+	Vec3 r = planeNormal * sphereBody->radius;
+
+	// True rolling velocity
+	Vec3 v = VMath::cross(sphereBody->angularVelocity, r);
+
+	return v;
+}
 
 bool Scene3p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed , const float _time)
 {
