@@ -1,6 +1,7 @@
+#pragma once
 //#pragma once
-#ifndef SCENE3p_H
-#define SCENE3p_H
+#ifndef SCENE4p_H
+#define SCENE4p_H
 #include "Scene.h"
 #include "Vector.h"
 #include <Matrix.h>
@@ -15,7 +16,7 @@ class Body;
 class Mesh;
 class Shader;
 
-class Scene3p : public Scene
+class Scene4p : public Scene
 {
 private:
 	bool drawInWireMode;
@@ -82,15 +83,15 @@ public:	/// again this up vector is set public for speed...
 
 
 public:
-	explicit Scene3p();
-	virtual ~Scene3p();
+	explicit Scene4p();
+	virtual ~Scene4p();
 
 	virtual bool OnCreate() override;
 	virtual void OnDestroy() override;
 	virtual void Update(const float deltaTime) override;
 	virtual void Render() const override;
 	virtual void HandleEvents(const SDL_Event& sdlEvent) override;
-	
+
 	/// ----- LINEAR VELOCITY -- THESE SHOULD BE IN BODY
 	Vec3 ComputeRollingVelocity_Cross(const Vec3& planeNormal);
 	Vec3 ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt);
@@ -119,8 +120,8 @@ public:
 		float deltaTime,
 		Vec3& outLinearVelocity);
 
-};		
-#endif // SCENE3p_P
+};
+#endif // SCENE4p_P
 
 
 

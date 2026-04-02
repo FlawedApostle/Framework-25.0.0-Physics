@@ -1,7 +1,7 @@
 ﻿#include <glew.h>
 #include <iostream>
 #include <SDL.h>
-#include "Scene3p.h"			/// scene3p.h
+#include "Scene4p.h"			/// scene3p.h
 #include <MMath.h>
 #include "Debug.h"
 #include "Mesh.h"
@@ -15,129 +15,45 @@
 /// Notes are Written in Repo Jargon - check NOTES_PHYSICS FOR FORMULA BREAKDOWNS
 
 
-Scene3p::Scene3p() :
+Scene4p::Scene4p() :
 
-	  drawInWireMode			{ false }
-	, drawInNormalsFace			{ false }
-	, drawInNormalsLine			{ false }
-	, shader					{ nullptr }
-	, shader_normals_face		{ nullptr }
-	, shader_normals_line		{ nullptr }
-	, sphereMesh				{ nullptr }
-	, sphereBody				{ nullptr }
-	, planeBody					{ nullptr }
-	, planeMesh					{ nullptr }
-	, sphereCollision0_Body		{ nullptr }
-	, sphereCollision0_Mesh		{ nullptr }
-	, sphereCollision0_Normal	{ 0,0,0 }
-	, trackball					{ nullptr }
-	, distancetoPivot			{ NULL  }
-	, torqueMagnitude			{ NULL	}
-	, angle						{ NULL }
-	, velocityMagnitutde		{ NULL }
-	, normalScale				{ NULL }
-	, lightPosLoc				{ NULL }
-	, torqueDirection			{ 0,0,0 }
-	, torque					{ 0,0,0 }
-	, velocityDirection			{ 0,0,0 }
-	, linearVelocity			{ 0,0,0 }
-	, planeNormal				{ 0,1,0 }
-	, upVector					{ 0.0f,1.0f,0.0f }
-	
+	drawInWireMode{ false }
+	, drawInNormalsFace{ false }
+	, drawInNormalsLine{ false }
+	, shader{ nullptr }
+	, shader_normals_face{ nullptr }
+	, shader_normals_line{ nullptr }
+	, sphereMesh{ nullptr }
+	, sphereBody{ nullptr }
+	, planeBody{ nullptr }
+	, planeMesh{ nullptr }
+	, sphereCollision0_Body{ nullptr }
+	, sphereCollision0_Mesh{ nullptr }
+	, sphereCollision0_Normal{ 0,0,0 }
+	, trackball{ nullptr }
+	, distancetoPivot{ NULL }
+	, torqueMagnitude{ NULL }
+	, angle{ NULL }
+	, velocityMagnitutde{ NULL }
+	, normalScale{ NULL }
+	, lightPosLoc{ NULL }
+	, torqueDirection{ 0,0,0 }
+	, torque{ 0,0,0 }
+	, velocityDirection{ 0,0,0 }
+	, linearVelocity{ 0,0,0 }
+	, planeNormal{ 0,1,0 }
+	, upVector{ 0.0f,1.0f,0.0f }
+
 {
 	Debug::Info("Created Scene3p: ", __FILE__, __LINE__);
 }
-Scene3p::~Scene3p()
+Scene4p::~Scene4p()
 {
 	Debug::Info("Deleted Scene3p: ", __FILE__, __LINE__);
 }
 
-bool Scene3p::OnCreate() {
-	Debug::Info("Loading assets Scene3p: ", __FILE__, __LINE__);
-	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
-	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
-
-	/// Trackball
-	trackball = new Trackball();
-
-	/// UNIFORMS
-	lightPos = Vec3(10.0f, 10.0f, 0.0f);														// light position for shader
-	normalScale = 2.0f;																			// normal scale for shader
-
-	/// Plane
-	planeBody = new Body();
-	planeBody->OnCreate();
-	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));
-	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
-	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
-	planeBody->scale = Vec3(5.0f, 1.0f, 5.0f);
-	
-
-	/// Sphere 1.
-	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
-	sphereBody = new Body();
-	sphereBody->OnCreate();
-	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
-	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 1.0f);										// starts at 0 for rest
-	//sphereBody->radius = 1;
-	sphereBody->scale = Vec3(2.0f, 2.0f, 2.0f);
-	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
-	
-	/// sphere .2 - COLLISIONS
-	sphereCollision0_Body = new Body();
-	sphereCollision0_Body->OnCreate();
-	sphereCollision0_Body->pos = Vec3(0.0f, 1.0, 0.0f);
-
-
-	// ----- 3D
-	// PLANE
-	planeMesh = new Mesh("meshes/Plane.obj");
-	planeMesh->OnCreate();
-	// SPHERE 1.
-	sphereMesh = new Mesh("meshes/Sphere.obj");
-	sphereMesh->OnCreate();
-	// SPHERE 2.
-	sphereCollision0_Mesh = new Mesh("meshes/Sphere.obj");
-	sphereCollision0_Mesh->OnCreate();
-
-	/// ----- SHADER 1. ---- DEFAULT.
-	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
-	shader->CheckShader(shader);										// added shader CHECK function to Shader.h
-	
-	// SHADER - NORMALS 
-	shader_normals_face = new Shader("shaders/Normals/normalsVert.glsl", "shaders/Normals/normalsFrag.glsl");
-	shader_normals_face->CheckShader(shader_normals_face);
-	
-	// SHADER - NORMAL LINES
-	shader_normals_line = new Shader(
-		"shaders/NormalsDraw/drawNormals.vert",
-		"shaders/NormalsDraw/drawNormals.frag",
-		nullptr, nullptr,
-		"shaders/NormalsDraw/drawNormals.geom"
-	);
-	shader_normals_line->CheckShader(shader_normals_line);				// ----- DEBUG SHADER NORMALS LINES
-
-	
-	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 25.0f);
-	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
-	
-	// ----- CAMERA
-	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
-	Matrix4 T = MMath::translate(cameraPosition);
-	Matrix4 R = MMath::toMatrix4(cameraOrientation);
-	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
-
-	// ----- FIND POINT BETWEEN TWO POSITIONS
-	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
-
-	return true;
-}
-
 // DESTROY
-void Scene3p::OnDestroy() {
+void Scene4p::OnDestroy() {
 	Debug::Info("Deleting assets Scene3p: ", __FILE__, __LINE__);
 	/// sphere 1.
 	sphereBody->OnDestroy();
@@ -165,8 +81,92 @@ void Scene3p::OnDestroy() {
 	delete shader_normals_line;
 }
 
+bool Scene4p::OnCreate() {
+	Debug::Info("Loading assets Scene3p: ", __FILE__, __LINE__);
+	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
+	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
+
+	/// Trackball
+	trackball = new Trackball();
+
+	/// UNIFORMS
+	lightPos = Vec3(10.0f, 10.0f, 0.0f);														// light position for shader
+	normalScale = 2.0f;																			// normal scale for shader
+
+	/// Plane
+	planeBody = new Body();
+	planeBody->OnCreate();
+	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));
+	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
+	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
+	planeBody->scale = Vec3(5.0f, 1.0f, 5.0f);
+
+
+	/// Sphere 1.
+	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
+	sphereBody = new Body();
+	sphereBody->OnCreate();
+	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
+	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 1.0f);										// starts at 0 for rest
+	//sphereBody->radius = 1;
+	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
+	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
+
+	/// sphere .2 - COLLISIONS
+	sphereCollision0_Body = new Body();
+	sphereCollision0_Body->OnCreate();
+	sphereCollision0_Body->pos = Vec3(0.0f, 1.0, 0.0f);
+
+
+	// ----- 3D
+	// PLANE
+	planeMesh = new Mesh("meshes/Plane.obj");
+	planeMesh->OnCreate();
+	// SPHERE 1.
+	sphereMesh = new Mesh("meshes/Sphere.obj");
+	sphereMesh->OnCreate();
+	// SPHERE 2.
+	sphereCollision0_Mesh = new Mesh("meshes/Sphere.obj");
+	sphereCollision0_Mesh->OnCreate();
+
+	/// ----- SHADER 1. ---- DEFAULT.
+	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
+	shader->CheckShader(shader);										// added shader CHECK function to Shader.h
+
+	// SHADER - NORMALS 
+	shader_normals_face = new Shader("shaders/Normals/normalsVert.glsl", "shaders/Normals/normalsFrag.glsl");
+	shader_normals_face->CheckShader(shader_normals_face);
+
+	// SHADER - NORMAL LINES
+	shader_normals_line = new Shader(
+		"shaders/NormalsDraw/drawNormals.vert",
+		"shaders/NormalsDraw/drawNormals.frag",
+		nullptr, nullptr,
+		"shaders/NormalsDraw/drawNormals.geom"
+	);
+	shader_normals_line->CheckShader(shader_normals_line);				// ----- DEBUG SHADER NORMALS LINES
+
+
+	/// ----- CAMERA STARTING POSITIONING
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 25.0f);
+	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
+
+	// ----- CAMERA
+	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
+	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
+	Matrix4 T = MMath::translate(cameraPosition);
+	Matrix4 R = MMath::toMatrix4(cameraOrientation);
+	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
+
+	// ----- FIND POINT BETWEEN TWO POSITIONS
+	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
+
+	return true;
+}
+
 /// CONTROLLS
-void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
+void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 	/// Trackball
 	initialTrackballOrientation = trackball->getQuat();
 	trackball->HandleEvents(sdlEvent);
@@ -252,11 +252,11 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
-void Scene3p::Update(const float deltaTime)
+void Scene4p::Update(const float deltaTime)
 {
 	// ----- FIND POINT BETWEEN TWO POSITIONS
 	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
-	
+
 	/// 1. Recompute plane normal from orientation
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
 	planeNormal = VMath::normalize(planeNormal);
@@ -266,7 +266,7 @@ void Scene3p::Update(const float deltaTime)
 	/// 3. TORQUE - ROTATION , BEGIN ROTATION
 	/*  UpVector is set in INIT - it is a const , should it be ?
 	 we know the perpendicular distance between pivot and force
-	 ----- ANGULAR ACCELERATION 
+	 ----- ANGULAR ACCELERATION
 	 ------ FIND the angle between PLANE normal and UPVECTOR to distinguish angular acceleration
 	 Set the upVector
 	 Get the cos(angle) - planeNormal DOT up = cos(angle)
@@ -289,51 +289,50 @@ void Scene3p::Update(const float deltaTime)
 	 find axis of rotation
 	 torque = (UP CROSS planeNormal)
 	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
-	 weight * distance to pivot 
+	 weight * distance to pivot
 	 */
 	torque = VMath::cross(upVector, planeNormal);
-	if(VMath::mag(torque) > VERY_SMALL) {
-	Vec3 torqueDir = VMath::normalize(torque);
-	//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
-	torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
-	//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
-	Vec3 torqueFinal = torqueDir * torqueMagnitude;
+	if (VMath::mag(torque) > VERY_SMALL) {
+		Vec3 torqueDir = VMath::normalize(torque);
+		//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
+		torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
+		//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
+		Vec3 torqueFinal = torqueDir * torqueMagnitude;
 
-	sphereBody->ApplyTourque(torqueFinal);
+		sphereBody->ApplyTourque(torqueFinal);
 	}
 
 	/// 4. UPDATE ANGULAR MOTION
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime);													// Change the orientation using quaternion.
-	
-	
+
+
 	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
-	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);		
+	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 
 	/// ----- GLOBAL ----- SPHERE ON PLANE
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	const float CONTACT_EPS = 0.01f;
 	bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
 	//bool onPlane = fabs(planeDist - sphereBody->radius) < CONTACT_EPS;										// ----- DEPRECAED
-	
+
 	// ------ GLOBAL ----- GRAVITY
 	Vec3 gravity(0.0f, -9.8f, 0.0f);
 	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
 	Vec3 downhill = gravity - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
-	
+
 	/// 5. ROTATION - ANGULAR ACCELERATION / VELOCITY
-	/* 
+	/*
 	Remove component along plane normal → get tangent component
 	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
 	if (onPlane)
 	{
 		/// ------------- LOOP FUNCTIONS 2 , 3
-		//sphereBody->vel = ComputeRollingVelocity_Cross(planeNormal);
-		linearVelocity = ComputeRollingVelocity_Cross(planeNormal);
-		//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
+		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal , sphereBody);
+		//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime); 
 	}
 	else
 	{
@@ -343,8 +342,8 @@ void Scene3p::Update(const float deltaTime)
 	}
 
 
-	
-	
+
+
 	/// ------------- LOOP FUNCTIONS 1
 	//IfOnPlane(onPlane, sphereBody, gravity, downhill, linearVelocity, angSpeed, speed, deltaTime);
 
@@ -379,7 +378,7 @@ void Scene3p::Update(const float deltaTime)
 	if (VMath::mag(downhill) > VERY_SMALL)
 	{
 		Vec3 downhillDir = VMath::normalize(downhill);
-		
+
 		// Rolling without slipping: v = ω × R (approx using |ω| * R along downhill)
 		float angSpeed = VMath::mag(sphereBody->angularVelocity);
 		float speed = angSpeed * sphereBody->radius;
@@ -393,7 +392,7 @@ void Scene3p::Update(const float deltaTime)
 	/// 6. ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
-	
+
 	/// 7. PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
 	planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	if (planeDist < sphereBody->radius)
@@ -430,7 +429,7 @@ void Scene3p::Update(const float deltaTime)
 
 }
 
-void Scene3p::Render() const {
+void Scene4p::Render() const {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
@@ -446,7 +445,7 @@ void Scene3p::Render() const {
 	// =========================
 	// WIREFRAME TOGGLE
 	// =========================
-	if (drawInWireMode) {
+	if (!drawInWireMode) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 	else {
@@ -519,7 +518,7 @@ void Scene3p::Render() const {
 /// ----- Linear Velocity
 
 // 1.
-Vec3 Scene3p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
+Vec3 Scene4p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
 {
 	// Contact vector (center → contact point)
 	// THIS ASSUMES THAT THE POINT IS DIRECTLY ALONG THE NORMAL - THIS IS OK ONLY FOR SPHERES...
@@ -532,42 +531,42 @@ Vec3 Scene3p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
 }
 
 // 2.
-Vec3 Scene3p::ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt)
+Vec3 Scene4p::ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt)
 {
 	body->vel += gravity * dt;
 	return body->vel;
 }
- 
+
 // 3. MUTEABLE
-Vec3 Scene3p::ComputeLinearVelocity(
-    bool onPlane,
-    Body* body,
-    const Vec3& gravity,
-    const Vec3& downhill,
-    float deltaTime)
+Vec3 Scene4p::ComputeLinearVelocity(
+	bool onPlane,
+	Body* body,
+	const Vec3& gravity,
+	const Vec3& downhill,
+	float deltaTime)
 {
-    if (onPlane)
-    {
-        if (VMath::mag(downhill) > VERY_SMALL)
-        {
-            Vec3 downhillDir = VMath::normalize(downhill);
-            float angSpeed = VMath::mag(body->angularVelocity);
-            float speed = angSpeed * body->radius;
+	if (onPlane)
+	{
+		if (VMath::mag(downhill) > VERY_SMALL)
+		{
+			Vec3 downhillDir = VMath::normalize(downhill);
+			float angSpeed = VMath::mag(body->angularVelocity);
+			float speed = angSpeed * body->radius;
 
-            return downhillDir * speed;
-        }
+			return downhillDir * speed;
+		}
 
-        return Vec3(0.0f, 0.0f, 0.0f);
-    }
-    else
-    {
-        body->vel += gravity * deltaTime;
-        return body->vel;
-    }
+		return Vec3(0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		body->vel += gravity * deltaTime;
+		return body->vel;
+	}
 }
 
 // 4. MUTEABLE
-void Scene3p::UpdateLinearVelocity(
+void Scene4p::UpdateLinearVelocity(
 	bool onPlane,
 	Body* body,
 	const Vec3& gravity,
@@ -601,7 +600,7 @@ void Scene3p::UpdateLinearVelocity(
 /// ARCADE ANGULAR DAMPNING MOVMENT
 /// </summary>
 /// <param name="deltaTime"></param>
-void Scene3p::ApplyAngularDamping(float deltaTime)
+void Scene4p::ApplyAngularDamping(float deltaTime)
 {
 	const float damping = 0.95f; // 0.0 = instant stop, 1.0 = no damping
 	sphereBody->angularVelocity *= damping;
@@ -612,7 +611,7 @@ void Scene3p::ApplyAngularDamping(float deltaTime)
 /// -------------- DEPRECATED
 
 // 5. REDUNDANT
-Vec3 Scene3p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed , const float _time)
+Vec3 Scene4p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time)
 {
 	if (onPlane) {
 		// --- rolling on plane ---
@@ -636,7 +635,7 @@ Vec3 Scene3p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHil
 }
 
 // 2. REDUNDANT
-Vec3 Scene3p::ComputeRollingVelocity(const Vec3& downhill)
+Vec3 Scene4p::ComputeRollingVelocity(const Vec3& downhill)
 {
 
 	if (VMath::mag(downhill) > VERY_SMALL)
@@ -645,7 +644,7 @@ Vec3 Scene3p::ComputeRollingVelocity(const Vec3& downhill)
 		float angSpeed = VMath::mag(sphereBody->angularVelocity);
 		float speed = angSpeed * sphereBody->radius;
 
-		return linearVelocity =  downhillDir * speed;
+		return linearVelocity = downhillDir * speed;
 	}
 
 	return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);

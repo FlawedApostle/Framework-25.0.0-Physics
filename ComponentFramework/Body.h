@@ -19,17 +19,16 @@ public:	/// public for now
 	Vec3 pos;
 	Vec3 vel;
 	Vec3 accel;
-	float mass;
+	Vec3 scale;
 	Vec3 angularVelocity;
 	Vec3 angularAcceleration;
-	Matrix3 rotationalInertia;
-	float radius; 
-
-	Quaternion orientation;
-	//Quaternion position;
 	Vec3 upVector;								/// Up vector for the ball, to solve the angle
 	Vec3 displacement;							/// track the ball ? can this determine velocity && acceleration ?
 	Vec3 angularDisplacement;					/// track the ball ? can this determine velocity && acceleration ?
+	Matrix3 rotationalInertia;
+	Quaternion orientation;
+	float mass;
+	float radius; 
 
 private: /// Physics stuff
 	/// put physics vars private, and set getters for them
@@ -49,6 +48,7 @@ public:
 	void setAccel(const Vec3 &accel_) { accel = accel_;}
 	void ApplyForce(Vec3 force);
 	void ApplyTourque(Vec3 Torque);
+	
 	// Update
 	void UpdateOrientation(float deltatime);
 	void UpdateAngularVelocity(float deltaTime);
@@ -56,12 +56,15 @@ public:
 	void UpdatePos(float deltaTime);
 	void UpdateVel(float deltaTime);
 	void UpdateAccel(float deltaTime);
+	
 	/// get Model Matrix
 	const Matrix4 getModelMatrix() const;
 	
 	/// Get Radius
 	Vec3 GetRadius() { return Vec3(radius , radius, radius); };
 
+
+	static Vec3 ComputeRollingVelocity_Cross(const Vec3& planeNormal , Body* body);
 
 	/// Calculator test to ensure the radians_to_degrees is working...
 	void converttoRads(float omega , float deltatime)

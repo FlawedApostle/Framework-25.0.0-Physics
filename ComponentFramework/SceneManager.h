@@ -15,9 +15,10 @@ public:
 private:
 	enum class SCENE_NUMBER {
 		SCENE0p = 0,
-		SCENE1p = 1,			// Physics Toruqe Ball Part 2
-		SCENE2p = 2,			// Physics Toruqe Ball Part 3
-		SCENE3p = 3,			// Physics Toruqe Ball Part 3
+		SCENE1p = 1,
+		SCENE2p = 2,
+		SCENE3p = 3,
+		SCENE4p = 4,
 	};
 
 	class Scene* currentScene;

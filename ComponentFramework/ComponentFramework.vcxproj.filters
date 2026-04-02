@@ -97,6 +97,9 @@
     <Filter Include="Source Files\Scenes_Physics\Collision">
       <UniqueIdentifier>{9a1e5eb3-f03d-4011-b602-f8e97f9f928b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scenes_Physics\Scene4p">
+      <UniqueIdentifier>{f7b3fbf9-3a8f-4e0e-afad-65af4370260d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -179,6 +182,9 @@
     </ClCompile>
     <ClCompile Include="Collision.cpp">
       <Filter>Source Files\Scenes_Physics\Collision</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene4p.cpp">
+      <Filter>Source Files\Scenes_Physics\Scene4p</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +271,9 @@
     </ClInclude>
     <ClInclude Include="Collision.h">
       <Filter>Source Files\Scenes_Physics\Collision</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene4p.h">
+      <Filter>Source Files\Scenes_Physics\Scene4p</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

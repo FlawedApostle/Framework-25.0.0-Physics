@@ -15,7 +15,8 @@
 /// Physics
 #include "Scene1p.h"			// Rolling Ball at slant
 #include "Scene2p.h"			// Rotation Ball on plane
-#include "Scene3p.h"			// Collisions Ball-to-Ball
+#include "Scene3p.h"			// Collisions Ball-to-Ball - rotation on testing different functions pt 1.
+#include "Scene4p.h"			// Collisions Ball-to-Ball - rotation on testing different functions pt 2.
 
 
 SceneManager::SceneManager(): 
@@ -63,7 +64,8 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	//BuildNewScene(SCENE_NUMBER::SCENE0p);				
 	//BuildNewScene(SCENE_NUMBER::SCENE1p);
 	//BuildNewScene(SCENE_NUMBER::SCENE2p);
-	BuildNewScene(SCENE_NUMBER::SCENE3p);
+	//BuildNewScene(SCENE_NUMBER::SCENE3p);
+	BuildNewScene(SCENE_NUMBER::SCENE4p);
 	/********************************************************************************/
 	return true;
 }
@@ -105,7 +107,8 @@ void SceneManager::HandleEvents() {
 					"Scene 0p (1) - Physics Baseline\n"
 					"Scene 1p (2) - Ball Rolling\n"
 					"Scene 2p (3) - Ball & Plane \n"
-					"Scene 3p (4) - Collision \n"
+					"Scene 3p (4) - Collision - rotation on testing different functions pt 1. \n"
+					"Scene 4p (5) - Collision - rotation on testing different functions pt 2.\n"
 				);
 				break;
 			case SDL_SCANCODE_1:
@@ -121,8 +124,12 @@ void SceneManager::HandleEvents() {
 				BuildNewScene(SCENE_NUMBER::SCENE2p);
 				break;
 			case SDL_SCANCODE_4:
-				printf("Scene 3p - COLLISIONS - BALL-TO-BALL");
+				printf("Scene 3p - COLLISIONS - BALL-TO-BALL - rotation on testing different functions pt 1.");
 				BuildNewScene(SCENE_NUMBER::SCENE3p);
+				break;
+			case SDL_SCANCODE_5:
+				printf("Scene 4p - COLLISIONS - BALL-TO-BALL - rotation on testing different functions pt 2.");
+				BuildNewScene(SCENE_NUMBER::SCENE4p);
 				break;
 
 			default:
@@ -162,6 +169,10 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 	case SCENE_NUMBER::SCENE3p:
 		currentScene = new Scene3p();
+		status = currentScene->OnCreate();
+		break;
+	case SCENE_NUMBER::SCENE4p:
+		currentScene = new Scene4p();
 		status = currentScene->OnCreate();
 		break;
 

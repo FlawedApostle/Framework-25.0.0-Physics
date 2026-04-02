@@ -1,4 +1,4 @@
-#include "Body.h"
+﻿#include "Body.h"
 #include "Matrix.h"
 #include "vector.h"
 #include "MMath.h"
@@ -18,6 +18,7 @@ Body::Body():
 	accel					{}, 
 	mass					{1.0f},		// mass set from 0 to 1.0
 	radius					{1.0f},
+	scale					{1.0f,1.0f,1.0f},
 	rotationalInertia		{ },
 	angularAcceleration		{},
 	angularVelocity			{},
@@ -28,18 +29,49 @@ Body::Body():
 
 Body::~Body() {}
 
-void Body::Update(float deltaTime) {
-	/// From 1st semester physics class
-	pos += vel * deltaTime + 0.5f * accel * deltaTime * deltaTime;
-	vel += accel * deltaTime;
+
+/// Get the model matrix
+const Matrix4 Body::getModelMatrix() const
+{
+	// scale * rotate * translate == translate * rotate * scale
+	// read right to left Hebrew style
+	//return translate * rotation * scale;
+
+	// PRO ORDER (Hebrew Style / Right-to-Left):
+	// Translate * Rotate * Scale
+	return MMath::translate(pos) * MMath::toMatrix4(orientation) * MMath::scale(scale);
 }
 
-/// ------- TEST
+
+
 void Body::ApplyForce(Vec3 force) {
 	accel = force / mass;
 }
+void Body::UpdateOrientation(float deltatime)
+{
+	// 1. Rotate your orientation quaternion using the angular velocity  [slides Velocity]
+	// 2. Find the axis you are rotating about by normalizing the angular velocity vector
+	// 3. Calculate the angle you need to rotate using angle = magnitude of the angular velocity *  deltaTime.
+	//Vec3 angularVelocityNormalize = VMath::normalize(angularVelocity);																				// Using this I get weird results
+	float angularSpeed = VMath::mag(angularVelocity);
+	// Failsafe obj does not have a 'FULL' vector only direction, but no Mag , therefore it will crash
+	/// I want more clarification on this - Vector requers a direction and a Mag , with no Mag its has nothing, therefore it will fail
+	if (angularSpeed < VERY_SMALL)
+	{
+		return;
+	}
 
-// ----- NEW PHYSICS
+	float angleRadians = angularSpeed * deltatime;
+	float angleDegrees = angleRadians * RADIANS_TO_DEGREES;
+	Vec3 axisOfRotation = VMath::normalize(angularVelocity);
+	Quaternion rotation = QMath::angleAxisRotation(angleDegrees, axisOfRotation);
+
+	// Combine quaternions my multiplying
+	orientation *= rotation;
+}
+
+
+/// TORQUE
 void Body::ApplyTourque(Vec3 Torque)
 {
 	/* TORQUE SLDES - rotational inertia
@@ -73,29 +105,6 @@ void Body::ApplyTourque(Vec3 Torque)
 	angularAcceleration.z = inverseIValue * Torque.z;
 
 }
-void Body::UpdateOrientation(float deltatime)
-{
-	// 1. Rotate your orientation quaternion using the angular velocity  [slides Velocity]
-	// 2. Find the axis you are rotating about by normalizing the angular velocity vector
-	// 3. Calculate the angle you need to rotate using angle = magnitude of the angular velocity *  deltaTime.
-	//Vec3 angularVelocityNormalize = VMath::normalize(angularVelocity);																				// Using this I get weird results
-	float angularSpeed = VMath::mag(angularVelocity);
-	// Failsafe obj does not have a 'FULL' vector only direction, but no Mag , therefore it will crash
-	/// I want more clarification on this - Vector requers a direction and a Mag , with no Mag its has nothing, therefore it will fail
-	if (angularSpeed < VERY_SMALL)
-	{
-		return;
-	}
-
-	float angleRadians = angularSpeed * deltatime;
-	float angleDegrees = angleRadians * RADIANS_TO_DEGREES;
-	Vec3 axisOfRotation = VMath::normalize(angularVelocity);
-	Quaternion rotation = QMath::angleAxisRotation(angleDegrees, axisOfRotation);
-
-	// Combine quaternions my multiplying
-	orientation *= rotation;
-}
-
 
 void Body::UpdateAngularVelocity(float deltaTime)
 {
@@ -112,19 +121,16 @@ void Body::UpdateAngularAcceleration(float deltaTime)
 	angularVelocity = angularVelocity + angularAcceleration * deltaTime;
 }
 
-/// Get the model matrix
-const Matrix4 Body::getModelMatrix() const
+ Vec3 Body::ComputeRollingVelocity_Cross(const Vec3& planeNormal , Body* body)
 {
-	Matrix4 translate = MMath::translate(pos);
-	Matrix4 rotation = MMath::toMatrix4(orientation);
-	Matrix4 scale = MMath::scale(radius, radius, radius);
-	// scale * rotate * translate == translate * rotate * scale
-	// read right to left Hebrew style
-	//return translate * rotation * scale;
+	// Contact vector (center → contact point)
+	// THIS ASSUMES THAT THE POINT IS DIRECTLY ALONG THE NORMAL - THIS IS OK ONLY FOR SPHERES...
+	Vec3 r = planeNormal * body->radius;
 
-	// PRO ORDER (Hebrew Style / Right-to-Left):
-	// Translate * Rotate * Scale
-	return MMath::translate(pos) * MMath::toMatrix4(orientation) * MMath::scale(radius, radius, radius);
+	// True rolling velocity
+	Vec3 v = VMath::cross(body->angularVelocity, r);
+
+	return v;
 }
 
 /// Physics 1
@@ -164,7 +170,12 @@ void Body::UpdateAccel(float deltaTime)
 }
 
 
-/// Physics default Body
+void Body::Update(float deltaTime) {
+	/// From 1st semester physics class
+	pos += vel * deltaTime + 0.5f * accel * deltaTime * deltaTime;
+	vel += accel * deltaTime;
+}
+
 bool Body::OnCreate() {
 	return true;
 }
