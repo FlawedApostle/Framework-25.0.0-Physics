@@ -273,12 +273,13 @@ void Scene4p::Update(const float deltaTime)
 	const float CONTACT_EPS = 0.01f;
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
+	//bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
 
 
 	// 3. Boundary test (local space)
 	Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
 
-
+	//	---------------- BOUNDRIES
 	float halfX = planeBody->scale.x;
 	float halfZ = planeBody->scale.z;
 
@@ -287,8 +288,7 @@ void Scene4p::Update(const float deltaTime)
 		fabs(localPos.z) <= halfZ;
 
 
-	// 4. Final on-plane test
-	//bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
+	// 4. Final on-plane test ---------------- BOUNDRIES
 	bool onPlane = heightOK && insideBounds;
 	static bool wasOnPlane = true;
 	bool justLeftPlane = wasOnPlane && !onPlane;
@@ -354,36 +354,36 @@ void Scene4p::Update(const float deltaTime)
 	Remove component along plane normal → get tangent component
 	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
-	if (onPlane)
-	{
-		/// ------------- LOOP FUNCTIONS 2 , 3
-		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal , sphereBody);
-		//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime); 
-	}
-	else
-	{
-		//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
-		sphereBody->vel += gravity * deltaTime;
-		linearVelocity = sphereBody->vel;
-	}
-
 	//if (onPlane)
 	//{
-	//	linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
+	//	/// ------------- LOOP FUNCTIONS 2 , 3
+	//	linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal , sphereBody);
+	//	//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime); 
 	//}
 	//else
 	//{
-	//	if (justLeftPlane)
-	//	{
-	//		// Convert angular motion → linear velocity ONCE at detachment
-	//		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
-	//		sphereBody->vel = linearVelocity;
-	//	}
-
-	//	// Apply gravity normally
+	//	//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
 	//	sphereBody->vel += gravity * deltaTime;
 	//	linearVelocity = sphereBody->vel;
 	//}
+
+	if (onPlane)
+	{
+		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
+	}
+	else
+	{
+		if (justLeftPlane)
+		{
+			// Convert angular motion → linear velocity ONCE at detachment
+			linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
+			sphereBody->vel = linearVelocity;
+		}
+
+		// Apply gravity normally
+		sphereBody->vel += gravity * deltaTime;
+		linearVelocity = sphereBody->vel;
+	}
 
 
 	/// ------------- LOOP FUNCTIONS 1
@@ -439,7 +439,7 @@ void Scene4p::Update(const float deltaTime)
 	//planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	if (onPlane)
 	{
-		// Recompute planeDist after movement if you want it precise
+		// Recompute planeDist after movement to keep it precise
 		float planeDistAfter = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 
 		if (planeDistAfter < sphereBody->radius)
