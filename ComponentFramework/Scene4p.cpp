@@ -98,15 +98,19 @@ bool Scene4p::OnCreate() {
 	planeBody->OnCreate();
 	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));
 	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
+	//Matrix4 model = planeBody->getModelMatrix();
+	//Vec3 planeNormal = VMath::normalize(Vec3(model[2][0], model[2][1], model[2][2]));
+
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
-	planeBody->scale = Vec3(5.0f, 1.0f, 5.0f);
+	planeNormal.print("planeNormal");
+	planeBody->scale = Vec3(2.0f, 2.0f, 2.0f);
 
 
 	/// Sphere 1.
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
 	sphereBody = new Body();
 	sphereBody->OnCreate();
-	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
+	sphereBody->pos = Vec3(0.0f, 0.0, 0.0f);
 	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);										// starts at 0 for rest
 	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
 	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
@@ -258,11 +262,37 @@ void Scene4p::Update(const float deltaTime)
 	// ----- FIND POINT BETWEEN TWO POSITIONS
 	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 
+
 	/// 1. Recompute plane normal from orientation
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
 	planeNormal = VMath::normalize(planeNormal);
+
+	///													----- GLOBAL ----- SPHERE ON PLANE
 	/// 2.
 	upVector = { 0.0f,1.0f,0.0f };																// GENERATE UPVECTOR ----- MORE RESPOSNIVE ??
+	const float CONTACT_EPS = 0.01f;
+	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
+
+
+	// 3. Boundary test (local space)
+	Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
+
+
+	float halfX = planeBody->scale.x;
+	float halfZ = planeBody->scale.z;
+
+	bool insideBounds =
+		fabs(localPos.x) <= halfX &&
+		fabs(localPos.z) <= halfZ;
+
+
+	// 4. Final on-plane test
+	//bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
+	bool onPlane = heightOK && insideBounds;
+	static bool wasOnPlane = true;
+	bool justLeftPlane = wasOnPlane && !onPlane;
+	wasOnPlane = onPlane;
 
 	/// 3. TORQUE - ROTATION , BEGIN ROTATION
 	/*  UpVector is set in INIT - it is a const , should it be ?
@@ -311,11 +341,6 @@ void Scene4p::Update(const float deltaTime)
 	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
 	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 
-	/// ----- GLOBAL ----- SPHERE ON PLANE
-	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
-	const float CONTACT_EPS = 0.01f;
-	bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
-	//bool onPlane = fabs(planeDist - sphereBody->radius) < CONTACT_EPS;										// ----- DEPRECAED
 
 	// ------ GLOBAL ----- GRAVITY
 	Vec3 gravity(0.0f, -9.8f, 0.0f);
@@ -342,7 +367,23 @@ void Scene4p::Update(const float deltaTime)
 		linearVelocity = sphereBody->vel;
 	}
 
+	//if (onPlane)
+	//{
+	//	linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
+	//}
+	//else
+	//{
+	//	if (justLeftPlane)
+	//	{
+	//		// Convert angular motion → linear velocity ONCE at detachment
+	//		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
+	//		sphereBody->vel = linearVelocity;
+	//	}
 
+	//	// Apply gravity normally
+	//	sphereBody->vel += gravity * deltaTime;
+	//	linearVelocity = sphereBody->vel;
+	//}
 
 
 	/// ------------- LOOP FUNCTIONS 1
@@ -394,19 +435,25 @@ void Scene4p::Update(const float deltaTime)
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
 
-	/// 7. PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
+	/// 7. ------------------------------------------ PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
 	//planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
-	if (planeDist < sphereBody->radius)
+	if (onPlane)
 	{
-		float penetration = sphereBody->radius - planeDist;
-		sphereBody->pos += planeNormal * penetration;
+		// Recompute planeDist after movement if you want it precise
+		float planeDistAfter = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+
+		if (planeDistAfter < sphereBody->radius)
+		{
+			float penetration = sphereBody->radius - planeDistAfter;
+			sphereBody->pos += planeNormal * penetration;
+		}
+
+		float vdot = VMath::dot(sphereBody->vel, planeNormal);
+		if (vdot > 0.0f) {
+			sphereBody->vel -= planeNormal * vdot;
+		}
 	}
 
-	// ------ Remove any velocity that pushes away from the plane (one‑way valve)
-	float vdot = VMath::dot(sphereBody->vel, planeNormal);
-	if (vdot > 0.0f) {
-		sphereBody->vel -= planeNormal * vdot;
-	}
 
 
 	// ------ TRACKBALL - SYNTHETIC CAMERA - [Starting camera position]
