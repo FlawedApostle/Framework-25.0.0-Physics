@@ -5,10 +5,24 @@
 
 bool Collision::SphereSphereCollisionDetected(const Body* body1, const Body* body2)
 {
-	double _pointPosition = sqrt(pow((body1->pos.x + body2->pos.x), 2) + pow((body1->pos.y + body2->pos.y) , 2));
-	printf("Point Position: %f\n" ,_pointPosition);
+	//double _pointPosition = sqrt(pow((body1->pos.x - body2->pos.x), 2) + pow((body1->pos.y - body2->pos.y) , 2));
+	//printf("Point Position: %f\n" ,_pointPosition);
+	//return _pointPosition;
 
-	return _pointPosition;
+	Vec3 d = body1->pos - body2->pos;
+	float distanceSquared = VMath::dot(d, d);
+
+	float radiusSum = body1->radius + body2->radius;
+	float radiusSumSquared = radiusSum * radiusSum;
+
+	bool collided = distanceSquared <= radiusSumSquared;
+
+	if (collided)
+		printf("Collision!  distSq=%.3f  radSq=%.3f\n", distanceSquared, radiusSumSquared);
+	else
+		printf("No Collision. distSq=%.3f  radSq=%.3f\n", distanceSquared, radiusSumSquared);
+
+	return collided;
 }
 
 
@@ -31,7 +45,7 @@ bool Collision::SphereSphereCollisionDetected_test(Body* body1, Body* body2)
 	// The logic follows same suit - rather than getting the square root value its taxed as a squared distance instead 
 	// if a < b THEN pow(a,2) < pow(b,2)
 	// if a = b THEN pow(a,2) = pow(b,2)
-	float distanceSquared = dx*dx + dy*dy;
+	float distanceSquared = (dx * dx) + (dy * dy);
 	float radiusSum = body1->radius + body2->radius;
 	float radiusSumSquared = radiusSum * radiusSum;
 

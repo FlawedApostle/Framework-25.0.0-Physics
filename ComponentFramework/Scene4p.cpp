@@ -45,16 +45,16 @@ Scene4p::Scene4p() :
 	, upVector{ 0.0f,1.0f,0.0f }
 
 {
-	Debug::Info("Created Scene3p: ", __FILE__, __LINE__);
+	Debug::Info("Created Scene4p: ", __FILE__, __LINE__);
 }
 Scene4p::~Scene4p()
 {
-	Debug::Info("Deleted Scene3p: ", __FILE__, __LINE__);
+	Debug::Info("Deleted Scene4p: ", __FILE__, __LINE__);
 }
 
 // DESTROY
 void Scene4p::OnDestroy() {
-	Debug::Info("Deleting assets Scene3p: ", __FILE__, __LINE__);
+	Debug::Info("Deleting assets Scene4p: ", __FILE__, __LINE__);
 	/// sphere 1.
 	sphereBody->OnDestroy();
 	delete sphereBody;
@@ -82,7 +82,7 @@ void Scene4p::OnDestroy() {
 }
 
 bool Scene4p::OnCreate() {
-	Debug::Info("Loading assets Scene3p: ", __FILE__, __LINE__);
+	Debug::Info("Loading assets Scene4p: ", __FILE__, __LINE__);
 	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
 	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
 
@@ -107,15 +107,16 @@ bool Scene4p::OnCreate() {
 	sphereBody = new Body();
 	sphereBody->OnCreate();
 	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
-	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 1.0f);										// starts at 0 for rest
-	//sphereBody->radius = 1;
+	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);										// starts at 0 for rest
 	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
 	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
+	sphereBody->radius = 1.0f;
 
 	/// sphere .2 - COLLISIONS
 	sphereCollision0_Body = new Body();
 	sphereCollision0_Body->OnCreate();
 	sphereCollision0_Body->pos = Vec3(0.0f, 1.0, 0.0f);
+	sphereCollision0_Body->radius = 1.0f;
 
 
 	// ----- 3D
@@ -148,7 +149,7 @@ bool Scene4p::OnCreate() {
 
 
 	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 25.0f);
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 50.0f);
 	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 
 	// ----- CAMERA
@@ -255,7 +256,7 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 void Scene4p::Update(const float deltaTime)
 {
 	// ----- FIND POINT BETWEEN TWO POSITIONS
-	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
+	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 
 	/// 1. Recompute plane normal from orientation
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
@@ -394,7 +395,7 @@ void Scene4p::Update(const float deltaTime)
 	sphereBody->UpdatePos(deltaTime);
 
 	/// 7. PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
-	planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	//planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	if (planeDist < sphereBody->radius)
 	{
 		float penetration = sphereBody->radius - planeDist;
@@ -463,7 +464,7 @@ void Scene4p::Render() const {
 		glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 		// 3. Render Plane with Face Shader
 		glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES);
+		planeMesh->Render(GL_TRIANGLES); sphereMesh->Render(GL_TRIANGLES);
 
 	}
 	else

@@ -255,7 +255,7 @@ void Scene3p::HandleEvents(const SDL_Event& sdlEvent) {
 void Scene3p::Update(const float deltaTime)
 {
 	// ----- FIND POINT BETWEEN TWO POSITIONS
-	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
+	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 	
 	/// 1. Recompute plane normal from orientation
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
@@ -294,8 +294,8 @@ void Scene3p::Update(const float deltaTime)
 	torque = VMath::cross(upVector, planeNormal);
 	if(VMath::mag(torque) > VERY_SMALL) {
 	Vec3 torqueDir = VMath::normalize(torque);
-	//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
 	torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
+	//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
 	//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
 	Vec3 torqueFinal = torqueDir * torqueMagnitude;
 
@@ -331,15 +331,15 @@ void Scene3p::Update(const float deltaTime)
 	if (onPlane)
 	{
 		/// ------------- LOOP FUNCTIONS 2 , 3
-		//sphereBody->vel = ComputeRollingVelocity_Cross(planeNormal);
 		linearVelocity = ComputeRollingVelocity_Cross(planeNormal);
+		//sphereBody->vel = ComputeRollingVelocity_Cross(planeNormal);
 		//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
 	}
 	else
 	{
-		//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
 		sphereBody->vel += gravity * deltaTime;
 		linearVelocity = sphereBody->vel;
+		//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
 	}
 
 
