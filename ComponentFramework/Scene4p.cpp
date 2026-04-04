@@ -164,8 +164,6 @@ bool Scene4p::OnCreate() {
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
 
-	// ----- FIND POINT BETWEEN TWO POSITIONS
-	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected_test(sphereBody, sphereCollision0_Body) << "\n";
 
 	return true;
 }
@@ -260,7 +258,7 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 void Scene4p::Update(const float deltaTime)
 {
 	// ----- FIND POINT BETWEEN TWO POSITIONS
-	std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
+	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 
 
 	/// 1. Recompute plane normal from orientation
@@ -275,17 +273,47 @@ void Scene4p::Update(const float deltaTime)
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 	//bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
 
+	float baseHalfSize = 5.0f; // or 1.0f depending on Plane.obj
 
-	// 3. Boundary test (local space)
-	Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
+
+	// 3.									 ---------------- BOUNDRIES Boundary test (local space)
+	Vec3 localPos = sphereBody->pos - planeBody->pos;
+	localPos = QMath::inverse(planeBody->orientation) * localPos;
+
+	// Adjust depending on your mesh base size
+	//Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
+	//Vec3 localPos = sphereBody->pos - planeBody->pos;
+	//localPos = QMath::inverse(planeBody->orientation) * localPos;
+
+
+
+	// Apply inverse scale
+	//localPos.x /= planeBody->scale.x;
+	//localPos.z /= planeBody->scale.z;
+	localPos.x /= planeBody->scale.x;
+	localPos.y /= planeBody->scale.y;
+	localPos.z /= planeBody->scale.z;
+
+	printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
 
 	//	---------------- BOUNDRIES
-	float halfX = planeBody->scale.x;
-	float halfZ = planeBody->scale.z;
+	//float halfX = baseHalfSize * planeBody->scale.x;
+	//float halfZ = baseHalfSize * planeBody->scale.z;
+
+	float halfX = baseHalfSize;
+	float halfZ = baseHalfSize;
 
 	bool insideBounds =
-		fabs(localPos.x) <= halfX &&
-		fabs(localPos.z) <= halfZ;
+		fabs(localPos.x) <= (baseHalfSize - sphereBody->radius) &&
+		fabs(localPos.z) <= (baseHalfSize - sphereBody->radius);
+
+
+		//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
+		//localPos.x, localPos.z, halfX, halfZ);
+		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
+
+		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
+		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
 
 
 	// 4. Final on-plane test ---------------- BOUNDRIES
