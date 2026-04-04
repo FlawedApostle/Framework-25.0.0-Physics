@@ -210,33 +210,28 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 			printf("UP\n");
 			rotation = QMath::angleAxisRotation(2.0f, axis_PitchUp);
 			planeBody->orientation = rotation * planeBody->orientation;
-			//planeNormal = QMath::rotate(planeNormal, rotation);
-			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
-
 			break;
 		case SDL_SCANCODE_A:
 			printf("LEFT\n");
 			rotation = QMath::angleAxisRotation(2.0f, axis_Left);
 			planeBody->orientation = rotation * planeBody->orientation;
-			//planeNormal = QMath::rotate(planeNormal, rotation);
-			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
-
 			break;
 		case SDL_SCANCODE_D:
 			printf("RIGHT\n");
 			rotation = QMath::angleAxisRotation(2.0f, axis_Right);
 			planeBody->orientation = rotation * planeBody->orientation;
-			//planeNormal = QMath::rotate(planeNormal, rotation);
-			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
-
 			break;
 		case SDL_SCANCODE_S:
 			printf("DOWN\n"); planeNormal.print();
 			rotation = QMath::angleAxisRotation(2.0f, axis_PitchDown);
 			planeBody->orientation = rotation * planeBody->orientation;
-			//planeNormal = QMath::rotate(planeNormal, rotation);
-			//planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);
+			break;
+		case SDL_SCANCODE_SPACE:
+			printf("SPACE\n"); 
+			bWantsToJump = true;
 
+			printf("upVector = %f,%f,%f\n" , sphereBody->upVector.x, sphereBody->upVector.y, sphereBody->upVector.z);
+			printf("Plane Body orientation = %f,%f,%f\n" , planeBody->orientation.ijk.x, planeBody->orientation.ijk.y, planeBody->orientation.ijk.z);
 			break;
 		}
 		break;
@@ -397,7 +392,6 @@ void Scene4p::Update(const float deltaTime)
 	*/
 	
 	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
-
 	float halfZ = baseHalfSize * planeBody->scale.z;
 	
 	bool insideBounds =
@@ -419,9 +413,11 @@ void Scene4p::Update(const float deltaTime)
 	
 
 		/// ------------------------------------- DEBUG
+	/*
 		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
 		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
 		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
+	*/
 		//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
 		//localPos.x, localPos.z, halfX, halfZ);
 		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
@@ -444,13 +440,26 @@ void Scene4p::Update(const float deltaTime)
 
 	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )
 	static bool grounded = true;
-
+	
+	/*
 	if (grounded)
 	{
 		if (!withinBounds)
 		{
 			grounded = false; // leave edge immediately
 		}
+	}
+	*/
+	// --- UPDATED GROUNDED LOGIC ---
+	if (!grounded && onPlane)
+	{
+		// We were in the air, but now we are touching the plane and within bounds. We landed!
+		grounded = true;
+	}
+	else if (grounded && !withinBounds)
+	{
+		// We are on the ground but rolled off the edge
+		grounded = false;
 	}
 
 
@@ -473,6 +482,17 @@ void Scene4p::Update(const float deltaTime)
 		// Apply gravity normally
 		sphereBody->vel += gravity * deltaTime;
 		linearVelocity = sphereBody->vel;
+	}
+
+	// --- NEW: JUMP IMPULSE LOGIC ---
+	if (bWantsToJump && grounded) {
+		float jumpSpeed = 10.0f; // My chosen impulse scalar
+
+		// Add instantaneous upward velocity along the plane's normal
+		linearVelocity += planeNormal * jumpSpeed;
+
+		bWantsToJump = false; // Reset the trigger
+		grounded = false;     // Instantly detach from the ground
 	}
 
 
@@ -555,8 +575,9 @@ void Scene4p::Update(const float deltaTime)
 			sphereBody->pos += planeNormal * penetration;
 		}
 
+		/// JUMPING - CHANGED > to <
 		float vdot = VMath::dot(sphereBody->vel, planeNormal);
-		if (vdot > 0.0f) {
+		if (vdot < 0.0f) {
 			sphereBody->vel -= planeNormal * vdot;
 		}
 	}
