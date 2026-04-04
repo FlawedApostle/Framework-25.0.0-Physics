@@ -265,111 +265,12 @@ void Scene4p::Update(const float deltaTime)
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
 	planeNormal = VMath::normalize(planeNormal);
 
-	///											--------- GLOBALs ----- SPHERE ON PLANE
-	/// 3.A
-	/*
-	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
-	values are not absolute so the sphere might have a subtle float value where the plane is absolute
-	
-	*/
-	upVector = { 0.0f,1.0f,0.0f };
-	const float CONTACT_EPS = 0.01f;
-	/*
-	“How big is the plane in mesh space?”
-	or 1.0f depending on Plane.obj
-	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
-	*/
-	float baseHalfSize = 2.5f;	// Define the Boundary old# = [ 5 ]
-	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
-	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
-	//bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
 
-
-	// 3.B										--------- BOUNDRIES PT I [ Boundary test (local space) ]
-	/*
-	 localPos yields a vector distance
-	 invers-ing localPos rotates the vector onto the planes LOCAL axis
-	 - Where is the sphere relative to the plane, expressed in the plane’s coordinate system -
-	*/
+	// 2. LOCAL WORLD SPACE POSITION
 	Vec3 localPos = sphereBody->pos - planeBody->pos;					
 	localPos = QMath::inverse(planeBody->orientation) * localPos;
 
-	// DEPRECATED
-	/*
-	// Adjust depending on your mesh base size
-	//Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
-	//Vec3 localPos = sphereBody->pos - planeBody->pos;
-	//localPos = QMath::inverse(planeBody->orientation) * localPos;
-	*/
-
-
-	// --- Convert to mesh space 
-	/* 
-	convert localPos WORLD SPACE to MESH SPACE - Apply inverse scale - 
-	MESHRADIUS = WORLDRADIUS / SCALE
-
-	world - scaled space → original mesh space (un-scaled)
-	Matching the boundary scale with the plane scale
-	*/
-	localPos.x /= planeBody->scale.x;
-	localPos.y /= planeBody->scale.y;
-	localPos.z /= planeBody->scale.z;
-
-
-	//											--------- BOUNDRIES PT II
-	// --------- BOUNDARIES OPTION A ( WORLD SPACE )
-	/*
-	 converts PLANE scale to WORLD SPACE
-	 - Rather than doing world space to mesh space we just translate the mesh to world -
-	 physics needs state-based transitions rather than frame by frame stateless transistions
-	*/
-	
-	
-	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
-	float halfZ = baseHalfSize * planeBody->scale.z;
-		
-	bool insideBounds =
-	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
-	fabs(localPos.z) <= (halfZ - sphereBody->radius);
-	
-
-	
-	// --------- BOUNDARIES OPTION B ( MESH SPACE ) -  Convert radius to mesh space
-	/*
-	float scaledRadiusX = sphereBody->radius / planeBody->scale.x;
-	float scaledRadiusZ = sphereBody->radius / planeBody->scale.z;
-
-	bool insideBounds =
-		fabs(localPos.x) <= (baseHalfSize - scaledRadiusX) &&
-		fabs(localPos.z) <= (baseHalfSize - scaledRadiusZ);
-	*/
-	
-
-		/// ------------------------------------- DEBUG
-		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
-		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
-		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
-		//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
-		//localPos.x, localPos.z, halfX, halfZ);
-		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
-		//------------------------------------------------------------------------------------------------
-
-	// 3.C										--------- BOUNDRIES PT III [ (Boundary on - PLANE - LOCAL space) ]
-	//bool onPlane = heightOK && insideBounds;	// OLD
-	
-		// NEW 
-	bool touchingPlane = heightOK;
-	bool withinBounds = insideBounds;
-	bool onPlane = touchingPlane && withinBounds;
-	bool offEdge = touchingPlane && !withinBounds;
-		// OLD
-	static bool wasOnPlane = true;
-	bool justLeftPlane = wasOnPlane && !onPlane;
-	wasOnPlane = onPlane;
-
-
-
-	/// 4.A										---------  TORQUE PT I ( ROTATION , BEGIN ROTATION )
+	/// 3.A									---------  TORQUE PT I ( ROTATION , BEGIN ROTATION )
 	/*  UpVector is set in INIT - it is a const , should it be ?
 	 we know the perpendicular distance between pivot and force
 	 ----- ANGULAR ACCELERATION
@@ -408,30 +309,125 @@ void Scene4p::Update(const float deltaTime)
 		sphereBody->ApplyTourque(torqueFinal);
 	}
 
-	/// 4.B										--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
+	/// 3.B										--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime); // Change the orientation using quaternion.
 
+	/// 3.C										--------- TORQUE PT III ( ROTATION - ANGULAR ACCELERATION / VELOCITY )
+	/*
+	Remove component along plane normal → get tangent component
+	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
+	*/
 
 	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
 	// linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 
 
-	//5											--------- GRAVITY
+	///											--------- GLOBALs ----- GRAVITY & BOUNDARIES
 	Vec3 gravity(0.0f, -9.8f, 0.0f);
 	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
 	Vec3 downhill = gravity - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
 
-	/// 4.C										--------- TORQUE PT III ( ROTATION - ANGULAR ACCELERATION / VELOCITY )
 	/*
-	Remove component along plane normal → get tangent component
-	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
+	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
+	values are not absolute so the sphere might have a subtle float value where the plane is absolute
+
+	*/
+	upVector = { 0.0f,1.0f,0.0f };
+	const float CONTACT_EPS = 0.01f;
+	/*
+	“How big is the plane in mesh space?”
+	or 1.0f depending on Plane.obj
+	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
+	*/
+	float baseHalfSize = 3.5f;	// Define the Boundary old# = [ 5 ]
+	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
+
+	// 4.A										--------- BOUNDRIES GO PT I [ Boundary test (local space) ]
+	/*
+	 localPos yields a vector distance
+	 invers-ing localPos rotates the vector onto the planes LOCAL axis
+	 - Where is the sphere relative to the plane, expressed in the plane’s coordinate system -
+	*/
+
+	//  ----- DEPRECATED -----
+	/*
+	// Adjust depending on your mesh base size
+	//Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
+	//Vec3 localPos = sphereBody->pos - planeBody->pos;
+	//localPos = QMath::inverse(planeBody->orientation) * localPos;
+	*/
+
+	//  ----- DEPRECATED ----- ( MESH SPACE ) -  Convert to mesh space - OPTION A
+	/* 
+	convert localPos WORLD SPACE to MESH SPACE - Apply inverse scale - 
+	MESHRADIUS = WORLDRADIUS / SCALE
+
+	world - scaled space → original mesh space (un-scaled)
+	Matching the boundary scale with the plane scale
+	*/
+	/*
+	localPos.x /= planeBody->scale.x;
+	localPos.y /= planeBody->scale.y;
+	localPos.z /= planeBody->scale.z;
+	*/
+	
+	// --------- BOUNDARIES OPTION OLD ( WORLD SPACE )
+	/*
+	 converts PLANE scale to WORLD SPACE
+	 - Rather than doing world space to mesh space we just translate the mesh to world -
+	 physics needs state-based transitions rather than frame by frame stateless transistions
+	*/
+	
+	// Convert to mesh space - OPTION B ( WORLD SPACE )
+	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
+	float halfZ = baseHalfSize * planeBody->scale.z;
+		
+	bool insideBounds =
+	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
+	fabs(localPos.z) <= (halfZ - sphereBody->radius);
+	
+
+	
+	// --------- BOUNDARIES OPTION B ( MESH SPACE ) -  Convert radius to mesh space
+	/*
+	float scaledRadiusX = sphereBody->radius / planeBody->scale.x;
+	float scaledRadiusZ = sphereBody->radius / planeBody->scale.z;
+
+	bool insideBounds =
+		fabs(localPos.x) <= (baseHalfSize - scaledRadiusX) &&
+		fabs(localPos.z) <= (baseHalfSize - scaledRadiusZ);
 	*/
 	
 
-	/// 7.										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )
+		/// ------------------------------------- DEBUG
+		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
+		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
+		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
+		//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
+		//localPos.x, localPos.z, halfX, halfZ);
+		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
+		//------------------------------------------------------------------------------------------------
+
+	// 4.B										--------- BOUNDRIES PT III [ (Boundary on - PLANE - LOCAL space) ]
+	//bool onPlane = heightOK && insideBounds;	// OLD
+	
+		// NEW 
+	bool touchingPlane = heightOK;
+	bool withinBounds = insideBounds;
+	bool onPlane = touchingPlane && withinBounds;
+	bool offEdge = touchingPlane && !withinBounds;
+		// OLD
+	static bool wasOnPlane = true;
+	bool justLeftPlane = wasOnPlane && !onPlane;
+	wasOnPlane = onPlane;
+
+	
+
+	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )
 	static bool grounded = true;
 
 	if (grounded)
@@ -443,7 +439,7 @@ void Scene4p::Update(const float deltaTime)
 	}
 
 
-
+	/// 4.D
 	if (grounded)	//onPlane
 	{
 		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
@@ -525,13 +521,13 @@ void Scene4p::Update(const float deltaTime)
 	
 
 
-	/// 6. ----------------------------------------	ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
+	/// ----------------------------------------	ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
 
 
 
-	/// 7. ---------------------------------------- CONTACT CONSTRAINT [ PLANE ] ( KEEP SPHERE RESTING ON PLANE )
+	/// 4.E ---------------------------------------- BOUNDARIES ( CONTACT CONSTRAINT - PLANE )[ KEEP SPHERE RESTING ON PLANE ]
 	
 	if (onPlane)
 	{
