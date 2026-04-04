@@ -261,14 +261,41 @@ void Scene4p::Update(const float deltaTime)
 	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 
 
-	/// 1. PLANE NORMAL - ( Recompute plane normal from orientation )
+	//										--------- GLOBALs ----- NORMAL ( PLANE ) & LOCAL POSITION
+	/* 
+	(Recompute plane normal from orientation)
+	*/
+	upVector = { 0.0f,1.0f,0.0f };
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
 	planeNormal = VMath::normalize(planeNormal);
 
-
-	// 2. LOCAL WORLD SPACE POSITION
 	Vec3 localPos = sphereBody->pos - planeBody->pos;					
 	localPos = QMath::inverse(planeBody->orientation) * localPos;
+
+	///										--------- GLOBALs ----- GRAVITY & BOUNDARIES
+	Vec3 gravity(0.0f, -9.8f, 0.0f);
+	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
+	Vec3 downhill = gravity - gravityNormalComp;
+	float angSpeed = VMath::mag(sphereBody->angularVelocity);
+	float speed = angSpeed * sphereBody->radius;
+	
+	/*
+	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
+	values are not absolute so the sphere might have a subtle float value where the plane is absolute
+
+	*/
+	const float CONTACT_EPS = 0.01f;
+
+	/*
+	“How big is the plane in mesh space?”
+	or 1.0f depending on Plane.obj
+	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
+	*/
+	float baseHalfSize = 3.5f;	// Define the Boundary old# = [ 5 ]
+	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
+
+
 
 	/// 3.A									---------  TORQUE PT I ( ROTATION , BEGIN ROTATION )
 	/*  UpVector is set in INIT - it is a const , should it be ?
@@ -285,6 +312,8 @@ void Scene4p::Update(const float deltaTime)
 	 The force is the weight of the sphere
 	 The distance to the pivot relies on the angle
 	 between the weight and the normal
+	 Remove component along plane normal → get tangent component
+	 Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
 	float cosTheta = VMath::dot(planeNormal, upVector);
 	//cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
@@ -313,44 +342,20 @@ void Scene4p::Update(const float deltaTime)
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime); // Change the orientation using quaternion.
 
-	/// 3.C										--------- TORQUE PT III ( ROTATION - ANGULAR ACCELERATION / VELOCITY )
-	/*
-	Remove component along plane normal → get tangent component
-	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
-	*/
 
 	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
 	// linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
-
-
-	///											--------- GLOBALs ----- GRAVITY & BOUNDARIES
-	Vec3 gravity(0.0f, -9.8f, 0.0f);
-	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
-	Vec3 downhill = gravity - gravityNormalComp;
-	float angSpeed = VMath::mag(sphereBody->angularVelocity);
-	float speed = angSpeed * sphereBody->radius;
-
-	/*
-	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
-	values are not absolute so the sphere might have a subtle float value where the plane is absolute
-
-	*/
-	upVector = { 0.0f,1.0f,0.0f };
-	const float CONTACT_EPS = 0.01f;
-	/*
-	“How big is the plane in mesh space?”
-	or 1.0f depending on Plane.obj
-	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
-	*/
-	float baseHalfSize = 3.5f;	// Define the Boundary old# = [ 5 ]
-	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
-	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 
 	// 4.A										--------- BOUNDRIES GO PT I [ Boundary test (local space) ]
 	/*
 	 localPos yields a vector distance
 	 invers-ing localPos rotates the vector onto the planes LOCAL axis
 	 - Where is the sphere relative to the plane, expressed in the plane’s coordinate system -
+
+	 converts PLANE scale to WORLD SPACE
+	 - Rather than doing world space to mesh space we just translate the mesh to world -
+	 physics needs state-based transitions rather than frame by frame stateless transitions
+
 	*/
 
 	//  ----- DEPRECATED -----
@@ -361,34 +366,44 @@ void Scene4p::Update(const float deltaTime)
 	//localPos = QMath::inverse(planeBody->orientation) * localPos;
 	*/
 
-	//  ----- DEPRECATED ----- ( MESH SPACE ) -  Convert to mesh space - OPTION A
+	//  ----- DEPRECATED ----- OPTION A - ( MESH SPACE )
 	/* 
+	Divide localPos by planeBody->scale.
+	Use baseHalfSize directly (no scale).
+	Divide sphere radius by scale too. 
+	
 	convert localPos WORLD SPACE to MESH SPACE - Apply inverse scale - 
 	MESHRADIUS = WORLDRADIUS / SCALE
 
 	world - scaled space → original mesh space (un-scaled)
 	Matching the boundary scale with the plane scale
 	*/
+	
 	/*
 	localPos.x /= planeBody->scale.x;
 	localPos.y /= planeBody->scale.y;
 	localPos.z /= planeBody->scale.z;
+
+	bool insideBounds =
+		fabs(localPos.x) <= (baseHalfSize - sphereBody->radius / planeBody->scale.x) &&
+		fabs(localPos.z) <= (baseHalfSize - sphereBody->radius / planeBody->scale.z);
 	*/
 	
-	// --------- BOUNDARIES OPTION OLD ( WORLD SPACE )
+	// OPTION B ( WORLD SPACE )
 	/*
-	 converts PLANE scale to WORLD SPACE
-	 - Rather than doing world space to mesh space we just translate the mesh to world -
-	 physics needs state-based transitions rather than frame by frame stateless transistions
+	Keep localPos rotated into plane axes, but do not divide by scale.
+	Multiply baseHalfSize by plane scale for halfX/halfZ.
+	Use sphere radius as-is in world units.
 	*/
 	
-	// Convert to mesh space - OPTION B ( WORLD SPACE )
 	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
+
 	float halfZ = baseHalfSize * planeBody->scale.z;
-		
+	
 	bool insideBounds =
 	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
 	fabs(localPos.z) <= (halfZ - sphereBody->radius);
+	
 	
 
 	
