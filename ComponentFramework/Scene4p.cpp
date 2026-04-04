@@ -265,36 +265,44 @@ void Scene4p::Update(const float deltaTime)
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
 	planeNormal = VMath::normalize(planeNormal);
 
-	///													----- GLOBAL ----- SPHERE ON PLANE
-	/// 2.
-	upVector = { 0.0f,1.0f,0.0f };																// GENERATE UPVECTOR ----- MORE RESPOSNIVE ??
+	///											--------- GLOBALs ----- SPHERE ON PLANE
+	/// 3.A
+	/*
+	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
+	values are not absolute so the sphere might have a subtle float value where the plane is absolute
+	
+	*/
+	upVector = { 0.0f,1.0f,0.0f };
 	const float CONTACT_EPS = 0.01f;
+	float baseHalfSize = 5.0f;	// or 1.0f depending on Plane.obj
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 	//bool onPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
 
-	float baseHalfSize = 5.0f; // or 1.0f depending on Plane.obj
 
+	// 3.B										--------- BOUNDRIES Boundary test (local space)
+	/*
+	 localPos yields a vector distance
+	 invers-ing localPos rotates the vector onto the planes LOCAL axis
+	 - Where is the sphere relative to the plane, expressed in the plane’s coordinate system -
+	*/
+	Vec3 localPos = sphereBody->pos - planeBody->pos;						// WORLD SPACE
+	localPos = QMath::inverse(planeBody->orientation) * localPos;			// LOCAL SPACE
 
-	// 3.									 ---------------- BOUNDRIES Boundary test (local space)
-	Vec3 localPos = sphereBody->pos - planeBody->pos;
-	localPos = QMath::inverse(planeBody->orientation) * localPos;
-
+	// DEPRECATED
+	/*
 	// Adjust depending on your mesh base size
 	//Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
 	//Vec3 localPos = sphereBody->pos - planeBody->pos;
 	//localPos = QMath::inverse(planeBody->orientation) * localPos;
+	*/
 
 
-
-	// Apply inverse scale
-	//localPos.x /= planeBody->scale.x;
-	//localPos.z /= planeBody->scale.z;
+	// Apply inverse scale - WORLD SCALE to MESH SCALE
 	localPos.x /= planeBody->scale.x;
 	localPos.y /= planeBody->scale.y;
 	localPos.z /= planeBody->scale.z;
 
-	printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
 
 	//	---------------- BOUNDRIES
 	//float halfX = baseHalfSize * planeBody->scale.x;
@@ -308,21 +316,22 @@ void Scene4p::Update(const float deltaTime)
 		fabs(localPos.z) <= (baseHalfSize - sphereBody->radius);
 
 
+		/// ------------------------------------- DEBUG
+		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
+		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
+		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
 		//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
 		//localPos.x, localPos.z, halfX, halfZ);
 		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
+		//------------------------------------------------------------------------------------------------
 
-		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
-		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
-
-
-	// 4. Final on-plane test ---------------- BOUNDRIES
+	// 3.C										--------- BOUNDRIES (Boundary on - PLANE - LOCAL space)
 	bool onPlane = heightOK && insideBounds;
 	static bool wasOnPlane = true;
 	bool justLeftPlane = wasOnPlane && !onPlane;
 	wasOnPlane = onPlane;
 
-	/// 3. TORQUE - ROTATION , BEGIN ROTATION
+	/// 4.A										---------  TORQUE ( ROTATION , BEGIN ROTATION )
 	/*  UpVector is set in INIT - it is a const , should it be ?
 	 we know the perpendicular distance between pivot and force
 	 ----- ANGULAR ACCELERATION
@@ -361,7 +370,7 @@ void Scene4p::Update(const float deltaTime)
 		sphereBody->ApplyTourque(torqueFinal);
 	}
 
-	/// 4. UPDATE ANGULAR MOTION
+	/// 4.B										--------- TORQUE ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime);													// Change the orientation using quaternion.
 
@@ -370,30 +379,20 @@ void Scene4p::Update(const float deltaTime)
 	linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 
 
-	// ------ GLOBAL ----- GRAVITY
+	//5											--------- GRAVITY
 	Vec3 gravity(0.0f, -9.8f, 0.0f);
 	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
 	Vec3 downhill = gravity - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
 
-	/// 5. ROTATION - ANGULAR ACCELERATION / VELOCITY
+	/// 4.C										--------- TORQUE ( ROTATION - ANGULAR ACCELERATION / VELOCITY )
 	/*
 	Remove component along plane normal → get tangent component
 	Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
-	//if (onPlane)
-	//{
-	//	/// ------------- LOOP FUNCTIONS 2 , 3
-	//	linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal , sphereBody);
-	//	//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime); 
-	//}
-	//else
-	//{
-	//	//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
-	//	sphereBody->vel += gravity * deltaTime;
-	//	linearVelocity = sphereBody->vel;
-	//}
+	
+
 
 	if (onPlane)
 	{
@@ -413,11 +412,26 @@ void Scene4p::Update(const float deltaTime)
 		linearVelocity = sphereBody->vel;
 	}
 
-
-	/// ------------- LOOP FUNCTIONS 1
+	// ----- DEPRECATED ----- LOOP ( OnPlane ) 1
+	/*
+	if (onPlane)
+	{
+		/// ------------- LOOP FUNCTIONS 2 , 3
+		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal , sphereBody);
+		//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
+	}
+	else
+	{
+		//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
+		sphereBody->vel += gravity * deltaTime;
+		linearVelocity = sphereBody->vel;
+	}
+	*/
+	
+	// ----- DEPRECATED ----- FUNCTION ( OnPlane ) 1
 	//IfOnPlane(onPlane, sphereBody, gravity, downhill, linearVelocity, angSpeed, speed, deltaTime);
 
-	// DEPRECATED LOOP 2. 
+	// ----- DEPRECATED ----- LOOP ( OnPlane ) 2 
 	/*
 	if (onPlane) {
 		// --- rolling on plane ---
@@ -438,12 +452,10 @@ void Scene4p::Update(const float deltaTime)
 	}
 	*/
 
-
-
-
-
-	// DEPRECATED LOOP 1. 
+	// ----- DEPRECATED ----- FUNCTION ( OnPlane ) 2
 	//ComputeRollingVelocity(downhill);
+
+	// ----- DEPRECATED ----- LOOP ( OnPlane ) 3 
 	/*
 	if (VMath::mag(downhill) > VERY_SMALL)
 	{
@@ -456,14 +468,16 @@ void Scene4p::Update(const float deltaTime)
 		linearVelocity = downhillDir * speed;
 	}
 	*/
+	
 
 
-
-	/// 6. ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
+	/// 6. ----------------------------------------	ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
 
-	/// 7. ------------------------------------------ PLANE CONTACT CONSTRAINT (KEEP SPHERE RESTING ON PLANE)
+
+
+	/// 7. ---------------------------------------- PLANE CONTACT CONSTRAINT ( KEEP SPHERE RESTING ON PLANE )
 	//planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	if (onPlane)
 	{
@@ -484,16 +498,19 @@ void Scene4p::Update(const float deltaTime)
 
 
 
-	// ------ TRACKBALL - SYNTHETIC CAMERA - [Starting camera position]
+	// ------ TRACKBALL ------ SYNTHETIC CAMERA - [Starting camera position]
 	//cameraPosition = cameraPosition - sphereBody->pos;
 	cameraPosition = cameraPosition - planeBody->pos;
 
-	/* WHY INVERSE !...... looking down the neg z axis !
-	// initial is getQuat() in handle events, gets the inital position of the orientation of the quat
-	// trackball.HandleEvents(sdlEvent) is sandwiched in between to gather controler input - final is is getQuat() is the orientation after movement */
+	/* 
+	WHY INVERSE !...... looking down the neg z axis !
+	- initial is getQuat() in handle events, gets the inital position of the orientation of the quat
+	- trackball.HandleEvents(sdlEvent) is sandwiched in between to gather controler input - final is is getQuat() is the orientation after movement 
+
+	cam orientation will equal the finalOrientaion *= inverseOrientaion(initial) -
+	then correct the rotate of the cam position in relation to the change in trackball orientaion 
+	*/
 	Quaternion changeInTrackballOrientation = finalTrackballOrientation * QMath::inverse(initialTrackballOrientation);
-	/* cam orientation will equal the finalOrientaion *= inverseOrientaion(initial)
-	// - then correct the rotate of the cam position in relation to the change in trackball orientaion */
 	cameraOrientation *= changeInTrackballOrientation;
 	cameraPosition = QMath::rotate(cameraPosition, changeInTrackballOrientation);
 
@@ -613,7 +630,19 @@ Vec3 Scene4p::ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt)
 	return body->vel;
 }
 
-// 3. MUTEABLE
+
+/// ARCADE ANGULAR DAMPNING MOVMENT
+void Scene4p::ApplyAngularDamping(float deltaTime)
+{
+	const float damping = 0.95f; // 0.0 = instant stop, 1.0 = no damping
+	sphereBody->angularVelocity *= damping;
+}
+
+
+
+/// -------------- DEPRECATED ( MUTEABLE(S) )
+
+// ----- DEPRECATED -----
 Vec3 Scene4p::ComputeLinearVelocity(
 	bool onPlane,
 	Body* body,
@@ -641,7 +670,7 @@ Vec3 Scene4p::ComputeLinearVelocity(
 	}
 }
 
-// 4. MUTEABLE
+// ----- DEPRECATED -----
 void Scene4p::UpdateLinearVelocity(
 	bool onPlane,
 	Body* body,
@@ -672,21 +701,7 @@ void Scene4p::UpdateLinearVelocity(
 	}
 }
 
-/// <summary>
-/// ARCADE ANGULAR DAMPNING MOVMENT
-/// </summary>
-/// <param name="deltaTime"></param>
-void Scene4p::ApplyAngularDamping(float deltaTime)
-{
-	const float damping = 0.95f; // 0.0 = instant stop, 1.0 = no damping
-	sphereBody->angularVelocity *= damping;
-}
-
-
-
-/// -------------- DEPRECATED
-
-// 5. REDUNDANT
+// ----- DEPRECATED -----
 Vec3 Scene4p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time)
 {
 	if (onPlane) {
@@ -710,7 +725,7 @@ Vec3 Scene4p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHil
 	//return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
 }
 
-// 2. REDUNDANT
+// ----- DEPRECATED -----
 Vec3 Scene4p::ComputeRollingVelocity(const Vec3& downhill)
 {
 
