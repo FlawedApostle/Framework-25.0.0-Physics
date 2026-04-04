@@ -261,7 +261,7 @@ void Scene4p::Update(const float deltaTime)
 	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 
 
-	/// 1. Recompute plane normal from orientation
+	/// 1. PLANE NORMAL - ( Recompute plane normal from orientation )
 	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
 	planeNormal = VMath::normalize(planeNormal);
 
@@ -432,7 +432,6 @@ void Scene4p::Update(const float deltaTime)
 	
 
 	/// 7.										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )
-
 	static bool grounded = true;
 
 	if (grounded)
@@ -442,6 +441,8 @@ void Scene4p::Update(const float deltaTime)
 			grounded = false; // leave edge immediately
 		}
 	}
+
+
 
 	if (grounded)	//onPlane
 	{
@@ -462,6 +463,8 @@ void Scene4p::Update(const float deltaTime)
 		sphereBody->vel += gravity * deltaTime;
 		linearVelocity = sphereBody->vel;
 	}
+
+
 
 	// ----- DEPRECATED ----- LOOP ( OnPlane ) 1
 	/*
