@@ -59,8 +59,8 @@ private:
 	Vec3 axis_PitchDown = Vec3(1.0f, 0.0f, 0.0f);
 
 
-
-	/// ANGLE
+	// SHOULD BE MOVED TO EITHER BODY OR A PHYSICS CLASS
+	/// ANGLE		
 	Vec3 upVector;				/// Up Vector - for rolling the ball
 	float angle;
 	float distancetoPivot;		/// force of the ball 
@@ -75,9 +75,14 @@ private:
 	Vec3 linearVelocity;
 
 	/// Uniforms
+	Vec4 color1;
 	Vec3 lightPos;
 	float normalScale;
 	float lightPosLoc;
+
+	/// BOUNDARIES			--- MOVED TO A NEW CPP
+	float baseHalfSize;
+	const float CONTACT_EPS = 0.01f;;
 
 
 public:	/// again this up vector is set public for speed...

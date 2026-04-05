@@ -88,24 +88,28 @@ bool Scene4p::OnCreate() {
 	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
 	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
 
+	// GLOBALS PHYISCS
+	baseHalfSize = 20.0f;	// Define the Boundary old# = [ 5 ]
+
 	/// Trackball
 	trackball = new Trackball();
 
 	/// UNIFORMS
 	lightPos = Vec3(10.0f, 10.0f, 0.0f);														// light position for shader
 	normalScale = 2.0f;																			// normal scale for shader
+	color1 = Vec4(0.0, 0.0, 1.0, 0.0);
 
 	/// Plane
 	planeBody = new Body();
 	planeBody->OnCreate();
-	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
-	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
-	//Matrix4 model = planeBody->getModelMatrix();
+	//planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
+	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
+	Matrix4 model = planeBody->getModelMatrix();
 	//Vec3 planeNormal = VMath::normalize(Vec3(model[2][0], model[2][1], model[2][2]));
 
-	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
+	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
 	planeNormal.print("planeNormal");
-	planeBody->scale = Vec3(2.0f, 2.0f, 2.0f);
+	planeBody->scale = Vec3(1.0f, 1.0f, 1.0f);
 
 
 	/// Sphere 1.
@@ -127,7 +131,7 @@ bool Scene4p::OnCreate() {
 
 	// ----- 3D
 	// PLANE
-	planeMesh = new Mesh("meshes/Plane.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
+	planeMesh = new Mesh("meshes/Plane_Blender.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeMesh->OnCreate();
 	// SPHERE 1.
 	sphereMesh = new Mesh("meshes/Sphere.obj");
@@ -263,9 +267,10 @@ void Scene4p::Update(const float deltaTime)
 	(Recompute plane normal from orientation)
 	*/
 	upVector = { 0.0f,1.0f,0.0f };
-	planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);
+	planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);								//  Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
 	planeNormal = VMath::normalize(planeNormal);
 
+	// LOCAL POSITION
 	Vec3 localPos = sphereBody->pos - planeBody->pos;					
 	localPos = QMath::inverse(planeBody->orientation) * localPos;
 
@@ -280,13 +285,13 @@ void Scene4p::Update(const float deltaTime)
 	values are not absolute so the sphere might have a subtle float value where the plane is absolute
 
 	*/
-	const float CONTACT_EPS = 0.01f;
+	
 	/*
 	“How big is the plane in mesh space?”
 	or 1.0f depending on Plane.obj
 	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
 	*/
-	float baseHalfSize = 4.0f;	// Define the Boundary old# = [ 5 ]
+	
 	/*
 	signed distance
 	the position between the sphere and the plane then finding the dot product using the planes normal
@@ -440,10 +445,21 @@ void Scene4p::Update(const float deltaTime)
 	bool justLeftPlane = wasOnPlane && !onPlane;
 	wasOnPlane = onPlane;
 
-	
-
-	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )  logic needs cleaning
 	static bool grounded = true;
+	
+	//const float contactVelocityThreshold = 0.5f;
+	//float vNormal = VMath::dot(sphereBody->vel, planeNormal);
+	//bool nearPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
+	//bool stableContact = nearPlane && (vNormal <= contactVelocityThreshold);
+	//if (!grounded && onPlane && stableContact) grounded = true;
+
+
+	//if (justLeftPlane) {
+	//	linearVelocity = ComputeRollingVelocity_Cross(planeNormal);
+	//	sphereBody->vel = linearVelocity;
+	//}
+	//wasOnPlane = onPlane;
+
 	
 	/*
 	if (grounded)
@@ -454,6 +470,9 @@ void Scene4p::Update(const float deltaTime)
 		}
 	}
 	*/
+
+	
+	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )  logic needs cleaning
 	// --- UPDATED GROUNDED LOGIC ---
 	if (!grounded && onPlane)
 	{
@@ -491,77 +510,18 @@ void Scene4p::Update(const float deltaTime)
 		linearVelocity = sphereBody->vel;
 	}
 
+	float jumpSpeed = 10.0f; // My chosen impulse scalar
 	// --- NEW: JUMP IMPULSE LOGIC ---
 	if (bWantsToJump && grounded) {
-		float jumpSpeed = 10.0f; // My chosen impulse scalar
-
 		// Add instantaneous upward velocity along the plane's normal
-		linearVelocity += planeNormal * jumpSpeed;
-
-	}
-	else // untill true again you CANT jump
-		bWantsToJump = false; // Reset the trigger
-		grounded = false;     // Instantly detach from the ground
-
-
-
-	// ----- DEPRECATED ----- LOOP ( OnPlane ) 1
-	/*
-	if (onPlane)
-	{
-		/// ------------- LOOP FUNCTIONS 2 , 3
-		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal , sphereBody);
-		//linearVelocity = ComputeLinearVelocity(onPlane, sphereBody, gravity, downhill, deltaTime);
-	}
-	else
-	{
-		//linearVelocity = ComputeFreeFallVelocity(sphereBody, gravity, deltaTime);								// GRAVITY FUNCTION TEST
-		sphereBody->vel += gravity * deltaTime;
+		//2linearVelocity += planeNormal * jumpSpeed;
+		sphereBody->vel += planeNormal * jumpSpeed; // immediate change
 		linearVelocity = sphereBody->vel;
+		bWantsToJump = false;
+		grounded = false;
 	}
-	*/
-	
-	// ----- DEPRECATED ----- FUNCTION ( OnPlane ) 1
-	//IfOnPlane(onPlane, sphereBody, gravity, downhill, linearVelocity, angSpeed, speed, deltaTime);
 
-	// ----- DEPRECATED ----- LOOP ( OnPlane ) 2 
-	/*
-	if (onPlane) {
-		// --- rolling on plane ---
-		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
-		//Vec3 downhill = gravity - gravityNormalComp;
 
-		if (VMath::mag(downhill) > VERY_SMALL) {
-			Vec3 downhillDir = VMath::normalize(downhill);
-			float angSpeed = VMath::mag(sphereBody->angularVelocity);
-			float speed = angSpeed * sphereBody->radius;
-			linearVelocity = downhillDir * speed;
-		}
-	}
-	else {
-		// --- free fall ---
-		sphereBody->vel += gravity * deltaTime;
-		linearVelocity = sphereBody->vel;
-	}
-	*/
-
-	// ----- DEPRECATED ----- FUNCTION ( OnPlane ) 2
-	//ComputeRollingVelocity(downhill);
-
-	// ----- DEPRECATED ----- LOOP ( OnPlane ) 3 
-	/*
-	if (VMath::mag(downhill) > VERY_SMALL)
-	{
-		Vec3 downhillDir = VMath::normalize(downhill);
-
-		// Rolling without slipping: v = ω × R (approx using |ω| * R along downhill)
-		float angSpeed = VMath::mag(sphereBody->angularVelocity);
-		float speed = angSpeed * sphereBody->radius;
-
-		linearVelocity = downhillDir * speed;
-	}
-	*/
-	
 
 
 	/// ----------------------------------------	ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
@@ -658,6 +618,7 @@ void Scene4p::Render() const {
 		// Default Shader
 		glUseProgram(shader->GetProgram());
 		glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
+		glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color1"), 1, color1);
 
 		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);

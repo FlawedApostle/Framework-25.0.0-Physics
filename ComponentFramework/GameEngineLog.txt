@@ -1,4 +1,4 @@
-Sun Apr  5 12:05:39 2026
+Sun Apr  5 16:27:25 2026
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 NVIDIA 591.86
 [INFO]: Graphics card vendor NVIDIA Corporation
@@ -7,10 +7,11 @@ Sun Apr  5 12:05:39 2026
 [INFO]: Created Scene4p: 
 [INFO]: Loading assets Scene4p: 
 [INFO]: Uniforms:
-"lightPos" loc:0
-"modelMatrix" loc:1
-"projectionMatrix" loc:2
-"viewMatrix" loc:3
+"color1" loc:0
+"lightPos" loc:1
+"modelMatrix" loc:2
+"projectionMatrix" loc:3
+"viewMatrix" loc:4
 
 [INFO]: Uniforms:
 "modelMatrix" loc:0
@@ -27,10 +28,11 @@ Sun Apr  5 12:05:39 2026
 [INFO]: Created Scene4p: 
 [INFO]: Loading assets Scene4p: 
 [INFO]: Uniforms:
-"lightPos" loc:0
-"modelMatrix" loc:1
-"projectionMatrix" loc:2
-"viewMatrix" loc:3
+"color1" loc:0
+"lightPos" loc:1
+"modelMatrix" loc:2
+"projectionMatrix" loc:3
+"viewMatrix" loc:4
 
 [INFO]: Uniforms:
 "modelMatrix" loc:0

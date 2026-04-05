@@ -9,9 +9,13 @@ layout(location = 2) in vec3 eyeDir;
 layout(location = 3) in vec2 textureCoords; 
 
 //uniform sampler2D myTexture; 
+uniform vec4 color1;
+uniform vec4 color2;
+
 
 void main() {
-    vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
+//    vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
+    vec4 ks = color1;
 	vec4 kd = vec4(0.3, 0.3, 0.3, 0.0);
 	vec4 ka = 0.1 * kd;
 //	vec4 kt = texture(myTexture,textureCoords); 
