@@ -13,7 +13,9 @@
 #include "Collision.h"
 
 /// Notes are Written in Repo Jargon - check NOTES_PHYSICS FOR FORMULA BREAKDOWNS
-
+//Local X is still Left / Right.
+//Local Z is now pointing straight UP(Height).
+//Local Y is now pointing FORWARD(Depth).
 
 Scene4p::Scene4p() :
 
@@ -391,12 +393,19 @@ void Scene4p::Update(const float deltaTime)
 	Use sphere radius as-is in world units.
 	*/
 	
+	// NOTES::BOUNDARIES
+	/*
+		Local X is still Left/Right.
+		Local Z is now pointing straight UP (Height).
+		Local Y is now pointing FORWARD (Depth).
+	*/
+
 	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
 	float halfZ = baseHalfSize * planeBody->scale.z;
 	
 	bool insideBounds =
 	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
-	fabs(localPos.z) <= (halfZ - sphereBody->radius);
+	fabs(localPos.y) <= (halfZ - sphereBody->radius);		// changed localPos.z TO localPos.y 
 	
 	
 
