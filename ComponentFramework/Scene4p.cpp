@@ -98,7 +98,7 @@ bool Scene4p::OnCreate() {
 	/// Plane
 	planeBody = new Body();
 	planeBody->OnCreate();
-	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));
+	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
 	//Matrix4 model = planeBody->getModelMatrix();
 	//Vec3 planeNormal = VMath::normalize(Vec3(model[2][0], model[2][1], model[2][2]));
@@ -127,7 +127,7 @@ bool Scene4p::OnCreate() {
 
 	// ----- 3D
 	// PLANE
-	planeMesh = new Mesh("meshes/Plane.obj");
+	planeMesh = new Mesh("meshes/Plane.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeMesh->OnCreate();
 	// SPHERE 1.
 	sphereMesh = new Mesh("meshes/Sphere.obj");
@@ -275,20 +275,23 @@ void Scene4p::Update(const float deltaTime)
 	Vec3 downhill = gravity - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
-	
 	/*
 	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
 	values are not absolute so the sphere might have a subtle float value where the plane is absolute
 
 	*/
 	const float CONTACT_EPS = 0.01f;
-
 	/*
 	“How big is the plane in mesh space?”
 	or 1.0f depending on Plane.obj
 	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
 	*/
-	float baseHalfSize = 3.5f;	// Define the Boundary old# = [ 5 ]
+	float baseHalfSize = 4.0f;	// Define the Boundary old# = [ 5 ]
+	/*
+	signed distance
+	the position between the sphere and the plane then finding the dot product using the planes normal
+	height is okay if the distance is equal to the radius of the sphere
+	*/
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 
@@ -354,7 +357,6 @@ void Scene4p::Update(const float deltaTime)
 	 physics needs state-based transitions rather than frame by frame stateless transitions
 
 	*/
-
 	//  ----- DEPRECATED -----
 	/*
 	// Adjust depending on your mesh base size
@@ -362,7 +364,6 @@ void Scene4p::Update(const float deltaTime)
 	//Vec3 localPos = sphereBody->pos - planeBody->pos;
 	//localPos = QMath::inverse(planeBody->orientation) * localPos;
 	*/
-
 	//  ----- DEPRECATED ----- OPTION A - ( MESH SPACE )
 	/* 
 	Divide localPos by planeBody->scale.
@@ -385,14 +386,12 @@ void Scene4p::Update(const float deltaTime)
 		fabs(localPos.x) <= (baseHalfSize - sphereBody->radius / planeBody->scale.x) &&
 		fabs(localPos.z) <= (baseHalfSize - sphereBody->radius / planeBody->scale.z);
 	*/
-	
 	// OPTION B ( WORLD SPACE )
 	/*
 	Keep localPos rotated into plane axes, but do not divide by scale.
 	Multiply baseHalfSize by plane scale for halfX/halfZ.
 	Use sphere radius as-is in world units.
 	*/
-	
 	// NOTES::BOUNDARIES
 	/*
 		Local X is still Left/Right.
@@ -407,9 +406,7 @@ void Scene4p::Update(const float deltaTime)
 	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
 	fabs(localPos.y) <= (halfZ - sphereBody->radius);		// changed localPos.z TO localPos.y 
 	
-	
-
-	
+		
 	// --------- BOUNDARIES OPTION B ( MESH SPACE ) -  Convert radius to mesh space
 	/*
 	float scaledRadiusX = sphereBody->radius / planeBody->scale.x;
@@ -419,22 +416,20 @@ void Scene4p::Update(const float deltaTime)
 		fabs(localPos.x) <= (baseHalfSize - scaledRadiusX) &&
 		fabs(localPos.z) <= (baseHalfSize - scaledRadiusZ);
 	*/
-	
-
 		/// ------------------------------------- DEBUG
 	/*
 		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
 		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
 		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
 	*/
-		//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
+	//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
 		//localPos.x, localPos.z, halfX, halfZ);
 		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
 		//------------------------------------------------------------------------------------------------
 
+
 	// 4.B										--------- BOUNDRIES PT III [ (Boundary on - PLANE - LOCAL space) ]
 	//bool onPlane = heightOK && insideBounds;	// OLD
-	
 		// NEW 
 	bool touchingPlane = heightOK;
 	bool withinBounds = insideBounds;
@@ -447,7 +442,7 @@ void Scene4p::Update(const float deltaTime)
 
 	
 
-	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )
+	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )  logic needs cleaning
 	static bool grounded = true;
 	
 	/*
@@ -463,17 +458,20 @@ void Scene4p::Update(const float deltaTime)
 	if (!grounded && onPlane)
 	{
 		// We were in the air, but now we are touching the plane and within bounds. We landed!
+		printf("We were in the air, but now we are touching the plane and within bounds grounded\n");
 		grounded = true;
 	}
 	else if (grounded && !withinBounds)
 	{
 		// We are on the ground but rolled off the edge
+		printf(" We are on the ground but rolled off the edge !grounded\n");
 		grounded = false;
 	}
 
-
+	// FIX ! if in the air cannot attempt to log another jump. rather jump is null untill touching ground
+	// FIX ! ball will stay above plane with physics applied - jumping resets signed distance making the ball fall back onto the plane
 	/// 4.D
-	if (grounded)	//onPlane
+	if (grounded && onPlane)	//onPlane
 	{
 		linearVelocity = Body::ComputeRollingVelocity_Cross(planeNormal, sphereBody);
 	}
@@ -500,9 +498,10 @@ void Scene4p::Update(const float deltaTime)
 		// Add instantaneous upward velocity along the plane's normal
 		linearVelocity += planeNormal * jumpSpeed;
 
+	}
+	else // untill true again you CANT jump
 		bWantsToJump = false; // Reset the trigger
 		grounded = false;     // Instantly detach from the ground
-	}
 
 
 
