@@ -22,6 +22,7 @@ private:
 	bool drawInWireMode;
 	bool drawInNormalsFace;
 	bool drawInNormalsLine = true;
+	bool bWantsToJump;
 	Shader* shader;
 	Shader* shader_normals_face;
 	Shader* shader_normals_line;
