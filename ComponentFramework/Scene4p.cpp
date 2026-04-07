@@ -22,6 +22,7 @@ Scene4p::Scene4p() :
 	drawInWireMode					{ false }
 	, drawInNormalsFace				{ false }
 	, drawInNormalsLine				{ false }
+	, bWantsToJump					{ NULL }
 	, shader						{ nullptr }
 	, shader_normals_face			{ nullptr }
 	, shader_normals_line			{ nullptr }
@@ -39,7 +40,8 @@ Scene4p::Scene4p() :
 	, velocityMagnitutde			{ NULL }
 	, normalScale					{ NULL }
 	, lightPosLoc					{ NULL }
-	, color_ambient_exponent		{NULL} 
+	, baseHalfSize					{ NULL }
+	, color_ambient_exponent		{ 0.1f }
 	, torqueDirection				{ 0,0,0 }
 	, torque						{ 0,0,0 }
 	, velocityDirection				{ 0,0,0 }
@@ -187,15 +189,14 @@ bool Scene4p::OnCreate() {
 	/// Plane
 	planeBody = new Body();
 	planeBody->OnCreate();
-	//planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
 	Matrix4 model = planeBody->getModelMatrix();
-	//Vec3 planeNormal = VMath::normalize(Vec3(model[2][0], model[2][1], model[2][2]));
-
-	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
 	planeNormal.print("planeNormal");
-	planeBody->scale = Vec3(10.0f, 0.0f, 10.0f);
-
+	planeBody->scale = Vec3(20.0f, 1.0f, 20.0f);													// CHECK:: baseHalfScale defines the true space - leave at 1.0f - this scale is to defin the plane size
+	/*
+	//planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender --- new rotated planed that requires no rotation - fks up the gravity tho
+	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
+	*/
 
 	/// Sphere 1.
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
