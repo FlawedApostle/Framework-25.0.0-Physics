@@ -83,97 +83,6 @@ void Scene4p::OnDestroy() {
 	delete shader_normals_line;
 }
 
-bool Scene4p::OnCreate() {
-	Debug::Info("Loading assets Scene4p: ", __FILE__, __LINE__);
-	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
-	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
-
-	// GLOBALS PHYISCS
-	baseHalfSize = 20.0f;	// Define the Boundary old# = [ 5 ]
-
-	/// Trackball
-	trackball = new Trackball();
-
-	/// UNIFORMS
-	lightPos = Vec3(10.0f, 10.0f, 0.0f);														// light position for shader
-	normalScale = 2.0f;																			// normal scale for shader
-	color1 = Vec4(0.0, 0.0, 1.0, 0.0);
-
-	/// Plane
-	planeBody = new Body();
-	planeBody->OnCreate();
-	//planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
-	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
-	Matrix4 model = planeBody->getModelMatrix();
-	//Vec3 planeNormal = VMath::normalize(Vec3(model[2][0], model[2][1], model[2][2]));
-
-	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
-	planeNormal.print("planeNormal");
-	planeBody->scale = Vec3(1.0f, 1.0f, 1.0f);
-
-
-	/// Sphere 1.
-	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
-	sphereBody = new Body();
-	sphereBody->OnCreate();
-	sphereBody->pos = Vec3(0.0f, 0.0, 0.0f);
-	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);										// starts at 0 for rest
-	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
-	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
-	sphereBody->radius = 1.0f;
-
-	/// sphere .2 - COLLISIONS
-	sphereCollision0_Body = new Body();
-	sphereCollision0_Body->OnCreate();
-	sphereCollision0_Body->pos = Vec3(0.0f, 1.0, 0.0f);
-	sphereCollision0_Body->radius = 1.0f;
-
-
-	// ----- 3D
-	// PLANE
-	planeMesh = new Mesh("meshes/Plane_Blender.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
-	planeMesh->OnCreate();
-	// SPHERE 1.
-	sphereMesh = new Mesh("meshes/Sphere.obj");
-	sphereMesh->OnCreate();
-	// SPHERE 2.
-	sphereCollision0_Mesh = new Mesh("meshes/Sphere.obj");
-	sphereCollision0_Mesh->OnCreate();
-
-	/// ----- SHADER 1. ---- DEFAULT.
-	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
-	shader->CheckShader(shader);										// added shader CHECK function to Shader.h
-
-	// SHADER - NORMALS 
-	shader_normals_face = new Shader("shaders/Normals/normalsVert.glsl", "shaders/Normals/normalsFrag.glsl");
-	shader_normals_face->CheckShader(shader_normals_face);
-
-	// SHADER - NORMAL LINES
-	shader_normals_line = new Shader(
-		"shaders/NormalsDraw/drawNormals.vert",
-		"shaders/NormalsDraw/drawNormals.frag",
-		nullptr, nullptr,
-		"shaders/NormalsDraw/drawNormals.geom"
-	);
-	shader_normals_line->CheckShader(shader_normals_line);				// ----- DEBUG SHADER NORMALS LINES
-
-
-	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 50.0f);
-	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
-
-	// ----- CAMERA
-	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
-	Matrix4 T = MMath::translate(cameraPosition);
-	Matrix4 R = MMath::toMatrix4(cameraOrientation);
-	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
-
-
-	return true;
-}
-
 /// CONTROLLS
 void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 	/// Trackball
@@ -256,6 +165,99 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
+bool Scene4p::OnCreate() {
+	Debug::Info("Loading assets Scene4p: ", __FILE__, __LINE__);
+	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
+	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
+
+	// GLOBALS PHYISCS
+	baseHalfSize = 1.0f;	// Define the Boundary old# = [ 5 ]
+	upVector = { 0.0f,1.0f,0.0f };
+
+	/// Trackball
+	trackball = new Trackball();
+
+	/// UNIFORMS
+	lightPos = Vec3(0.0f, 5.0f, 0.0f);														// light position for shader
+	normalScale = 2.0f;																			// normal scale for shader
+	color1 = Vec4(0.0, 0.0, 1.0, 0.0);
+
+	/// Plane
+	planeBody = new Body();
+	planeBody->OnCreate();
+	//planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
+	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
+	Matrix4 model = planeBody->getModelMatrix();
+	//Vec3 planeNormal = VMath::normalize(Vec3(model[2][0], model[2][1], model[2][2]));
+
+	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
+	planeNormal.print("planeNormal");
+	planeBody->scale = Vec3(20.0f, 0.0f, 20.0f);
+
+
+	/// Sphere 1.
+	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
+	sphereBody = new Body();
+	sphereBody->OnCreate();
+	sphereBody->pos = Vec3(0.0f, 0.0, 0.0f);
+	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);										// starts at 0 for rest
+	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
+	sphereBody->angularAcceleration = Vec3(0.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
+	sphereBody->radius = 1.0f;
+
+	/// sphere .2 - COLLISIONS
+	sphereCollision0_Body = new Body();
+	sphereCollision0_Body->OnCreate();
+	sphereCollision0_Body->pos = Vec3(0.0f, 1.0, 0.0f);
+	sphereCollision0_Body->radius = 1.0f;
+
+
+	// ----- 3D
+	// PLANE
+	planeMesh = new Mesh("meshes/Plane_Blender.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
+	planeMesh->OnCreate();
+	// SPHERE 1.
+	sphereMesh = new Mesh("meshes/Sphere.obj");
+	sphereMesh->OnCreate();
+	// SPHERE 2.
+	sphereCollision0_Mesh = new Mesh("meshes/Sphere.obj");
+	sphereCollision0_Mesh->OnCreate();
+
+	/// ----- SHADER 1. ---- DEFAULT.
+	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
+	shader->CheckShader(shader);										// added shader CHECK function to Shader.h
+
+	// SHADER - NORMALS 
+	shader_normals_face = new Shader("shaders/Normals/normalsVert.glsl", "shaders/Normals/normalsFrag.glsl");
+	shader_normals_face->CheckShader(shader_normals_face);
+
+	// SHADER - NORMAL LINES
+	shader_normals_line = new Shader(
+		"shaders/NormalsDraw/drawNormals.vert",
+		"shaders/NormalsDraw/drawNormals.frag",
+		nullptr, nullptr,
+		"shaders/NormalsDraw/drawNormals.geom"
+	);
+	shader_normals_line->CheckShader(shader_normals_line);				// ----- DEBUG SHADER NORMALS LINES
+
+
+	/// ----- CAMERA STARTING POSITIONING
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 50.0f);
+	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
+
+	// ----- CAMERA
+	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
+	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
+	Matrix4 T = MMath::translate(cameraPosition);
+	Matrix4 R = MMath::toMatrix4(cameraOrientation);
+	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
+
+
+	return true;
+}
+
+
 void Scene4p::Update(const float deltaTime)
 {
 	// ----- FIND POINT BETWEEN TWO POSITIONS
@@ -266,7 +268,7 @@ void Scene4p::Update(const float deltaTime)
 	/* 
 	(Recompute plane normal from orientation)
 	*/
-	upVector = { 0.0f,1.0f,0.0f };
+
 	planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);								//  Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
 	planeNormal = VMath::normalize(planeNormal);
 
@@ -299,6 +301,7 @@ void Scene4p::Update(const float deltaTime)
 	*/
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
+
 
 
 
@@ -343,16 +346,16 @@ void Scene4p::Update(const float deltaTime)
 		sphereBody->ApplyTourque(torqueFinal);
 	}
 
-	/// 3.B										--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
+	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);
 	sphereBody->UpdateOrientation(deltaTime); // Change the orientation using quaternion.
 
 
-	// ----- GLOBAL ----- EXPLICITLY ZERO OUT THE LINEAR VELOCITY BEFORE CALCULATING NEW ONE BASED ON DOWNHILL DIRECTION
-	// linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
-
 	// 4.A										--------- BOUNDRIES GO PT I [ Boundary test (local space) ]
 	/*
+ 											Local X is still Left/Right.
+											Local Y is now pointing straight UP (Height).
+											Local Z is now pointing FORWARD (Depth).
 	 localPos yields a vector distance
 	 invers-ing localPos rotates the vector onto the planes LOCAL axis
 	 - Where is the sphere relative to the plane, expressed in the plane’s coordinate system -
@@ -361,16 +364,8 @@ void Scene4p::Update(const float deltaTime)
 	 - Rather than doing world space to mesh space we just translate the mesh to world -
 	 physics needs state-based transitions rather than frame by frame stateless transitions
 
-	*/
-	//  ----- DEPRECATED -----
-	/*
-	// Adjust depending on your mesh base size
-	//Vec3 localPos = QMath::inverse(planeBody->orientation) * (sphereBody->pos - planeBody->pos);
-	//Vec3 localPos = sphereBody->pos - planeBody->pos;
-	//localPos = QMath::inverse(planeBody->orientation) * localPos;
-	*/
 	//  ----- DEPRECATED ----- OPTION A - ( MESH SPACE )
-	/* 
+
 	Divide localPos by planeBody->scale.
 	Use baseHalfSize directly (no scale).
 	Divide sphere radius by scale too. 
@@ -382,6 +377,7 @@ void Scene4p::Update(const float deltaTime)
 	Matching the boundary scale with the plane scale
 	*/
 	
+	//  ----- DEPRECATED ----- OPTION A - ( MESH SPACE ) [leave for now]
 	/*
 	localPos.x /= planeBody->scale.x;
 	localPos.y /= planeBody->scale.y;
@@ -391,47 +387,44 @@ void Scene4p::Update(const float deltaTime)
 		fabs(localPos.x) <= (baseHalfSize - sphereBody->radius / planeBody->scale.x) &&
 		fabs(localPos.z) <= (baseHalfSize - sphereBody->radius / planeBody->scale.z);
 	*/
-	// OPTION B ( WORLD SPACE )
+	
+	// OPTION B ( WORLD SPACE ) - Scale to world Space
 	/*
 	Keep localPos rotated into plane axes, but do not divide by scale.
 	Multiply baseHalfSize by plane scale for halfX/halfZ.
 	Use sphere radius as-is in world units.
 	*/
-	// NOTES::BOUNDARIES
-	/*
-		Local X is still Left/Right.
-		Local Z is now pointing straight UP (Height).
-		Local Y is now pointing FORWARD (Depth).
-	*/
-
+	Vec3 planeHalfExtents = Vec3(20.0f, 0.0f, 20.0f);	// test 
 	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
 	float halfZ = baseHalfSize * planeBody->scale.z;
 	
 	bool insideBounds =
 	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
-	fabs(localPos.y) <= (halfZ - sphereBody->radius);		// changed localPos.z TO localPos.y 
+	fabs(localPos.z) <= (halfZ - sphereBody->radius);
+
+	//Vec3 rel = sphereBody->pos - planeBody->pos;
+
+	//bool insideBounds =
+	//	fabs(rel.x) <= halfX &&
+	//	fabs(rel.z) <= halfZ;
+
+
+	//std::cout << "BOUNDARIES CHECK :: " << "\n";
+	//printf("localPos: %f %f %f\n", localPos.x, localPos.y, localPos.z);
+	//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
+	//printf("localPos: %f %f\n", localPos.x, localPos.z);
 	
 		
-	// --------- BOUNDARIES OPTION B ( MESH SPACE ) -  Convert radius to mesh space
-	/*
-	float scaledRadiusX = sphereBody->radius / planeBody->scale.x;
-	float scaledRadiusZ = sphereBody->radius / planeBody->scale.z;
-
-	bool insideBounds =
-		fabs(localPos.x) <= (baseHalfSize - scaledRadiusX) &&
-		fabs(localPos.z) <= (baseHalfSize - scaledRadiusZ);
-	*/
-		/// ------------------------------------- DEBUG
+	/// ------------------------------------- DEBUG
 	/*
 		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
 		printf("plane pos: (%f,%f,%f)\n", planeBody->pos.x, planeBody->pos.y, planeBody->pos.z);
 		printf("sphere pos: (%f,%f,%f)\n", sphereBody->pos.x, sphereBody->pos.y, sphereBody->pos.z);
-	*/
-	//printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
-		//localPos.x, localPos.z, halfX, halfZ);
-		//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
+		printf("localPos: (%f, %f) | bounds: (%f, %f)\n",
+		localPos.x, localPos.z, halfX, halfZ);
+		printf("halfX: %f halfZ: %f\n", halfX, halfZ);
 		//------------------------------------------------------------------------------------------------
-
+	*/
 
 	// 4.B										--------- BOUNDRIES PT III [ (Boundary on - PLANE - LOCAL space) ]
 	//bool onPlane = heightOK && insideBounds;	// OLD
@@ -549,6 +542,8 @@ void Scene4p::Update(const float deltaTime)
 			sphereBody->vel -= planeNormal * vdot;
 		}
 	}
+
+
 
 
 
@@ -697,64 +692,6 @@ void Scene4p::ApplyAngularDamping(float deltaTime)
 
 /// -------------- DEPRECATED ( MUTEABLE(S) )
 
-// ----- DEPRECATED -----
-Vec3 Scene4p::ComputeLinearVelocity(
-	bool onPlane,
-	Body* body,
-	const Vec3& gravity,
-	const Vec3& downhill,
-	float deltaTime)
-{
-	if (onPlane)
-	{
-		if (VMath::mag(downhill) > VERY_SMALL)
-		{
-			Vec3 downhillDir = VMath::normalize(downhill);
-			float angSpeed = VMath::mag(body->angularVelocity);
-			float speed = angSpeed * body->radius;
-
-			return downhillDir * speed;
-		}
-
-		return Vec3(0.0f, 0.0f, 0.0f);
-	}
-	else
-	{
-		body->vel += gravity * deltaTime;
-		return body->vel;
-	}
-}
-
-// ----- DEPRECATED -----
-void Scene4p::UpdateLinearVelocity(
-	bool onPlane,
-	Body* body,
-	const Vec3& gravity,
-	const Vec3& downhill,
-	float deltaTime,
-	Vec3& outLinearVelocity)
-{
-	if (onPlane)
-	{
-		if (VMath::mag(downhill) > VERY_SMALL)
-		{
-			Vec3 downhillDir = VMath::normalize(downhill);
-			float angSpeed = VMath::mag(body->angularVelocity);
-			float speed = angSpeed * body->radius;
-
-			outLinearVelocity = downhillDir * speed;
-		}
-		else
-		{
-			outLinearVelocity = Vec3(0.0f, 0.0f, 0.0f);
-		}
-	}
-	else
-	{
-		body->vel += gravity * deltaTime;
-		outLinearVelocity = body->vel;
-	}
-}
 
 // ----- DEPRECATED -----
 Vec3 Scene4p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time)
