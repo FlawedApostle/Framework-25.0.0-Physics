@@ -9,15 +9,16 @@ layout(location = 2) in vec3 eyeDir;
 layout(location = 3) in vec2 textureCoords; 
 
 //uniform sampler2D myTexture; 
-uniform vec4 color1;
-uniform vec4 color2;
+uniform vec4 color_specular;
+uniform vec4 color_diffuse;
+uniform float color_ambient_exponent;
 
 
 void main() {
 //    vec4 ks = vec4(0.3, 0.3, 0.3, 0.0);
-    vec4 ks = color1;
-	vec4 kd = vec4(0.3, 0.3, 0.3, 0.0);
-	vec4 ka = 0.1 * kd;
+    vec4 ks = color_specular;
+	vec4 kd = color_diffuse;
+	vec4 ka = color_ambient_exponent * color_diffuse;
 //	vec4 kt = texture(myTexture,textureCoords); 
 
 	float diff = max(dot(vertNormal, lightDir), 0.0);

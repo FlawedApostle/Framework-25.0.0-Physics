@@ -75,7 +75,9 @@ private:
 	Vec3 linearVelocity;
 
 	/// Uniforms
-	Vec4 color1;
+	Vec4 color_specular;
+	Vec4 color_diffuse;
+	float color_ambient_exponent = 0.1f;
 	Vec3 lightPos;
 	float normalScale;
 	float lightPosLoc;

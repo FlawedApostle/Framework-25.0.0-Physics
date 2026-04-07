@@ -19,32 +19,33 @@
 
 Scene4p::Scene4p() :
 
-	drawInWireMode{ false }
-	, drawInNormalsFace{ false }
-	, drawInNormalsLine{ false }
-	, shader{ nullptr }
-	, shader_normals_face{ nullptr }
-	, shader_normals_line{ nullptr }
-	, sphereMesh{ nullptr }
-	, sphereBody{ nullptr }
-	, planeBody{ nullptr }
-	, planeMesh{ nullptr }
-	, sphereCollision0_Body{ nullptr }
-	, sphereCollision0_Mesh{ nullptr }
-	, sphereCollision0_Normal{ 0,0,0 }
-	, trackball{ nullptr }
-	, distancetoPivot{ NULL }
-	, torqueMagnitude{ NULL }
-	, angle{ NULL }
-	, velocityMagnitutde{ NULL }
-	, normalScale{ NULL }
-	, lightPosLoc{ NULL }
-	, torqueDirection{ 0,0,0 }
-	, torque{ 0,0,0 }
-	, velocityDirection{ 0,0,0 }
-	, linearVelocity{ 0,0,0 }
-	, planeNormal{ 0,1,0 }
-	, upVector{ 0.0f,1.0f,0.0f }
+	drawInWireMode					{ false }
+	, drawInNormalsFace				{ false }
+	, drawInNormalsLine				{ false }
+	, shader						{ nullptr }
+	, shader_normals_face			{ nullptr }
+	, shader_normals_line			{ nullptr }
+	, sphereMesh					{ nullptr }
+	, sphereBody					{ nullptr }
+	, planeBody						{ nullptr }
+	, planeMesh						{ nullptr }
+	, sphereCollision0_Body			{ nullptr }
+	, sphereCollision0_Mesh			{ nullptr }
+	, sphereCollision0_Normal		{ 0,0,0 }
+	, trackball						{ nullptr }
+	, distancetoPivot				{ NULL }
+	, torqueMagnitude				{ NULL }
+	, angle							{ NULL }
+	, velocityMagnitutde			{ NULL }
+	, normalScale					{ NULL }
+	, lightPosLoc					{ NULL }
+	, color_ambient_exponent		{NULL} 
+	, torqueDirection				{ 0,0,0 }
+	, torque						{ 0,0,0 }
+	, velocityDirection				{ 0,0,0 }
+	, linearVelocity				{ 0,0,0 }
+	, planeNormal					{ 0,1,0 }
+	, upVector						{ 0.0f,1.0f,0.0f }
 
 {
 	Debug::Info("Created Scene4p: ", __FILE__, __LINE__);
@@ -177,10 +178,11 @@ bool Scene4p::OnCreate() {
 	/// Trackball
 	trackball = new Trackball();
 
-	/// UNIFORMS
-	lightPos = Vec3(0.0f, 10.0f, 0.0f);														// light position for shader
-	normalScale = 2.0f;																			// normal scale for shader
-	color1 = Vec4(0.0, 1.0, 0.0, 0.0);
+	/// UNIFORMS --- phongVert , phongFrag [shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl] 
+	lightPos = Vec3(0.0f, 10.0f, 0.0f);															// lightpos shader PhoneVert
+	color_specular = Vec4(1.0, 0.0, 0.0, 0.0);
+	color_diffuse = Vec4(0.5, 0.0, 0.0, 0.0);
+	color_ambient_exponent = 0.5f;
 
 	/// Plane
 	planeBody = new Body();
@@ -593,7 +595,9 @@ void Scene4p::Render() const {
 		// Default Shader
 		glUseProgram(shader->GetProgram());
 		glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
-		glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color1"), 1, color1);
+		glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color_specular"), 1, color_specular);
+		glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color_diffuse"), 1, color_diffuse);
+		glUniform1f(glGetUniformLocation(shader->GetProgram(), "color_ambient_exponent"),color_ambient_exponent);
 
 		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
