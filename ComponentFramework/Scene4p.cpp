@@ -170,7 +170,7 @@ bool Scene4p::OnCreate() {
 	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
 	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
 
-	// GLOBALS PHYISCS
+	// MESH SCALE , MESH NORMAL
 	baseHalfSize = 1.0f;	// Define the Boundary old# = [ 5 ]
 	upVector = { 0.0f,1.0f,0.0f };
 
@@ -178,9 +178,9 @@ bool Scene4p::OnCreate() {
 	trackball = new Trackball();
 
 	/// UNIFORMS
-	lightPos = Vec3(0.0f, 5.0f, 0.0f);														// light position for shader
+	lightPos = Vec3(0.0f, 10.0f, 0.0f);														// light position for shader
 	normalScale = 2.0f;																			// normal scale for shader
-	color1 = Vec4(0.0, 0.0, 1.0, 0.0);
+	color1 = Vec4(0.0, 1.0, 0.0, 0.0);
 
 	/// Plane
 	planeBody = new Body();
@@ -192,7 +192,7 @@ bool Scene4p::OnCreate() {
 
 	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
 	planeNormal.print("planeNormal");
-	planeBody->scale = Vec3(20.0f, 0.0f, 20.0f);
+	planeBody->scale = Vec3(10.0f, 0.0f, 10.0f);
 
 
 	/// Sphere 1.
@@ -265,10 +265,6 @@ void Scene4p::Update(const float deltaTime)
 
 
 	//										--------- GLOBALs ----- NORMAL ( PLANE ) & LOCAL POSITION
-	/* 
-	(Recompute plane normal from orientation)
-	*/
-
 	planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);								//  Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
 	planeNormal = VMath::normalize(planeNormal);
 
@@ -277,33 +273,25 @@ void Scene4p::Update(const float deltaTime)
 	localPos = QMath::inverse(planeBody->orientation) * localPos;
 
 	///										--------- GLOBALs ----- GRAVITY & BOUNDARIES
+	/*
+	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
+	values are not absolute so the sphere might have a subtle float value where the plane is absolute
+
+	“How big is the plane in mesh space?”
+	or 1.0f depending on Plane.obj
+	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
+
+	signed distance
+	the position between the sphere and the plane then finding the dot product using the planes normal
+	height is okay if the distance is equal to the radius of the sphere
+	*/
 	Vec3 gravity(0.0f, -9.8f, 0.0f);
 	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
 	Vec3 downhill = gravity - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
-	/*
-	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
-	values are not absolute so the sphere might have a subtle float value where the plane is absolute
-
-	*/
-	
-	/*
-	“How big is the plane in mesh space?”
-	or 1.0f depending on Plane.obj
-	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
-	*/
-	
-	/*
-	signed distance
-	the position between the sphere and the plane then finding the dot product using the planes normal
-	height is okay if the distance is equal to the radius of the sphere
-	*/
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
-
-
-
 
 	/// 3.A									---------  TORQUE PT I ( ROTATION , BEGIN ROTATION )
 	/*  UpVector is set in INIT - it is a const , should it be ?
@@ -394,7 +382,7 @@ void Scene4p::Update(const float deltaTime)
 	Multiply baseHalfSize by plane scale for halfX/halfZ.
 	Use sphere radius as-is in world units.
 	*/
-	Vec3 planeHalfExtents = Vec3(20.0f, 0.0f, 20.0f);	// test 
+	//Vec3 planeHalfExtents = Vec3(10.0f, 0.0f, 10.0f);		// test 
 	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
 	float halfZ = baseHalfSize * planeBody->scale.z;
 	
@@ -440,28 +428,20 @@ void Scene4p::Update(const float deltaTime)
 
 	static bool grounded = true;
 	
-	//const float contactVelocityThreshold = 0.5f;
-	//float vNormal = VMath::dot(sphereBody->vel, planeNormal);
-	//bool nearPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
-	//bool stableContact = nearPlane && (vNormal <= contactVelocityThreshold);
-	//if (!grounded && onPlane && stableContact) grounded = true;
-
-
-	//if (justLeftPlane) {
-	//	linearVelocity = ComputeRollingVelocity_Cross(planeNormal);
-	//	sphereBody->vel = linearVelocity;
-	//}
-	//wasOnPlane = onPlane;
-
-	
+	// ---- DEPRECATED [not sure to remove just tyet]
 	/*
-	if (grounded)
-	{
-		if (!withinBounds)
-		{
-			grounded = false; // leave edge immediately
-		}
+	const float contactVelocityThreshold = 0.5f;
+	float vNormal = VMath::dot(sphereBody->vel, planeNormal);
+	bool nearPlane = planeDist <= sphereBody->radius + CONTACT_EPS;
+	bool stableContact = nearPlane && (vNormal <= contactVelocityThreshold);
+	if (!grounded && onPlane && stableContact) grounded = true;
+
+
+	if (justLeftPlane) {
+		linearVelocity = ComputeRollingVelocity_Cross(planeNormal);
+		sphereBody->vel = linearVelocity;
 	}
+	wasOnPlane = onPlane;
 	*/
 
 	
