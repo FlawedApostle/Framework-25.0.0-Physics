@@ -33,12 +33,14 @@ Body::~Body() {}
 /// Get the model matrix
 const Matrix4 Body::getModelMatrix() const
 {
-	// scale * rotate * translate == translate * rotate * scale
-	// read right to left Hebrew style
-	//return translate * rotation * scale;
+	/* 
+	scale* rotate* translate == translate * rotate * scale
+	read right to left Hebrew style
+	return translate * rotation * scale;
 
-	// PRO ORDER (Hebrew Style / Right-to-Left):
-	// Translate * Rotate * Scale
+	PRO ORDER (Hebrew Style / Right-to-Left):
+	Translate * Rotate * Scale
+	*/ 
 	return MMath::translate(pos) * MMath::toMatrix4(orientation) * MMath::scale(scale);
 }
 
