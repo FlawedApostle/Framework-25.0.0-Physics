@@ -216,7 +216,7 @@ bool Scene4p::OnCreate() {
 
 	// ----- 3D
 	// PLANE
-	planeMesh = new Mesh("meshes/Plane_2.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
+	planeMesh = new Mesh("meshes/Plane_3.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeMesh->OnCreate();
 	// SPHERE 1.
 	sphereMesh = new Mesh("meshes/Sphere.obj");
@@ -244,7 +244,7 @@ bool Scene4p::OnCreate() {
 
 
 	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 15.0f);
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 5.0f);
 	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 
 	// ----- CAMERA
