@@ -18,7 +18,7 @@ Body::Body():
 	accel					{}, 
 	mass					{1.0f},		// mass set from 0 to 1.0
 	radius					{1.0f},
-	scale					{1.0f,1.0f,1.0f},
+	scale					{},
 	rotationalInertia		{ },
 	angularAcceleration		{},
 	angularVelocity			{},

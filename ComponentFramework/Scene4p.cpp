@@ -190,9 +190,8 @@ bool Scene4p::OnCreate() {
 	planeBody = new Body();
 	planeBody->OnCreate();
 	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
-	Matrix4 model = planeBody->getModelMatrix();
 	planeNormal.print("planeNormal");
-	planeBody->scale = Vec3(20.0f, 1.0f, 20.0f);													// CHECK:: baseHalfScale defines the true space - leave at 1.0f - this scale is to defin the plane size
+	planeBody->scale = Vec3(1.0f, 1.0f, 1.0f);														// CHECK:: baseHalfScale defines the true space - leave at 1.0f - this scale is to defin the plane size
 	/*
 	//planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0));						// Plane_Blender --- new rotated planed that requires no rotation - fks up the gravity tho
 	//planeNormal = QMath::rotate(Vec3(0.0f, 0.0f, 1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
@@ -217,7 +216,7 @@ bool Scene4p::OnCreate() {
 
 	// ----- 3D
 	// PLANE
-	planeMesh = new Mesh("meshes/Plane_Blender.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
+	planeMesh = new Mesh("meshes/Plane_2.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeMesh->OnCreate();
 	// SPHERE 1.
 	sphereMesh = new Mesh("meshes/Sphere.obj");
@@ -245,7 +244,7 @@ bool Scene4p::OnCreate() {
 
 
 	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 50.0f);
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 15.0f);
 	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 
 	// ----- CAMERA
@@ -561,7 +560,7 @@ void Scene4p::Render() const {
 
 	// -- FACE WINDING
 	glFrontFace(GL_CCW);
-	// glFrontFace(GL_CW);
+	 //glFrontFace(GL_CW);
 
 	/// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -609,7 +608,7 @@ void Scene4p::Render() const {
 
 		// SPHERE 1. ---- DEFAULT
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
-		sphereMesh->Render(GL_TRIANGLES);
+		//sphereMesh->Render(GL_TRIANGLES);
 
 		// SPEHERE 2. - COLLISION
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereCollision0_Body->getModelMatrix());
@@ -632,7 +631,7 @@ void Scene4p::Render() const {
 
 		// SPHERE NORMALS
 		glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
-		sphereMesh->Render(GL_TRIANGLES);
+		//sphereMesh->Render(GL_TRIANGLES);
 	}
 
 	glUseProgram(0);

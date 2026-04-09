@@ -14,11 +14,13 @@ layout (location = 0) out VertexStage {
 
 void main() {
     mat3 normalMatrix = mat3(transpose(inverse(modelMatrix)));
-    gl_Position = viewMatrix * modelMatrix * vVertex;
+//    gl_Position = viewMatrix * modelMatrix * vVertex;
+    gl_Position = modelMatrix * vVertex;  // world space only
     vs_out.normal = mat3(normalMatrix) * vNormal;
+    vs_out.normal = normalize(normalMatrix * vNormal);
     
-    gl_Position = vVertex;
-    vs_out.normal = vNormal;
+//    gl_Position = vVertex;
+//    vs_out.normal = vNormal;
 
 
 }
