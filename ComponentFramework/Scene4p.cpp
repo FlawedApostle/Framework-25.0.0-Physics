@@ -244,7 +244,7 @@ bool Scene4p::OnCreate() {
 
 
 	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 25.0f);
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 35.0f);
 	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 
 	// ----- CAMERA
