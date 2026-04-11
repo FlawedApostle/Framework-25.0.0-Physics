@@ -41,7 +41,10 @@ const Matrix4 Body::getModelMatrix() const
 	PRO ORDER (Hebrew Style / Right-to-Left):
 	Translate * Rotate * Scale
 	*/ 
-	return MMath::translate(pos) * MMath::toMatrix4(orientation) * MMath::scale(scale);
+	Matrix4 T = MMath::translate(pos);
+		Matrix4 P = MMath::toMatrix4(orientation);
+		Matrix4 S =  MMath::scale(scale);
+		return T * P * S;
 }
 
 

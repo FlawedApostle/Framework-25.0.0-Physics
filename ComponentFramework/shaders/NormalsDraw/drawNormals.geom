@@ -3,7 +3,7 @@
 
 layout (triangles) in; /// bringing in triangles
 
-layout (line_strip, max_vertices = 2) out; 
+layout (line_strip, max_vertices = 6) out; 
 
 layout(location = 0) uniform mat4 projectionMatrix;
 layout(location = 1) uniform mat4 viewMatrix;
@@ -18,10 +18,10 @@ layout (location = 0) in VertexStage {
 void main() {
     float length  = 1.0;
     for(int index = 0; index < 3; index++){
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * gl_in[index].gl_Position;
+        gl_Position = projectionMatrix  * viewMatrix * gl_in[index].gl_Position;                                                     // * modelMatrix
         EmitVertex();
 
-        gl_Position = projectionMatrix * viewMatrix * modelMatrix * (gl_in[index].gl_Position + (vec4(vs_in[index].normal * length, 0.0)));
+        gl_Position = projectionMatrix  * viewMatrix  * (gl_in[index].gl_Position + (vec4(vs_in[index].normal * length, 0.0)));        // * modelMatrix
         EmitVertex();
 
         EndPrimitive();
