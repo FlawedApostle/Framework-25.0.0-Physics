@@ -12,7 +12,7 @@
 
 #include "Collision.h"
 #include "Plane.h"
-Plane Plane_object;
+
 
 /// Notes are Written in Repo Jargon - check NOTES_PHYSICS FOR FORMULA BREAKDOWNS
 //Local X is still Left / Right.
@@ -50,6 +50,7 @@ Scene4p::Scene4p() :
 	, linearVelocity				{ 0,0,0 }
 	, planeNormal					{ 0,1,0 }
 	, upVector						{ 0.0f,1.0f,0.0f }
+	, plane_plane1					{nullptr}
 
 {
 	Debug::Info("Created Scene4p: ", __FILE__, __LINE__);
@@ -79,6 +80,8 @@ void Scene4p::OnDestroy() {
 	delete planeMesh;
 
 	/// Plane Class
+	plane_plane1->GetPlane_Body()->OnDestroy();
+	delete plane_plane1;
 
 	/// Trackball
 	delete trackball;
@@ -191,8 +194,16 @@ bool Scene4p::OnCreate() {
 	color_diffuse = Vec4(0.5, 0.0, 0.0, 0.0);
 	color_ambient_exponent = 0.5f;
 
-	/// Plane
-	Plane_object.SetPlane_Body(new Body);
+	/// NEW :: Plane.h CLASS
+	//plane_plane1 = new Plane();	
+	//plane_plane1->SetPlane_Body(new Body);
+	//if (plane_plane1)
+	//{
+	//	printf("Plane_plane! is working ! \n");
+	//}
+	//plane_plane1->GetPlane_Body()->OnCreate();
+	//plane_plane1->GetPlane_Body()->scale = Vec3(10.0f, 10.0f, 10.0f);
+	
 
 	planeBody = new Body();
 	planeBody->OnCreate();

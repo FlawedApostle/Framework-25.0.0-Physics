@@ -1,9 +1,32 @@
-Sun Apr 12 10:31:05 2026
+Sun Apr 12 11:43:41 2026
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 NVIDIA 591.86
 [INFO]: Graphics card vendor NVIDIA Corporation
 [INFO]: Graphics card name NVIDIA GeForce RTX 3060/PCIe/SSE2
 [INFO]: GLSL Version 4.60 NVIDIA
+[INFO]: Created Scene4p: 
+[INFO]: Loading assets Scene4p: 
+[INFO]: Uniforms:
+"color_ambient_exponent" loc:0
+"color_diffuse" loc:1
+"color_specular" loc:2
+"lightPos" loc:3
+"modelMatrix" loc:4
+"projectionMatrix" loc:5
+"viewMatrix" loc:6
+
+[INFO]: Uniforms:
+"modelMatrix" loc:0
+"projectionMatrix" loc:1
+"viewMatrix" loc:2
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+
+[INFO]: Deleting assets Scene4p: 
+[INFO]: Deleted Scene4p: 
 [INFO]: Created Scene4p: 
 [INFO]: Loading assets Scene4p: 
 [INFO]: Uniforms:

@@ -7,6 +7,7 @@
 #include <Matrix.h>
 #include "Quaternion.h"
 #include "Trackball.h"
+#include "Plane.h"
 
 using namespace MATH;
 
@@ -38,7 +39,6 @@ private:
 	Body* planeBody;
 	Mesh* planeMesh;
 	Vec3  planeNormal;
-
 	/// CAMERA - PHYSICS
 	Vec3 cameraPosition;
 	Quaternion cameraOrientation;
@@ -57,9 +57,6 @@ private:
 	Vec3 axis_Right = Vec3(0.0f, 0.0f, -1.0f);
 	Vec3 axis_PitchUp = Vec3(-1.0f, 0.0f, 0.0f);
 	Vec3 axis_PitchDown = Vec3(1.0f, 0.0f, 0.0f);
-
-
-	// SHOULD BE MOVED TO EITHER BODY OR A PHYSICS CLASS
 	/// ANGLE		
 	Vec3 upVector;				/// Up Vector - for rolling the ball
 	float angle;
@@ -68,12 +65,10 @@ private:
 	float torqueMagnitude;		/// speed of the ball 
 	Vec3 torqueDirection;		/// direction of the ball
 	Vec3 torque;
-	//Vec3 torqueDir;			// for update scene3.p
 	// VELOCITY
 	Vec3 velocityDirection;
 	float velocityMagnitutde;
 	Vec3 linearVelocity;
-
 	/// Uniforms
 	Vec4 color_specular;
 	Vec4 color_diffuse;
@@ -81,7 +76,6 @@ private:
 	Vec3 lightPos;
 	float normalScale;
 	float lightPosLoc;
-
 	/// BOUNDARIES			--- MOVED TO A NEW CPP
 	float baseHalfSize;
 	const float CONTACT_EPS = 0.01f;;
@@ -89,6 +83,8 @@ private:
 
 public:	/// again this up vector is set public for speed...
 
+	// Plane 
+	Plane* plane_plane1;
 
 public:
 	explicit Scene4p();

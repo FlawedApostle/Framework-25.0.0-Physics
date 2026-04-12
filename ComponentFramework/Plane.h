@@ -16,7 +16,7 @@ protected:
 	//std::unique_ptr<Body> Plane_Body;
 public:
 	
-	Plane(); // : Plane_Body(nullptr) {}
+	Plane() : Plane_Body(nullptr) {}
 	~Plane()
 	{
 		printf("Plane ... Deleting \n");
