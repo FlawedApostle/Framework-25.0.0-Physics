@@ -1,5 +1,4 @@
 #pragma once
-//#pragma once
 #ifndef SCENE4p_H
 #define SCENE4p_H
 #include "Scene.h"

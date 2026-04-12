@@ -79,9 +79,13 @@ void Scene4p::OnDestroy() {
 	planeMesh->OnDestroy();
 	delete planeMesh;
 
-	/// Plane Class
-	plane_plane1->GetPlane_Body()->OnDestroy();
+	/// NEW PLANE CLASS 
+	// - Scene OWNS plane_plane1 pointer 
+	// - Plane.h OWNS plane_plane1 Body*
+	// Once object is deleted - the destructor in Plane.h [ ~Plane() ] will handle the Body deletion
+	if(plane_plane1)
 	delete plane_plane1;
+
 
 	/// Trackball
 	delete trackball;
@@ -195,12 +199,8 @@ bool Scene4p::OnCreate() {
 	color_ambient_exponent = 0.5f;
 
 	/// NEW :: Plane.h CLASS
-	//plane_plane1 = new Plane();	
-	//plane_plane1->SetPlane_Body(new Body);
-	//if (plane_plane1)
-	//{
-	//	printf("Plane_plane! is working ! \n");
-	//}
+	plane_plane1 = new Plane();	
+	plane_plane1->SetPlane_Body(new Body); if (plane_plane1) { printf("plane_plane1 success\n"); }
 	//plane_plane1->GetPlane_Body()->OnCreate();
 	//plane_plane1->GetPlane_Body()->scale = Vec3(10.0f, 10.0f, 10.0f);
 	

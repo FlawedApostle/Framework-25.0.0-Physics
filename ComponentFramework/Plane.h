@@ -6,6 +6,7 @@
 #include "Matrix.h"
 #include "Quaternion.h"
 #include "Body.h"
+#include "Mesh.h"
 
 #include "memory.h" // unique pointer
 
@@ -16,22 +17,11 @@ protected:
 	//std::unique_ptr<Body> Plane_Body;
 public:
 	
-	Plane() : Plane_Body(nullptr) {}
-	~Plane()
-	{
-		printf("Plane ... Deleting \n");
-		// When Plane Obj is deleted - destroy the Body	
-		if(Plane_Body)
-		delete Plane_Body; printf("Plane_Body::DELETED\n");
-	}
+	Plane();
+	~Plane();
 
 	Body* GetPlane_Body() { return Plane_Body; }
-	void SetPlane_Body(Body* NB) 
-	{ 
-		//if (Plane_Body)					// if plane_body has been made somewhere delete it and remake a new one. - this i dont know yet as I may want more planes in the scene
-			//delete Plane_Body;
-		Plane_Body = NB; 
-	}
+	void SetPlane_Body(Body* NB);
 
 };
 
