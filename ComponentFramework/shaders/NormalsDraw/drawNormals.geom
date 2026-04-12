@@ -3,7 +3,7 @@
 
 layout (triangles) in; /// bringing in triangles
 
-layout (line_strip, max_vertices = 6) out; 
+layout (line_strip, max_vertices = 6) out;  // 2 triangles per quad  - 3 vert each triangle - 2 triangle = 2 * 3 = 6 
 
 layout(location = 0) uniform mat4 projectionMatrix;
 layout(location = 1) uniform mat4 viewMatrix;

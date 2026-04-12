@@ -11,6 +11,8 @@
 #include "Quaternion.h"
 
 #include "Collision.h"
+#include "Plane.h"
+Plane Plane_object;
 
 /// Notes are Written in Repo Jargon - check NOTES_PHYSICS FOR FORMULA BREAKDOWNS
 //Local X is still Left / Right.
@@ -75,6 +77,11 @@ void Scene4p::OnDestroy() {
 	delete planeBody;
 	planeMesh->OnDestroy();
 	delete planeMesh;
+
+	/// Plane Class
+	Plane_object.GetPlane_Body()->OnDestroy();
+	delete Plane_object.GetPlane_Body();
+
 	/// Trackball
 	delete trackball;
 	/// ----------- SHADERS
@@ -187,6 +194,8 @@ bool Scene4p::OnCreate() {
 	color_ambient_exponent = 0.5f;
 
 	/// Plane
+	Plane_object.SetPlane_Body(new Body);
+
 	planeBody = new Body();
 	planeBody->OnCreate();
 	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f

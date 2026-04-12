@@ -4,14 +4,20 @@
 
 #include <Vector.h> /// This is in GameDev
 #include "Matrix.h"
-#include "vector.h"
 #include "Quaternion.h"
 #include "Body.h"
 
 
 class Plane
 {
+protected:
+	Body* Plane_Body;
 
+public:
+	
+
+	void SetPlane_Body(Body* NB) { Plane_Body = NB; };
+	Body* GetPlane_Body() { return Plane_Body; };
 
 };
 
