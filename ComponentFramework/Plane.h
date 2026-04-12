@@ -19,8 +19,10 @@ public:
 	Plane(); // : Plane_Body(nullptr) {}
 	~Plane()
 	{
+		printf("Plane ... Deleting \n");
 		// When Plane Obj is deleted - destroy the Body	
-		delete Plane_Body;
+		if(Plane_Body)
+		delete Plane_Body; printf("Plane_Body::DELETED\n");
 	}
 
 	Body* GetPlane_Body() { return Plane_Body; }

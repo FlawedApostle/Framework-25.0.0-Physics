@@ -79,8 +79,6 @@ void Scene4p::OnDestroy() {
 	delete planeMesh;
 
 	/// Plane Class
-	Plane_object.GetPlane_Body()->OnDestroy();
-	delete Plane_object.GetPlane_Body();
 
 	/// Trackball
 	delete trackball;
