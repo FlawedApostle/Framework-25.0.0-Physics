@@ -199,10 +199,13 @@ bool Scene4p::OnCreate() {
 	color_ambient_exponent = 0.5f;
 
 	/// NEW :: Plane.h CLASS
-	plane_plane1 = new Plane();	
-	plane_plane1->SetPlane_Body(new Body); if (plane_plane1) { printf("plane_plane1 success\n"); }
+	//plane_plane1 = new Plane();	
+	//plane_plane1->SetPlane_Body(new Body); 
+	//if (plane_plane1)
+	//	printf("Success :: Plane_Mesh\n");
 	//plane_plane1->GetPlane_Body()->OnCreate();
 	//plane_plane1->GetPlane_Body()->scale = Vec3(10.0f, 10.0f, 10.0f);
+
 	
 
 	planeBody = new Body();
@@ -233,6 +236,12 @@ bool Scene4p::OnCreate() {
 
 
 	// ----- 3D
+	// NEW PLANE
+	//plane_plane1->SetPlane_Mesh(new Mesh("meshes/Plane_3.obj"));
+	//if (plane_plane1)
+	//	printf("Success :: Plane_Mesh\n");
+	//plane_plane1->GetPlane_Mesh()->OnCreate();
+
 	// PLANE
 	planeMesh = new Mesh("meshes/Plane_3.obj");			// Plane_Blender , new rotated planed that requires no rotation - fks up the gravity tho
 	planeMesh->OnCreate();
@@ -597,7 +606,7 @@ void Scene4p::Render() const {
 	// ============================
 	// PASS 1 — BASE GEOMETRY
 	// ============================
-
+	/// ---- FIX THIS 
 	if (drawInNormalsFace) {
 		glUseProgram(shader_normals_face->GetProgram());
 		// 2. Send matrices to Face Shader
@@ -605,9 +614,13 @@ void Scene4p::Render() const {
 		glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 		// 3. Render Plane with Face Shader
 		glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES); sphereMesh->Render(GL_TRIANGLES);
+		
+		planeMesh->Render(GL_TRIANGLES); 
+		
+		sphereMesh->Render(GL_TRIANGLES);
 
 	}
+	/// ---- FIX THIS
 	else
 	{
 		// Default Shader
