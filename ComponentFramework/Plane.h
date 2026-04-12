@@ -28,6 +28,8 @@ public:
 	Body* GetPlane_Body() { return Plane_Body; }
 	void SetPlane_Body(Body* NB) 
 	{ 
+		//if (Plane_Body)					// if plane_body has been made somewhere delete it and remake a new one. - this i dont know yet as I may want more planes in the scene
+			//delete Plane_Body;
 		Plane_Body = NB; 
 	}
 

@@ -2,9 +2,13 @@
 #include "Plane.h"
 
 
-Plane::Plane() : 
-	//printf("Loading Plane Class ..... \n");
-	Plane_Body(nullptr) {}
+Plane::Plane() :
+	Plane_Body				{ nullptr } //{}
+
+
+{
+	std::cout << "Loading Plane Class ....." << std::endl;
+}
 	
 
 
