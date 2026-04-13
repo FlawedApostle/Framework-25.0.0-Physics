@@ -22,7 +22,7 @@ public:
 
 
 	//Torque Direction
-	Vec3 Get_TourqueDir() { return _torqueDir; }
+	Vec3 Get_TourqueDir() const { return _torqueDir; }
 	void Set_TourqueDir(Vec3 TD) { _torqueDir = TD; }
 	//Distance To Pivot
 	float Get_DistanceToPivot() { return _distanceToPivot; }
@@ -40,7 +40,7 @@ public:
 	 */
 	// TORQUE
 	Vec3 TORQUE_DIRECTION(const Vec3& UpVector, const Vec3& Normal);
-	void TORQUE_DIRECTION_UPDATE(Vec3 upVector, Vec3 Normal);
+	void TORQUE_DIRECTION_UPDATE(const Vec3& upVector, const Vec3& Normal);
 
 	Vec3 TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot, Body* Body);
 

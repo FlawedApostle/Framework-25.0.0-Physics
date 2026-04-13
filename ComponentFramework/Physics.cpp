@@ -36,15 +36,14 @@ float Physics::Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec)
 // Pure math
 /*
 Seperate computation from state
-TORQUE_DIRECTION - computes the direction
-UpdateTorque     - applies it in a state format ready for use
+TORQUE_DIRECTION - computes a value [ the direction ]
+UpdateTorque     - modifies members state _torqueDir
 */
 Vec3 Physics::TORQUE_DIRECTION(const Vec3& UpVector, const Vec3& Normal)
 {
 	return VMath::cross(UpVector, Normal);
 }
-
-void Physics::TORQUE_DIRECTION_UPDATE(Vec3 upVector, Vec3 Normal)
+void Physics::TORQUE_DIRECTION_UPDATE(const Vec3& upVector, const Vec3& Normal)
 {
 	_torqueDir = TORQUE_DIRECTION(upVector, Normal);
 }

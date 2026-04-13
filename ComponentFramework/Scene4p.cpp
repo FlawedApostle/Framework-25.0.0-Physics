@@ -352,10 +352,7 @@ void Scene4p::Update(const float deltaTime)
 	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
 
 	//	NEW PHYSICS FUNCTION [ TORQUE]
-	//if (VMath::mag(physics.TORQUE(upVector , planeNormal , distanceToPivot, sphereBody)) > VERY_SMALL)
-	//{
-	//	sphereBody->ApplyTourque(physics.TORQUE(upVector, planeNormal, distanceToPivot, sphereBody));
-	//}
+	torque = physics.TORQUE_DIRECTION(upVector, planeNormal);
 
 	/// AXIS OF ROTATION : UP x NORMAL
 	/* Find mag of torque
@@ -365,7 +362,7 @@ void Scene4p::Update(const float deltaTime)
 	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
 	 weight * distance to pivot
 	 */
-	torque = VMath::cross(upVector, planeNormal);				// Vec3 Torque( vec3 , Vec3, Body*)
+	//torque = VMath::cross(upVector, planeNormal);				// Vec3 Torque( vec3 , Vec3, Body*)
 	if (VMath::mag(torque) > VERY_SMALL) {
 		Vec3 torqueDir = VMath::normalize(torque);
 		//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
