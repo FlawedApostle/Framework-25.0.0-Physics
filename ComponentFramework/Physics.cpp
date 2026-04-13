@@ -33,11 +33,17 @@ float Physics::Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec)
 	return sinTheta;
 }
 
-
+// Pure math - just set the direction first
 Vec3 Physics::TORQUE_DIRECTION(Vec3 UpVector, Vec3 Normal)
 {
 	return VMath::cross(UpVector, Normal);
 }
+
+void Physics::UpdateTorque(Vec3 upVector, Vec3 Normal)
+{
+	_torqueDir = TORQUE_DIRECTION(upVector, Normal);
+}
+
 
 // TORQUE [ FUNCTION RETURNS A VEC3 TORQUE VALUE ] 
 // - THIS FUNCTION WORKS IN RELATION TO [ ANGLE_DISTANCETOPIVOT ]

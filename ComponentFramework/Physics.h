@@ -20,9 +20,7 @@ public:
 	Physics();
 	//~Physics();
 
-	// Torque
-	Vec3 Get_Tourque() { return _torque; }
-	void Set_Tourque(Vec3 T) {  _torque = T; }
+
 	//Torque Direction
 	Vec3 Get_TourqueDir() { return _torqueDir; }
 	void Set_TourqueDir(Vec3 TD) { _torqueDir = TD; }
@@ -42,6 +40,8 @@ public:
 	 */
 	// TORQUE
 	Vec3 TORQUE_DIRECTION(Vec3 UpVector, Vec3 Normal);
+	void UpdateTorque(Vec3 upVector, Vec3 Normal);
+
 	Vec3 TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot, Body* Body);
 
 
