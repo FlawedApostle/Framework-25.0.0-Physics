@@ -348,11 +348,19 @@ void Scene4p::Update(const float deltaTime)
 	//float distanceToPivot = sphereBody->radius * sin(theta);
 	
 	*/
-	//	NEW PHYSICS FUNCTION [ TORQUE - Distance to Pivot]
+	//	NEW PHYSICS FUNCTION [ TORQUE - DISTANCE TO PIVOT :: DOT ]
 	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
 
-	//	NEW PHYSICS FUNCTION [ TORQUE]
+	//	NEW PHYSICS FUNCTION [ TORQUE DIRECTION :: CROSS]
 	torque = physics.TORQUE_DIRECTION(upVector, planeNormal);
+
+	
+	//	NEW PHYSICS FUNCTION [ TORQUE ]
+	//Vec3 finalTorque;
+	//if (VMath::mag(torque) > VERY_SMALL) {
+	//	finalTorque = physics.TORQUE(upVector, planeNormal, distanceToPivot, sphereBody);
+	//	sphereBody->ApplyTourque(finalTorque);
+	//}
 
 	/// AXIS OF ROTATION : UP x NORMAL
 	/* Find mag of torque

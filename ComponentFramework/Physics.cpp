@@ -32,7 +32,6 @@ float Physics::Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec)
 	
 	return sinTheta;
 }
-
 // Pure math
 /*
 Seperate computation from state
@@ -72,25 +71,19 @@ void Physics::TORQUE_DIRECTION_UPDATE(const Vec3& upVector, const Vec3& Normal)
 */
 Vec3 Physics::TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot,  Body* Body)
 {
-	Vec3 TORQUE , TORQUE_DIRECTION , TORQUE_FINAL;
-	float COS_THETA , THETA , TORQUE_MAGNITUDE;
+	Vec3 TORQUE , TORQUE_DIR , TORQUE_FINAL;
+	float TORQUE_MAGNITUDE;
 
 	// find the direction first
-	TORQUE = VMath::cross(UpVector, Normal);
-	// if (MAG)TORQUE > VERY_SMALL. DO THE FOLLOWING
-	//if (VMath::mag(TORQUE) > VERY_SMALL)
-	//{
-		TORQUE_DIRECTION = VMath::normalize(TORQUE);
-		TORQUE_MAGNITUDE = Body->mass * 9.8f * Distance_to_Pivot;
-		TORQUE_FINAL = TORQUE_DIRECTION * TORQUE_MAGNITUDE;
+	//TORQUE = VMath::cross(UpVector, Normal);
+	TORQUE_DIR = TORQUE_DIRECTION(UpVector , Normal);
+	TORQUE_DIR = VMath::normalize(TORQUE_DIR);
 
-		//return Body->ApplyTourque(TORQUE_FINAL);
-	//}
+	TORQUE_MAGNITUDE = Body->mass * 9.8f * Distance_to_Pivot;
+	TORQUE_FINAL = TORQUE_DIR * TORQUE_MAGNITUDE;
 
 
 	return TORQUE_FINAL;
-
-
 
 
 }

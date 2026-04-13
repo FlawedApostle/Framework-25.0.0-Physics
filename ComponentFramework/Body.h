@@ -75,6 +75,9 @@ public:
 	}
 
 
+	// ----------------------- GETTERS/SETTERS
+	float Get_Mass() { return mass; }						// use this in the Physics class TORQUE function
+		
 };
 
 #endif
