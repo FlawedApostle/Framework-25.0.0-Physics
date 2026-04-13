@@ -34,7 +34,7 @@ float Physics::Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec)
 }
 
 // Pure math - just set the direction first
-Vec3 Physics::TORQUE_DIRECTION(Vec3 UpVector, Vec3 Normal)
+Vec3 Physics::TORQUE_DIRECTION(const Vec3& UpVector, const Vec3& Normal)
 {
 	return VMath::cross(UpVector, Normal);
 }
