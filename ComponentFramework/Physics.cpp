@@ -16,7 +16,14 @@ Physics::Physics() :
 	std::cout << "Physics Class" << std::endl;
 }
 
-// Angle Torque
+// TORQUE - ANGLE / DISTANCE TO PIVOT
+// NOTES -
+/*
+	//float cosTheta = VMath::dot(planeNormal, upVector);
+	////cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
+	//float theta = acos(cosTheta);
+	//float distanceToPivot = sphereBody->radius * sin(theta);
+*/
 float Physics::Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec)
 {
 	float cosTheta = VMath::dot(Normal, UpVec);
@@ -27,39 +34,53 @@ float Physics::Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec)
 }
 
 
-Vec3 Physics::TORQUE(Vec3 Up, Vec3 Normal, Body* Body)
+Vec3 Physics::TORQUE_DIRECTION(Vec3 UpVector, Vec3 Normal)
 {
-	Vec3 TORQUE, TORQUE_FINAL , TORQUE_DIRECTION;
-	float COS_THETA , THETA, DISTANCE_TO_PIVOT , TORQUE_MAGNITUDE;
+	return VMath::cross(UpVector, Normal);
+}
 
-	COS_THETA = VMath::dot(Normal, Up);
-	THETA = acos(COS_THETA);
-	DISTANCE_TO_PIVOT = Body->radius * sin(THETA);
-
-	TORQUE = VMath::cross(Up, Normal);
-	TORQUE_DIRECTION = VMath::normalize(TORQUE);
+// TORQUE [ FUNCTION RETURNS A VEC3 TORQUE VALUE ] 
+// - THIS FUNCTION WORKS IN RELATION TO [ ANGLE_DISTANCETOPIVOT ]
+// - PURPOSE IS TO YEILD A VALUE THAT CAN BE MANIPULATED IN THE SCENE
+// NOTES -
+/*
+	torque = VMath::cross(upVector, planeNormal);									// Vec3 Torque( vec3 , Vec3, Body*)
+	if (VMath::mag(torque) > VERY_SMALL) {
+		
+		Vec3 torqueDir = VMath::normalize(torque);
+		torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
+		Vec3 torqueFinal = torqueDir * torqueMagnitude;
+		
+		sphereBody->ApplyTourque(torqueFinal);
+		
+		
+		// -- Deprecated
+		//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
+		//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
 	
-	
-	TORQUE_MAGNITUDE = Body->mass * 9.8f * DISTANCE_TO_PIVOT;
 
-	TORQUE_FINAL = TORQUE_DIRECTION * TORQUE_MAGNITUDE;
+*/
+Vec3 Physics::TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot,  Body* Body)
+{
+	Vec3 TORQUE , TORQUE_DIRECTION , TORQUE_FINAL;
+	float COS_THETA , THETA , TORQUE_MAGNITUDE;
+
+	// find the direction first
+	TORQUE = VMath::cross(UpVector, Normal);
+	// if (MAG)TORQUE > VERY_SMALL. DO THE FOLLOWING
+	//if (VMath::mag(TORQUE) > VERY_SMALL)
+	//{
+		TORQUE_DIRECTION = VMath::normalize(TORQUE);
+		TORQUE_MAGNITUDE = Body->mass * 9.8f * Distance_to_Pivot;
+		TORQUE_FINAL = TORQUE_DIRECTION * TORQUE_MAGNITUDE;
+
+		//return Body->ApplyTourque(TORQUE_FINAL);
+	//}
+
 
 	return TORQUE_FINAL;
 
 
 
-	//float cosTheta = VMath::dot(planeNormal, upVector);
-	////cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
-	//float theta = acos(cosTheta);
-	//float distanceToPivot = sphereBody->radius * sin(theta);
-	
-	//torque = VMath::cross(upVector, planeNormal);				// Vec3 Torque( vec3 , Vec3, Body*)
-	//if (VMath::mag(torque) > VERY_SMALL) {
-	//	Vec3 torqueDir = VMath::normalize(torque);
-	//	//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
-	//	torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
-	//	//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
-	//	Vec3 torqueFinal = torqueDir * torqueMagnitude;
-	//
-	//	sphereBody->ApplyTourque(torqueFinal);
+
 }

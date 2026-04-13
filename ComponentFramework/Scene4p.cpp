@@ -323,6 +323,7 @@ void Scene4p::Update(const float deltaTime)
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 
 	/// 3.A									---------  TORQUE PT I ( ROTATION , BEGIN ROTATION )
+	// NOTES
 	/*  UpVector is set in INIT - it is a const , should it be ?
 	 we know the perpendicular distance between pivot and force
 	 ----- ANGULAR ACCELERATION
@@ -339,15 +340,22 @@ void Scene4p::Update(const float deltaTime)
 	 between the weight and the normal
 	 Remove component along plane normal → get tangent component
 	 Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
-	*/
+	
+
 	//float cosTheta = VMath::dot(planeNormal, upVector);
 	////cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
 	//float theta = acos(cosTheta);
 	//float distanceToPivot = sphereBody->radius * sin(theta);
-
-	//	NEW PHYSICS FUNCTION
+	
+	*/
+	//	NEW PHYSICS FUNCTION [ TORQUE - Distance to Pivot]
 	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
 
+	//	NEW PHYSICS FUNCTION [ TORQUE]
+	//if (VMath::mag(physics.TORQUE(upVector , planeNormal , distanceToPivot, sphereBody)) > VERY_SMALL)
+	//{
+	//	sphereBody->ApplyTourque(physics.TORQUE(upVector, planeNormal, distanceToPivot, sphereBody));
+	//}
 
 	/// AXIS OF ROTATION : UP x NORMAL
 	/* Find mag of torque
@@ -368,7 +376,6 @@ void Scene4p::Update(const float deltaTime)
 		sphereBody->ApplyTourque(torqueFinal);
 	}
 
-	//physics.TORQUE(upVector, planeNormal);
 
 
 	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )

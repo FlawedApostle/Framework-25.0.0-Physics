@@ -17,6 +17,9 @@ protected:
 	float _distanceToPivot;
 
 public:
+	Physics();
+	//~Physics();
+
 	// Torque
 	Vec3 Get_Tourque() { return _torque; }
 	void Set_Tourque(Vec3 T) {  _torque = T; }
@@ -27,21 +30,26 @@ public:
 	float Get_DistanceToPivot() { return _distanceToPivot; }
 	void Set_DistanceToPivot(float DP) { _distanceToPivot = DP; }
 
-	// ANGLE
+	// ANGLE - [DISTANCE TO PIVOT - TORQUE]
 	float Angle_DistanceToPivot(Vec3 Normal, Vec3 UpVec);
 
-	Physics();
-	//~Physics();
-
-	/// AXIS OF ROTATION : UP x NORMAL
 	/* Find mag of torque
+	 AXIS OF ROTATION : UP x NORMAL
 	 find axis of rotation
 	 torque = (UP CROSS planeNormal)
 	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
 	 weight * distance to pivot
 	 */
+	// TORQUE
+	Vec3 TORQUE_DIRECTION(Vec3 UpVector, Vec3 Normal);
+	Vec3 TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot, Body* Body);
 
-	Vec3 TORQUE(Vec3 Up, Vec3 Normal, Body* Body);
+
+
+
+
+
+
 
 };
 //#endif PHYSICS_H
