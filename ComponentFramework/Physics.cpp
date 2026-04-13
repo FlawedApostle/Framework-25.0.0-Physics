@@ -38,13 +38,13 @@ Seperate computation from state
 TORQUE_DIRECTION - computes a value [ the direction ]
 UpdateTorque     - modifies members state _torqueDir
 */
-Vec3 Physics::TORQUE_DIRECTION(const Vec3& UpVector, const Vec3& Normal)
+Vec3 Physics::Torque_Direction(const Vec3& UpVector, const Vec3& Normal)
 {
 	return VMath::cross(UpVector, Normal);
 }
-void Physics::TORQUE_DIRECTION_UPDATE(const Vec3& upVector, const Vec3& Normal)
+void Physics::Torque_Direction_Update(const Vec3& upVector, const Vec3& Normal)
 {
-	_torqueDir = TORQUE_DIRECTION(upVector, Normal);
+	_torqueDir = Torque_Direction(upVector, Normal);
 }
 
 
@@ -69,21 +69,16 @@ void Physics::TORQUE_DIRECTION_UPDATE(const Vec3& upVector, const Vec3& Normal)
 	
 
 */
-Vec3 Physics::TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot,  Body* Body)
+Vec3 Physics::Torque(const Vec3& TorqueDir, float mass, float distanceToPivot)
 {
-	Vec3 TORQUE , TORQUE_DIR , TORQUE_FINAL;
-	float TORQUE_MAGNITUDE;
+	float TorqueDirMag = VMath::mag(TorqueDir);
+	// check validity before using this vector
+	if (TorqueDirMag <= VERY_SMALL)
+		return Vec3(0.0f,0.0f,0.0f); // no torque
 
-	// find the direction first
-	//TORQUE = VMath::cross(UpVector, Normal);
-	TORQUE_DIR = TORQUE_DIRECTION(UpVector , Normal);
-	TORQUE_DIR = VMath::normalize(TORQUE_DIR);
+	Vec3 TorqueDirNormal = TorqueDir / TorqueDirMag;
+	float torqueMag = mass * 9.8f * distanceToPivot;
 
-	TORQUE_MAGNITUDE = Body->mass * 9.8f * Distance_to_Pivot;
-	TORQUE_FINAL = TORQUE_DIR * TORQUE_MAGNITUDE;
-
-
-	return TORQUE_FINAL;
-
+	return TorqueDirNormal * torqueMag;
 
 }

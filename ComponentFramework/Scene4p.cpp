@@ -346,42 +346,28 @@ void Scene4p::Update(const float deltaTime)
 	////cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
 	//float theta = acos(cosTheta);
 	//float distanceToPivot = sphereBody->radius * sin(theta);
-	
-	*/
-	//	NEW PHYSICS FUNCTION [ TORQUE - DISTANCE TO PIVOT :: DOT ]
-	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
 
-	//	NEW PHYSICS FUNCTION [ TORQUE DIRECTION :: CROSS]
-	torque = physics.TORQUE_DIRECTION(upVector, planeNormal);
 
-	
-	//	NEW PHYSICS FUNCTION [ TORQUE ]
-	//Vec3 finalTorque;
-	//if (VMath::mag(torque) > VERY_SMALL) {
-	//	finalTorque = physics.TORQUE(upVector, planeNormal, distanceToPivot, sphereBody);
-	//	sphereBody->ApplyTourque(finalTorque);
-	//}
-
-	/// AXIS OF ROTATION : UP x NORMAL
-	/* Find mag of torque
-	 Calculate torqueMag using forceMag * distance to pivot
-	 find axis of rotation
-	 torque = (UP CROSS planeNormal)
-	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
-	 weight * distance to pivot
-	 */
-	//torque = VMath::cross(upVector, planeNormal);				// Vec3 Torque( vec3 , Vec3, Body*)
-	if (VMath::mag(torque) > VERY_SMALL) {
-		Vec3 torqueDir = VMath::normalize(torque);
-		//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
+	// BLOCK BELOW - REMOVES TORQUE IF STATMENT BELOW
+	torque = VMath::cross(upVector, planeNormal);				// torqueDirection
+	if (torqueDirectionMag > VERY_SMALL) {
+		Vec3 torqueDir = VMath::normalize(torqueDirection);
 		torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
-		//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
 		Vec3 torqueFinal = torqueDir * torqueMagnitude;
 
+		// CALLING NEW PHYSICS FUNCTION
 		sphereBody->ApplyTourque(torqueFinal);
 	}
+	*/
 
-
+	//	NEW PHYSICS FUNCTION [ TORQUE - DISTANCE TO PIVOT :: DOT ]
+	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
+	//	NEW PHYSICS FUNCTION [ TORQUE DIRECTION :: CROSS]
+	torqueDirection = physics.Torque_Direction(upVector, planeNormal);
+	//	NEW PHYSICS FUNCTION [ TORQUE ]
+	torque = physics.Torque(torqueDirection, sphereBody->mass, distanceToPivot);
+	sphereBody->ApplyTourque(torque);
+	
 
 	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);

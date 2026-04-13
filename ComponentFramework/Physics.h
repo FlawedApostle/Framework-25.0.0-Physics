@@ -32,11 +32,10 @@ public:
 	 weight * distance to pivot
 	 */
 	// TORQUE
-	Vec3 TORQUE_DIRECTION(const Vec3& UpVector, const Vec3& Normal);
-	void TORQUE_DIRECTION_UPDATE(const Vec3& upVector, const Vec3& Normal);
+	Vec3 Torque_Direction(const Vec3& UpVector, const Vec3& Normal);
+	void Torque_Direction_Update(const Vec3& upVector, const Vec3& Normal);
 	
-	Vec3 TORQUE(Vec3 UpVector, Vec3 Normal, float Distance_to_Pivot, Body* Body);
-
+	Vec3 Torque(const Vec3& TorqueDir, float mass, float distanceToPivot);
 
 
 
