@@ -333,26 +333,31 @@ void Scene4p::Update(const float deltaTime)
 	 force = torqueMagnitude
 	 pivot is the upVector || is it the planeNormal
 
-	 Calculate torqueMag using forceMag * distance to pivot
+
 	 The force is the weight of the sphere
 	 The distance to the pivot relies on the angle
 	 between the weight and the normal
 	 Remove component along plane normal → get tangent component
 	 Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 	*/
-	float cosTheta = VMath::dot(planeNormal, upVector);
-	//cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
-	float theta = acos(cosTheta);
-	float distanceToPivot = sphereBody->radius * sin(theta);
+	//float cosTheta = VMath::dot(planeNormal, upVector);
+	////cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
+	//float theta = acos(cosTheta);
+	//float distanceToPivot = sphereBody->radius * sin(theta);
+
+	//	NEW PHYSICS FUNCTION
+	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
+
 
 	/// AXIS OF ROTATION : UP x NORMAL
 	/* Find mag of torque
+	 Calculate torqueMag using forceMag * distance to pivot
 	 find axis of rotation
 	 torque = (UP CROSS planeNormal)
 	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
 	 weight * distance to pivot
 	 */
-	torque = VMath::cross(upVector, planeNormal);
+	torque = VMath::cross(upVector, planeNormal);				// Vec3 Torque( vec3 , Vec3, Body*)
 	if (VMath::mag(torque) > VERY_SMALL) {
 		Vec3 torqueDir = VMath::normalize(torque);
 		//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
@@ -362,6 +367,9 @@ void Scene4p::Update(const float deltaTime)
 
 		sphereBody->ApplyTourque(torqueFinal);
 	}
+
+	//physics.TORQUE(upVector, planeNormal);
+
 
 	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);

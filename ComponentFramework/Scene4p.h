@@ -8,6 +8,8 @@
 #include "Trackball.h"
 #include "Plane.h"
 
+#include "Physics.h"
+
 using namespace MATH;
 
 /// Forward declarations 
@@ -84,6 +86,7 @@ public:	/// again this up vector is set public for speed...
 
 	// Plane 
 	Plane* plane_plane1;
+	Physics physics;
 
 public:
 	explicit Scene4p();

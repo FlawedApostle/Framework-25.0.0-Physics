@@ -189,6 +189,9 @@
     <ClCompile Include="Plane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Physics.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Debug.h">
@@ -279,6 +282,9 @@
       <Filter>Source Files\Scenes_Physics\Scene4p</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Physics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
