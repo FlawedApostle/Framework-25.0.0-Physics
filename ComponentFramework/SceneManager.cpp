@@ -17,6 +17,7 @@
 #include "Scene2p.h"			// Rotation Ball on plane
 #include "Scene3p.h"			// Collisions Ball-to-Ball - rotation on testing different functions pt 1.
 #include "Scene4p.h"			// Collisions Ball-to-Ball - rotation on testing different functions pt 2.
+#include "Scene5p.h"			// Collisions Ball-to-Ball - rotation on testing different functions pt 3.	- - Code being moved to functions (Physics.cpp / bodys) for scaling
 
 
 SceneManager::SceneManager(): 
@@ -65,7 +66,8 @@ bool SceneManager::Initialize(std::string name_, int width_, int height_) {
 	//BuildNewScene(SCENE_NUMBER::SCENE1p);
 	//BuildNewScene(SCENE_NUMBER::SCENE2p);
 	//BuildNewScene(SCENE_NUMBER::SCENE3p);
-	BuildNewScene(SCENE_NUMBER::SCENE4p);
+	//BuildNewScene(SCENE_NUMBER::SCENE4p);
+	BuildNewScene(SCENE_NUMBER::SCENE5p);
 	/********************************************************************************/
 	return true;
 }
@@ -131,6 +133,10 @@ void SceneManager::HandleEvents() {
 				printf("Scene 4p - COLLISIONS - BALL-TO-BALL - rotation on testing different functions pt 2.");
 				BuildNewScene(SCENE_NUMBER::SCENE4p);
 				break;
+			case SDL_SCANCODE_6:
+				printf("Scene 5p - COLLISIONS - BALL-TO-BALL - rotation on testing different functions pt 3. - Code being moved to functions (Physics.cpp) for scaling");
+				BuildNewScene(SCENE_NUMBER::SCENE5p);
+				break;
 
 			default:
 				break;
@@ -173,6 +179,10 @@ bool SceneManager::BuildNewScene(SCENE_NUMBER scene) {
 		break;
 	case SCENE_NUMBER::SCENE4p:
 		currentScene = new Scene4p();
+		status = currentScene->OnCreate();
+		break;
+	case SCENE_NUMBER::SCENE5p:
+		currentScene = new Scene5p();
 		status = currentScene->OnCreate();
 		break;
 

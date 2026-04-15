@@ -19,6 +19,7 @@ private:
 		SCENE2p = 2,
 		SCENE3p = 3,
 		SCENE4p = 4,
+		SCENE5p = 5
 	};
 
 	class Scene* currentScene;

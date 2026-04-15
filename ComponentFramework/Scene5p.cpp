@@ -1,7 +1,8 @@
 ﻿#include <glew.h>
 #include <iostream>
 #include <SDL.h>
-#include "Scene4p.h"			/// scene3p.h
+
+#include "Scene5p.h"			/// scene5p.h
 #include <MMath.h>
 #include "Debug.h"
 #include "Mesh.h"
@@ -19,50 +20,50 @@
 //Local Z is now pointing straight UP(Height).
 //Local Y is now pointing FORWARD(Depth).
 
-Scene4p::Scene4p() :
+Scene5p::Scene5p() :
 
-	drawInWireMode					{ false }
-	, drawInNormalsFace				{ false }
-	, drawInNormalsLine				{ false }
-	, bWantsToJump					{ NULL }
-	, shader						{ nullptr }
-	, shader_normals_face			{ nullptr }
-	, shader_normals_line			{ nullptr }
-	, sphereMesh					{ nullptr }
-	, sphereBody					{ nullptr }
-	, planeBody						{ nullptr }
-	, planeMesh						{ nullptr }
-	, sphereCollision0_Body			{ nullptr }
-	, sphereCollision0_Mesh			{ nullptr }
-	, sphereCollision0_Normal		{ 0,0,0 }
-	, trackball						{ nullptr }
-	, distancetoPivot				{ NULL }
-	, torqueMagnitude				{ NULL }
-	, angle							{ NULL }
-	, velocityMagnitutde			{ NULL }
-	, normalScale					{ NULL }
-	, lightPosLoc					{ NULL }
-	, baseHalfSize					{ NULL }
-	, color_ambient_exponent		{ 0.1f }
-	, torqueDirection				{ 0,0,0 }
-	, torque						{ 0,0,0 }
-	, velocityDirection				{ 0,0,0 }
-	, linearVelocity				{ 0,0,0 }
-	, planeNormal					{ 0,1,0 }
-	, upVector						{ 0.0f,1.0f,0.0f }
-	, plane_plane1					{nullptr}
+	drawInWireMode{ false }
+	, drawInNormalsFace{ false }
+	, drawInNormalsLine{ false }
+	, bWantsToJump{ NULL }
+	, shader{ nullptr }
+	, shader_normals_face{ nullptr }
+	, shader_normals_line{ nullptr }
+	, sphereMesh{ nullptr }
+	, sphereBody{ nullptr }
+	, planeBody{ nullptr }
+	, planeMesh{ nullptr }
+	, sphereCollision0_Body{ nullptr }
+	, sphereCollision0_Mesh{ nullptr }
+	, sphereCollision0_Normal{ 0,0,0 }
+	, trackball{ nullptr }
+	, distancetoPivot{ NULL }
+	, torqueMagnitude{ NULL }
+	, angle{ NULL }
+	, velocityMagnitutde{ NULL }
+	, normalScale{ NULL }
+	, lightPosLoc{ NULL }
+	, baseHalfSize{ NULL }
+	, color_ambient_exponent{ 0.1f }
+	, torqueDirection{ 0,0,0 }
+	, torque{ 0,0,0 }
+	, velocityDirection{ 0,0,0 }
+	, linearVelocity{ 0,0,0 }
+	, planeNormal{ 0,1,0 }
+	, upVector{ 0.0f,1.0f,0.0f }
+	, plane_plane1{ nullptr }
 
 {
-	Debug::Info("Created Scene4p: ", __FILE__, __LINE__);
+	Debug::Info("Created Scene5p: ", __FILE__, __LINE__);
 }
-Scene4p::~Scene4p()
+Scene5p::~Scene5p()
 {
-	Debug::Info("Deleted Scene4p: ", __FILE__, __LINE__);
+	Debug::Info("Deleted Scene5p: ", __FILE__, __LINE__);
 }
 
 // DESTROY
-void Scene4p::OnDestroy() {
-	Debug::Info("Deleting assets Scene4p: ", __FILE__, __LINE__);
+void Scene5p::OnDestroy() {
+	Debug::Info("Deleting assets Scene5p: ", __FILE__, __LINE__);
 	/// sphere 1.
 	sphereBody->OnDestroy();
 	delete sphereBody;
@@ -83,8 +84,8 @@ void Scene4p::OnDestroy() {
 	// - Scene OWNS plane_plane1 pointer 
 	// - Plane.h OWNS plane_plane1 Body*
 	// Once object is deleted - the destructor in Plane.h [ ~Plane() ] will handle the Body deletion
-	if(plane_plane1)
-	delete plane_plane1;
+	if (plane_plane1)
+		delete plane_plane1;
 
 
 	/// Trackball
@@ -99,7 +100,7 @@ void Scene4p::OnDestroy() {
 }
 
 /// CONTROLLS
-void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
+void Scene5p::HandleEvents(const SDL_Event& sdlEvent) {
 	/// Trackball
 	initialTrackballOrientation = trackball->getQuat();
 	trackball->HandleEvents(sdlEvent);
@@ -157,11 +158,11 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 			planeBody->orientation = rotation * planeBody->orientation;
 			break;
 		case SDL_SCANCODE_SPACE:
-			printf("SPACE\n"); 
+			printf("SPACE\n");
 			bWantsToJump = true;
 
-			printf("upVector = %f,%f,%f\n" , sphereBody->upVector.x, sphereBody->upVector.y, sphereBody->upVector.z);
-			printf("Plane Body orientation = %f,%f,%f\n" , planeBody->orientation.ijk.x, planeBody->orientation.ijk.y, planeBody->orientation.ijk.z);
+			printf("upVector = %f,%f,%f\n", sphereBody->upVector.x, sphereBody->upVector.y, sphereBody->upVector.z);
+			printf("Plane Body orientation = %f,%f,%f\n", planeBody->orientation.ijk.x, planeBody->orientation.ijk.y, planeBody->orientation.ijk.z);
 			break;
 		}
 		break;
@@ -180,8 +181,8 @@ void Scene4p::HandleEvents(const SDL_Event& sdlEvent) {
 	}
 }
 
-bool Scene4p::OnCreate() {
-	Debug::Info("Loading assets Scene4p: ", __FILE__, __LINE__);
+bool Scene5p::OnCreate() {
+	Debug::Info("Loading assets Scene5p: ", __FILE__, __LINE__);
 	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
 	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
 
@@ -194,8 +195,8 @@ bool Scene4p::OnCreate() {
 
 	/// UNIFORMS --- phongVert , phongFrag [shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl] 
 	lightPos = Vec3(0.0f, 10.0f, 0.0f);															// lightpos shader PhoneVert
-	color_specular = Vec4(1.0, 0.0, 0.0, 0.0);
-	color_diffuse = Vec4(0.5, 0.0, 0.0, 0.0);
+	color_specular = Vec4(0.0, 0.0, 1.0, 0.0);
+	color_diffuse = Vec4(0.0, 0.0, 0.5, 0.0);
 	color_ambient_exponent = 0.5f;
 
 	/// NEW :: Plane.h CLASS
@@ -206,7 +207,7 @@ bool Scene4p::OnCreate() {
 	//plane_plane1->GetPlane_Body()->OnCreate();
 	//plane_plane1->GetPlane_Body()->scale = Vec3(10.0f, 10.0f, 10.0f);
 
-	
+
 
 	planeBody = new Body();
 	planeBody->OnCreate();
@@ -287,7 +288,7 @@ bool Scene4p::OnCreate() {
 }
 
 
-void Scene4p::Update(const float deltaTime)
+void Scene5p::Update(const float deltaTime)
 {
 	// ----- Collisions
 	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
@@ -298,7 +299,7 @@ void Scene4p::Update(const float deltaTime)
 	planeNormal = VMath::normalize(planeNormal);
 
 	// LOCAL POSITION - Boundaries
-	Vec3 localPos = sphereBody->pos - planeBody->pos;					
+	Vec3 localPos = sphereBody->pos - planeBody->pos;
 	localPos = QMath::inverse(planeBody->orientation) * localPos;
 
 	///										--------- GLOBALs ----- GRAVITY & BOUNDARIES
@@ -340,9 +341,9 @@ void Scene4p::Update(const float deltaTime)
 	 between the weight and the normal
 	 Remove component along plane normal → get tangent component
 	 Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
-	
+
 	/// ORIGINAL OLD CODE - DO NOT REMOVE
-	
+
 	float cosTheta = VMath::dot(planeNormal, upVector);
 	//cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
 	float theta = acos(cosTheta);
@@ -368,7 +369,7 @@ void Scene4p::Update(const float deltaTime)
 	//	NEW PHYSICS FUNCTION [ TORQUE ]
 	torque = physics.Torque(torqueDirection, sphereBody->mass, distanceToPivot);
 	sphereBody->ApplyTourque(torque);
-	
+
 
 
 	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
@@ -378,7 +379,7 @@ void Scene4p::Update(const float deltaTime)
 
 	// 4.A										--------- BOUNDRIES GO PT I [ Boundary test (local space) ]
 	/*
- 											Local X is still Left/Right.
+											Local X is still Left/Right.
 											Local Y is now pointing straight UP (Height).
 											Local Z is now pointing FORWARD (Depth).
 	 localPos yields a vector distance
@@ -393,15 +394,15 @@ void Scene4p::Update(const float deltaTime)
 
 	Divide localPos by planeBody->scale.
 	Use baseHalfSize directly (no scale).
-	Divide sphere radius by scale too. 
-	
-	convert localPos WORLD SPACE to MESH SPACE - Apply inverse scale - 
+	Divide sphere radius by scale too.
+
+	convert localPos WORLD SPACE to MESH SPACE - Apply inverse scale -
 	MESHRADIUS = WORLDRADIUS / SCALE
 
 	world - scaled space → original mesh space (un-scaled)
 	Matching the boundary scale with the plane scale
 	*/
-	
+
 	//  ----- DEPRECATED ----- OPTION A - ( MESH SPACE ) [leave for now]
 	/*
 	localPos.x /= planeBody->scale.x;
@@ -412,7 +413,7 @@ void Scene4p::Update(const float deltaTime)
 		fabs(localPos.x) <= (baseHalfSize - sphereBody->radius / planeBody->scale.x) &&
 		fabs(localPos.z) <= (baseHalfSize - sphereBody->radius / planeBody->scale.z);
 	*/
-	
+
 	// OPTION B ( WORLD SPACE ) - Scale to world Space
 	/*
 	Keep localPos rotated into plane axes, but do not divide by scale.
@@ -422,10 +423,10 @@ void Scene4p::Update(const float deltaTime)
 	//Vec3 planeHalfExtents = Vec3(10.0f, 0.0f, 10.0f);		// test 
 	float halfX = baseHalfSize * planeBody->scale.x;		// float halfX = baseHalfSize;
 	float halfZ = baseHalfSize * planeBody->scale.z;
-	
+
 	bool insideBounds =
-	fabs(localPos.x) <= (halfX - sphereBody->radius) &&
-	fabs(localPos.z) <= (halfZ - sphereBody->radius);
+		fabs(localPos.x) <= (halfX - sphereBody->radius) &&
+		fabs(localPos.z) <= (halfZ - sphereBody->radius);
 
 	//Vec3 rel = sphereBody->pos - planeBody->pos;
 
@@ -438,8 +439,8 @@ void Scene4p::Update(const float deltaTime)
 	//printf("localPos: %f %f %f\n", localPos.x, localPos.y, localPos.z);
 	//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
 	//printf("localPos: %f %f\n", localPos.x, localPos.z);
-	
-		
+
+
 	/// ------------------------------------- DEBUG
 	/*
 		printf("localPos FIXED: (%f, %f)\n", localPos.x, localPos.z);
@@ -458,13 +459,13 @@ void Scene4p::Update(const float deltaTime)
 	bool withinBounds = insideBounds;
 	bool onPlane = touchingPlane && withinBounds;
 	bool offEdge = touchingPlane && !withinBounds;
-		// OLD
+	// OLD
 	static bool wasOnPlane = true;
 	bool justLeftPlane = wasOnPlane && !onPlane;
 	wasOnPlane = onPlane;
 
 	static bool grounded = true;
-	
+
 	// ---- DEPRECATED [not sure to remove just tyet]
 	/*
 	const float contactVelocityThreshold = 0.5f;
@@ -481,7 +482,7 @@ void Scene4p::Update(const float deltaTime)
 	wasOnPlane = onPlane;
 	*/
 
-	
+
 	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )  logic needs cleaning
 	// --- UPDATED GROUNDED LOGIC ---
 	if (!grounded && onPlane)
@@ -514,7 +515,7 @@ void Scene4p::Update(const float deltaTime)
 			sphereBody->vel = linearVelocity;
 		}
 		*/
-		
+
 		// Apply gravity normally
 		sphereBody->vel += gravity * deltaTime;
 		linearVelocity = sphereBody->vel;
@@ -541,7 +542,7 @@ void Scene4p::Update(const float deltaTime)
 
 
 	/// 4.E ---------------------------------------- BOUNDARIES ( CONTACT CONSTRAINT - PLANE )[ KEEP SPHERE RESTING ON PLANE ]
-	
+
 	if (onPlane)
 	{
 		// Recompute planeDist after movement to keep it precise
@@ -568,13 +569,13 @@ void Scene4p::Update(const float deltaTime)
 	//cameraPosition = cameraPosition - sphereBody->pos;
 	cameraPosition = cameraPosition - planeBody->pos;
 
-	/* 
+	/*
 	WHY INVERSE !...... looking down the neg z axis !
 	- initial is getQuat() in handle events, gets the inital position of the orientation of the quat
-	- trackball.HandleEvents(sdlEvent) is sandwiched in between to gather controler input - final is is getQuat() is the orientation after movement 
+	- trackball.HandleEvents(sdlEvent) is sandwiched in between to gather controler input - final is is getQuat() is the orientation after movement
 
 	cam orientation will equal the finalOrientaion *= inverseOrientaion(initial) -
-	then correct the rotate of the cam position in relation to the change in trackball orientaion 
+	then correct the rotate of the cam position in relation to the change in trackball orientaion
 	*/
 	Quaternion changeInTrackballOrientation = finalTrackballOrientation * QMath::inverse(initialTrackballOrientation);
 	cameraOrientation *= changeInTrackballOrientation;
@@ -588,16 +589,16 @@ void Scene4p::Update(const float deltaTime)
 
 }
 
-void Scene4p::Render() const {
+void Scene5p::Render() const {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
 	// -- FACE WINDING
 	glFrontFace(GL_CCW);
-	 //glFrontFace(GL_CW);
+	//glFrontFace(GL_CW);
 
-	/// Set the background color then clear the screen
+   /// Set the background color then clear the screen
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -622,9 +623,9 @@ void Scene4p::Render() const {
 		glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 		// 3. Render Plane with Face Shader
 		glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		
-		planeMesh->Render(GL_TRIANGLES); 
-		
+
+		planeMesh->Render(GL_TRIANGLES);
+
 		sphereMesh->Render(GL_TRIANGLES);
 
 	}
@@ -636,7 +637,7 @@ void Scene4p::Render() const {
 		glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
 		glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color_specular"), 1, color_specular);
 		glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color_diffuse"), 1, color_diffuse);
-		glUniform1f(glGetUniformLocation(shader->GetProgram(), "color_ambient_exponent"),color_ambient_exponent);
+		glUniform1f(glGetUniformLocation(shader->GetProgram(), "color_ambient_exponent"), color_ambient_exponent);
 
 		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
@@ -684,7 +685,7 @@ void Scene4p::Render() const {
 /// ----- Linear Velocity
 
 // 1.
-Vec3 Scene4p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
+Vec3 Scene5p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
 {
 	// Contact vector (center → contact point)
 	// THIS ASSUMES THAT THE POINT IS DIRECTLY ALONG THE NORMAL - THIS IS OK ONLY FOR SPHERES...
@@ -697,7 +698,7 @@ Vec3 Scene4p::ComputeRollingVelocity_Cross(const Vec3& planeNormal)
 }
 
 // 2.
-Vec3 Scene4p::ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt)
+Vec3 Scene5p::ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt)
 {
 	body->vel += gravity * dt;
 	return body->vel;
@@ -705,7 +706,7 @@ Vec3 Scene4p::ComputeFreeFallVelocity(Body* body, const Vec3& gravity, float dt)
 
 
 /// ARCADE ANGULAR DAMPNING MOVMENT
-void Scene4p::ApplyAngularDamping(float deltaTime)
+void Scene5p::ApplyAngularDamping(float deltaTime)
 {
 	const float damping = 0.95f; // 0.0 = instant stop, 1.0 = no damping
 	sphereBody->angularVelocity *= damping;
@@ -717,7 +718,7 @@ void Scene4p::ApplyAngularDamping(float deltaTime)
 
 
 // ----- DEPRECATED -----
-Vec3 Scene4p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time)
+Vec3 Scene5p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time)
 {
 	if (onPlane) {
 		// --- rolling on plane ---
@@ -741,7 +742,7 @@ Vec3 Scene4p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHil
 }
 
 // ----- DEPRECATED -----
-Vec3 Scene4p::ComputeRollingVelocity(const Vec3& downhill)
+Vec3 Scene5p::ComputeRollingVelocity(const Vec3& downhill)
 {
 
 	if (VMath::mag(downhill) > VERY_SMALL)

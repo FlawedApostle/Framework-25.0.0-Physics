@@ -100,6 +100,15 @@
     <Filter Include="Source Files\Scenes_Physics\Scene4p">
       <UniqueIdentifier>{f7b3fbf9-3a8f-4e0e-afad-65af4370260d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scenes_Physics\Scene5p">
+      <UniqueIdentifier>{0d1a5ca3-38af-4de0-bcee-5584ce54bd9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenes_Physics\Plane">
+      <UniqueIdentifier>{47acb328-1175-4330-a29b-75f57a0498b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scenes_Physics\Physics">
+      <UniqueIdentifier>{0ba23b27-b177-43d9-bfcb-acdf200d7cc3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -186,11 +195,14 @@
     <ClCompile Include="Scene4p.cpp">
       <Filter>Source Files\Scenes_Physics\Scene4p</Filter>
     </ClCompile>
+    <ClCompile Include="Scene5p.cpp">
+      <Filter>Source Files\Scenes_Physics\Scene5p</Filter>
+    </ClCompile>
     <ClCompile Include="Plane.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scenes_Physics\Plane</Filter>
     </ClCompile>
     <ClCompile Include="Physics.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Scenes_Physics\Physics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -282,10 +294,13 @@
       <Filter>Source Files\Scenes_Physics\Scene4p</Filter>
     </ClInclude>
     <ClInclude Include="Plane.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Scenes_Physics\Plane</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene5p.h">
+      <Filter>Source Files\Scenes_Physics\Scene5p</Filter>
     </ClInclude>
     <ClInclude Include="Physics.h">
-      <Filter>Header Files</Filter>
+      <Filter>Source Files\Scenes_Physics\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
