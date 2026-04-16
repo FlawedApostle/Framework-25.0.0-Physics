@@ -31,11 +31,45 @@ public:
 	 torqueMagnitude is the weight of the ball - we need a direction and a Magnitude
 	 weight * distance to pivot
 	 */
-	// TORQUE
+	// TORQUE - Distance to pivot / rotation
 	Vec3 Torque_Direction(const Vec3& UpVector, const Vec3& Normal);
 	void Torque_Direction_Update(const Vec3& upVector, const Vec3& Normal);
 	
+	// TORQUE - Apply Rotation using angle and direction force calculations - Notes below	function 1.
+	/*
+	/// ------------------------------- ORIGINAL OLD CODE - DO NOT REMOVE
+
+	float cosTheta = VMath::dot(planeNormal, upVector);
+	//cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
+	float theta = acos(cosTheta);
+	float distanceToPivot = sphereBody->radius * sin(theta);
+
+	//torque = VMath::cross(planeNormal, downhill) * sphereBody->radius * sphereBody->mass;			// NEW :: using downhill to apply gravity direction in relation to the
+	torque = VMath::cross(upVector, planeNormal);									// Vec3 Torque( vec3 , Vec3, Body*)
+	if (VMath::mag(torque) > VERY_SMALL) {
+
+	Vec3 torqueDir = VMath::normalize(torque);
+	torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
+	Vec3 torqueFinal = torqueDir * torqueMagnitude;
+
+	sphereBody->ApplyTourque(torqueFinal);
+
+	}
+
+	*/
 	Vec3 Torque(const Vec3& TorqueDir, float mass, float distanceToPivot);
+	
+	// TORQUE - Apply Rotation using angle and direction force calculations - Notes below	function 2. - current using gravity mag for speed in rotational rolling
+	/*
+	/// VER # 1.
+		Vec3 torque = VMath::cross(planeNormal, downhill) * sphereBody->mass * sphereBody->radius;
+
+		if (VMath::mag(torque) > VERY_SMALL)
+		{
+			sphereBody->ApplyTourque(torque);
+		}
+	*/
+	Vec3 Torque(const Vec3& planeNormal, Vec3& const downHill, float mass, float radius);
 
 
 

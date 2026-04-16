@@ -304,24 +304,38 @@ void Scene5p::Update(const float deltaTime)
 
 	///										--------- GLOBALs ----- GRAVITY & BOUNDARIES
 	/*
-	CONTACT_EPS is to generate a value that is ever-so-slightly above the plane
-	values are not absolute so the sphere might have a subtle float value where the plane is absolute
+	
+	Gravity
+	-	For this to work - The PLANE's NORMAL MUST be NORMALIZED
+
+	gravityNormalComp	[dot(g, n) = |g| * cos(theta)]
+	1.	dotProduct is the 'How much gravity in the direction of the normal
+	2.	re-multiplying planeNormal * planeNormal turns it back into a vector
+	-	how much gravity points in the same direction as the plane normal
+	
+	downhill
+	-	remove normal from the gravity leaving parallel line to roll down the slope 
+
+	CONTACT_EPS 
+	-	is to generate a value that is ever-so-slightly above the plane
+		values are not absolute so the sphere might have a subtle float value where the plane is absolute
 
 	“How big is the plane in mesh space?”
 	or 1.0f depending on Plane.obj
 	WORLD_HALF_SIZE = BASE_HALF_ZIE * SCALE (MESH BODY)
 
 	signed distance
-	the position between the sphere and the plane then finding the dot product using the planes normal
-	height is okay if the distance is equal to the radius of the sphere
-	*/
-	//Vec3 gravity(0.0f, -9.8f, 0.0f);
+	-	the position between the sphere and the plane then finding the dot product using the planes normal
+	-	height is okay if the distance is equal to the radius of the sphere
 	
-	Vec3 gravityNormalComp = VMath::dot(physics.Get_Gravity(), planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
-	Vec3 downhill = physics.Get_Gravity() - gravityNormalComp;
+	*/
+	
+	//Vec3 gravity(0.0f, -9.8f, 0.0f);
+	Vec3 gravityNormalComp = VMath::dot(PHYSICS.Get_Gravity(), planeNormal) * planeNormal;			// how close are the two normals , dot = magnitude of gravity
+	Vec3 downhill = PHYSICS.Get_Gravity() - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
-	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
+	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);					// how far is the ball off the plane
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 
 	///									--------- TORQUE PT I ( ROTATION , BEGIN ROTATION )
@@ -343,13 +357,14 @@ void Scene5p::Update(const float deltaTime)
 	 Remove component along plane normal → get tangent component
 	 Project gravity onto plane - remove perpendicular compeoent to leave parallel direction
 
-	/// ORIGINAL OLD CODE - DO NOT REMOVE
+	/// ------------------------------- ORIGINAL OLD CODE - DO NOT REMOVE
 
 	float cosTheta = VMath::dot(planeNormal, upVector);
 	//cosTheta = MMath::clamp(cosTheta, -1.0f, 1.0f);
 	float theta = acos(cosTheta);
 	float distanceToPivot = sphereBody->radius * sin(theta);
 
+	//torque = VMath::cross(planeNormal, downhill) * sphereBody->radius * sphereBody->mass;			// NEW :: using downhill to apply gravity direction in relation to the
 	torque = VMath::cross(upVector, planeNormal);									// Vec3 Torque( vec3 , Vec3, Body*)
 	if (VMath::mag(torque) > VERY_SMALL) {
 
@@ -360,18 +375,24 @@ void Scene5p::Update(const float deltaTime)
 	sphereBody->ApplyTourque(torqueFinal);
 
 	}
+	/// ---------------------------------
 
 	*/
-
-	//	NEW PHYSICS FUNCTION [ TORQUE - DISTANCE TO PIVOT :: DOT ]
-	float distanceToPivot = sphereBody->radius * physics.Angle_DistanceToPivot(planeNormal, upVector);
+	
+	//	----------------- NEW PHYSICS FUNCTION DO NOT REMOVE - [ TORQUE - DISTANCE TO PIVOT :: DOT ]
+	//float distanceToPivot = sphereBody->radius * PHYSICS.Angle_DistanceToPivot(planeNormal, upVector);
 	//	NEW PHYSICS FUNCTION [ TORQUE DIRECTION :: CROSS]
-	torqueDirection = physics.Torque_Direction(upVector, planeNormal);
+	//torqueDirection = PHYSICS.Torque_Direction(upVector, planeNormal);
 	//	NEW PHYSICS FUNCTION [ TORQUE ]
-	torque = physics.Torque(torqueDirection, sphereBody->mass, distanceToPivot);
+	//torque = PHYSICS.Torque(torqueDirection, sphereBody->mass, distanceToPivot);
+	//sphereBody->ApplyTourque(torque);
+
+
+	// NEW
+
+	torque = PHYSICS.Torque(planeNormal, downhill, sphereBody->mass, sphereBody->radius);
 	sphereBody->ApplyTourque(torque);
-
-
+	//
 
 	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);
@@ -518,7 +539,7 @@ void Scene5p::Update(const float deltaTime)
 		*/
 
 		// Apply gravity normally
-		sphereBody->vel += physics.Get_Gravity() * deltaTime;
+		sphereBody->vel += PHYSICS.Get_Gravity() * deltaTime;
 		linearVelocity = sphereBody->vel;
 	}
 

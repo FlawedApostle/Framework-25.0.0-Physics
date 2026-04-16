@@ -49,27 +49,7 @@ void Physics::Torque_Direction_Update(const Vec3& upVector, const Vec3& Normal)
 }
 
 
-// TORQUE [ FUNCTION RETURNS A VEC3 TORQUE VALUE ] 
-// - THIS FUNCTION WORKS IN RELATION TO [ ANGLE_DISTANCETOPIVOT ]
-// - PURPOSE IS TO YEILD A VALUE THAT CAN BE MANIPULATED IN THE SCENE
-// NOTES -
-/*
-	torque = VMath::cross(upVector, planeNormal);									// Vec3 Torque( vec3 , Vec3, Body*)
-	if (VMath::mag(torque) > VERY_SMALL) {
-		
-		Vec3 torqueDir = VMath::normalize(torque);
-		torqueMagnitude = sphereBody->mass * 9.8f * distanceToPivot;
-		Vec3 torqueFinal = torqueDir * torqueMagnitude;
-		
-		sphereBody->ApplyTourque(torqueFinal);
-		
-		
-		// -- Deprecated
-		//torqueMagnitude = distanceToPivot * sphereBody->mass;						// simple proportional model
-		//torqueMagnitude = torqueMagnitude * distanceToPivot;						// simple proportional model
-	
-
-*/
+// TORQUE Function 1.
 Vec3 Physics::Torque(const Vec3& TorqueDir, float mass, float distanceToPivot)
 {
 	float TorqueDirMag = VMath::mag(TorqueDir);
@@ -82,4 +62,13 @@ Vec3 Physics::Torque(const Vec3& TorqueDir, float mass, float distanceToPivot)
 
 	return TorqueDirNormal * torqueMag;
 
+}
+
+// TORQUE Function 2. - check notes in header file
+Vec3 Physics::Torque(const Vec3& planeNormal, Vec3& const downHill, float mass, float radius)
+{
+	if (VMath::mag(downHill) <= VERY_SMALL)
+		return Vec3(0.0f, 0.0f, 0.0f); // no torque
+	
+	return  VMath::cross(planeNormal, downHill) * mass * radius;
 }

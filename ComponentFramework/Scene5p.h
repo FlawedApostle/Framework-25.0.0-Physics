@@ -86,7 +86,8 @@ public:	/// again this up vector is set public for speed...
 
 	// Plane 
 	Plane* plane_plane1;
-	Physics physics;
+	//Physics physics;
+	Physics PHYSICS;
 
 public:
 	explicit Scene5p();
