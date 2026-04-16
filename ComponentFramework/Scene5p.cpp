@@ -315,9 +315,10 @@ void Scene5p::Update(const float deltaTime)
 	the position between the sphere and the plane then finding the dot product using the planes normal
 	height is okay if the distance is equal to the radius of the sphere
 	*/
-	Vec3 gravity(0.0f, -9.8f, 0.0f);
-	Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
-	Vec3 downhill = gravity - gravityNormalComp;
+	//Vec3 gravity(0.0f, -9.8f, 0.0f);
+	
+	Vec3 gravityNormalComp = VMath::dot(physics.Get_Gravity(), planeNormal) * planeNormal;									// Remove component along plane normal → get tangent component
+	Vec3 downhill = physics.Get_Gravity() - gravityNormalComp;
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);
@@ -517,7 +518,7 @@ void Scene5p::Update(const float deltaTime)
 		*/
 
 		// Apply gravity normally
-		sphereBody->vel += gravity * deltaTime;
+		sphereBody->vel += physics.Get_Gravity() * deltaTime;
 		linearVelocity = sphereBody->vel;
 	}
 

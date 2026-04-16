@@ -8,9 +8,10 @@
 
 Physics::Physics() :
 
-	_torque				{}			,
-	_torqueDir			{}			,
-	_distanceToPivot	{}
+	_torque				{}					,
+	_torqueDir			{}					,
+	_distanceToPivot	{}					,
+	_gravity			{0.0,-9.8,0.0}
 {
 
 	std::cout << "Physics Class" << std::endl;

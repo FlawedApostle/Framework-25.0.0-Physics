@@ -13,7 +13,7 @@ class Physics
 protected:
 	Vec3 _torque;
 	Vec3 _torqueDir;
-
+	Vec3 _gravity;
 	float _distanceToPivot;
 
 public:
@@ -45,9 +45,13 @@ public:
 	//Torque Direction
 	Vec3 Get_TourqueDir() const { return _torqueDir; }
 	void Set_TourqueDir(Vec3 TD) { _torqueDir = TD; }
+	// Gravity
+	Vec3 Get_Gravity() const { return _gravity; }
+	void Set_Gravity(Vec3 NG) { _gravity = NG; }
 	//Distance To Pivot
 	float Get_DistanceToPivot() { return _distanceToPivot; }
 	void Set_DistanceToPivot(float DP) { _distanceToPivot = DP; }
+
 	//-----------------------------------------------------------
 
 
