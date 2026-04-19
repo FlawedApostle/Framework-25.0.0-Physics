@@ -11,9 +11,18 @@
 class Physics
 {
 protected:
+
 	Vec3 _torque;
 	Vec3 _torqueDir;
 	Vec3 _gravity;
+	
+	Vec3 _gravityNormal;
+	Vec3 _torqueDirectionAndSpeed;
+
+	float angSpeed;
+	float speed;
+	float planeDist;
+
 	float _distanceToPivot;
 
 public:
@@ -72,9 +81,6 @@ public:
 	Vec3 Torque(const Vec3& planeNormal, Vec3& const downHill, float mass, float radius);
 
 
-
-
-
 	//--------------------------GETTERS/SETTERS---------------------------------
 	//Torque Direction
 	Vec3 Get_TourqueDir() const { return _torqueDir; }
@@ -83,9 +89,16 @@ public:
 	Vec3 Get_Gravity() const { return _gravity; }
 	void Set_Gravity(Vec3 NG) { _gravity = NG; }
 	//Distance To Pivot
-	float Get_DistanceToPivot() { return _distanceToPivot; }
-	void Set_DistanceToPivot(float DP) { _distanceToPivot = DP; }
-
+	float Get_DistanceToPivot()			{ return _distanceToPivot; }
+	void Set_DistanceToPivot(float DP)	{ _distanceToPivot = DP; }
+	// GravityNormal
+	Vec3 Get_GravityNormal() const	{ return _gravityNormal; }
+	void Set_GravityNormal(Vec3 GN) { _gravityNormal = GN; };
+	// Torque Axis Direction And Speed
+	Vec3 Get_TorqueDirectionAndSpeed() { return _torqueDirectionAndSpeed; }
+	void Set_TorqueDirectionAndSpeed(Vec3 NTDS) { _torqueDirectionAndSpeed = NTDS; }
+	// Angular Speed
+	// Plane Distance
 	//-----------------------------------------------------------
 
 

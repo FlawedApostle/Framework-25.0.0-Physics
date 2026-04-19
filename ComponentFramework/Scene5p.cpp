@@ -309,12 +309,21 @@ void Scene5p::Update(const float deltaTime)
 	-	For this to work - The PLANE's NORMAL MUST be NORMALIZED
 
 	gravityNormalComp	[dot(g, n) = |g| * cos(theta)]
-	1.	dotProduct is the 'How much gravity in the direction of the normal
-	2.	re-multiplying planeNormal * planeNormal turns it back into a vector
+	-	gravity acting perpendicular to the plane
+	-	To keep the ball from falling through the floor, the floor pushes back with an equal and opposite force to this component.
+	-	dotProduct is the 'How much gravity in the direction of the normal
+	-	re-multiplying planeNormal * planeNormal turns it back into a vector
 	-	how much gravity points in the same direction as the plane normal
 	
 	downhill
-	-	remove normal from the gravity leaving parallel line to roll down the slope 
+	-	remove normal from the gravity leaving parallel line to roll down the slope
+	-	This is the portion of gravity acting parallel to the surface.
+
+	PHYSICS.TORQUE - function
+	-	t = radiusVector x force
+	1. force is downhill 
+	2. the radius vector points from the center to the contact point - planeNormal * radius
+	- the cross product of 1 & 2 yields the axis direction
 
 	CONTACT_EPS 
 	-	is to generate a value that is ever-so-slightly above the plane
@@ -330,9 +339,14 @@ void Scene5p::Update(const float deltaTime)
 	
 	*/
 	
-	//Vec3 gravity(0.0f, -9.8f, 0.0f);
-	Vec3 gravityNormalComp = VMath::dot(PHYSICS.Get_Gravity(), planeNormal) * planeNormal;			// how close are the two normals , dot = magnitude of gravity
-	Vec3 downhill = PHYSICS.Get_Gravity() - gravityNormalComp;
+	Vec3 gravity(0.0f, -9.8f, 0.0f);
+	PHYSICS.Set_Gravity(gravity);
+	Vec3 gravityNormalComp = VMath::dot(PHYSICS.Get_Gravity(), planeNormal) * planeNormal;			// gravity projected onto plane normal 
+	PHYSICS.Set_GravityNormal(gravityNormalComp);
+	Vec3 downhill = PHYSICS.Get_Gravity() - gravityNormalComp;										// direction & speed of Torque axis
+	PHYSICS.Set_TorqueDirectionAndSpeed(downhill);
+
+
 	float angSpeed = VMath::mag(sphereBody->angularVelocity);
 	float speed = angSpeed * sphereBody->radius;
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);					// how far is the ball off the plane
@@ -390,7 +404,7 @@ void Scene5p::Update(const float deltaTime)
 
 	// NEW
 
-	torque = PHYSICS.Torque(planeNormal, downhill, sphereBody->mass, sphereBody->radius);
+	torque = PHYSICS.Torque(planeNormal, downhill , sphereBody->mass, sphereBody->radius);
 	sphereBody->ApplyTourque(torque);
 	//
 
@@ -738,30 +752,6 @@ void Scene5p::ApplyAngularDamping(float deltaTime)
 
 /// -------------- DEPRECATED ( MUTEABLE(S) )
 
-
-// ----- DEPRECATED -----
-Vec3 Scene5p::IfOnPlane(bool onPlane, Body* _body1, Vec3 _gravity, Vec3 _downHill, Vec3 _linearVelocity, float _angSpeed, float _speed, const float _time)
-{
-	if (onPlane) {
-		// --- rolling on plane ---
-		//Vec3 gravityNormalComp = VMath::dot(gravity, planeNormal) * planeNormal;
-		//Vec3 downhill = gravity - gravityNormalComp;
-
-		if (VMath::mag(_downHill) > VERY_SMALL) {
-			Vec3 downhillDir = VMath::normalize(_downHill);
-			_angSpeed = VMath::mag(_body1->angularVelocity);
-			_speed = _angSpeed * _body1->radius;
-			return linearVelocity = downhillDir * _speed;
-		}
-	}
-	else {
-		// --- free fall ---
-		_body1->vel += _gravity * _time;
-		return linearVelocity = _body1->vel;
-	}
-
-	//return linearVelocity = Vec3(0.0f, 0.0f, 0.0f);
-}
 
 // ----- DEPRECATED -----
 Vec3 Scene5p::ComputeRollingVelocity(const Vec3& downhill)
