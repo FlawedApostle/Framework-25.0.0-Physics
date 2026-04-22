@@ -183,26 +183,27 @@ void Scene5p::HandleEvents(const SDL_Event& sdlEvent) {
 
 bool Scene5p::OnCreate() {
 	Debug::Info("Loading assets Scene5p: ", __FILE__, __LINE__);
-	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
-	//upVector = { 0.0f,1.0f,0.0f };															/// generate the upVector - Currently in Update
 
+	///										******************************** SETTINGS - SCALE / NORMAL ********************************
 	// MESH SCALE , MESH NORMAL
 	baseHalfSize = 1.0f;	// Define the Boundary old# = [ 5 ]
 	upVector = { 0.0f,1.0f,0.0f };
 
+	///										******************************** SETTINGS - TRACKBALL ********************************
 	/// Trackball - CAMERA SETTINGS
 	trackball = new Trackball();
 	Matrix4 rot = MMath::toMatrix4(trackball->getQuat());
 	rot = MMath::inverse(rot);
 	trackball->setRot(rot);											// mouse = Matrix4 rot = MMath::toMatrix4(mouseRotationQuat);
 
-
-	/// UNIFORMS --- phongVert , phongFrag [shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl] 
+	///										******************************** UNIFORMS ********************************
 	lightPos = Vec3(0.0f, 10.0f, 0.0f);															// lightpos shader PhoneVert
 	color_specular = Vec4(0.0, 0.0, 1.0, 0.0);
 	color_diffuse = Vec4(0.0, 0.0, 0.5, 0.0);
 	color_ambient_exponent = 0.5f;
+	//lightPosLoc = glGetUniformLocation(shader->GetProgram(), "lightPos");						// Cache the uniform location for the light position in the shader
 
+	///										******************************** BODY ********************************
 	/// NEW :: Plane.h CLASS
 	//plane_plane1 = new Plane();	
 	//plane_plane1->SetPlane_Body(new Body); 
@@ -239,7 +240,7 @@ bool Scene5p::OnCreate() {
 	sphereCollision0_Body->radius = 1.0f;
 
 
-	// ----- 3D
+	///										******************************** MESH ********************************
 	// NEW PLANE
 	//plane_plane1->SetPlane_Mesh(new Mesh("meshes/Plane_3.obj"));
 	//if (plane_plane1)
@@ -256,7 +257,8 @@ bool Scene5p::OnCreate() {
 	sphereCollision0_Mesh = new Mesh("meshes/Sphere.obj");
 	sphereCollision0_Mesh->OnCreate();
 
-	/// ----- SHADER 1. ---- DEFAULT.
+	///										******************************** SHADERS ********************************
+	// ----- SHADER 1. ---- DEFAULT.
 	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
 	shader->CheckShader(shader);										// added shader CHECK function to Shader.h
 
@@ -275,8 +277,8 @@ bool Scene5p::OnCreate() {
 
 
 
-
-	/// CAMERA	- SET THE POSITION - NOTE WHICH VIEWMATRIX IS BEING USED IN UPDATE
+	///										******************************** CAMERA ********************************
+	/// CAMERA - DEFAULT SETTINGS
 	/* 
 	New camera is defined by the following
 	- target  → what you're looking at (your ball)
@@ -285,29 +287,24 @@ bool Scene5p::OnCreate() {
 	*/
 	target = sphereBody->pos;										// what you look at
 	offset = Vec3(0, 5, 30);										// camera distance
-	 //rotatedOffset = trackball->getRot() * offset;				// Rotate the offset using your quaternion - set above LINE:: 195
-	//cameraPosition = target + offset;								// final camera position
-	
+	//rotatedOffset = trackball->getRot() * offset;					// Rotate the offset using your quaternion - set above LINE:: 195
+	/// CAMERA - PAN SMOOTHING SETTINGS
 	//Vec3 desiredPos = target + rotatedOffset;
 	//float smooth = 0.1f; // smaller = smoother
 	//cameraPosition = VMath::lerp(cameraPosition, desiredPos, smooth);
-
-
-	/// ----- CAMERA STARTING POSITIONING
+	/// CAMERA - ORBIT  
+	cameraPosition = target + offset;
 	/*
 	* This is the initial settings of the camera - static
 	* Render contains the non-static 'following' camera settings.
 	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 35.0f);
 	cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 	*/
-	// ----- CAMERA
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
 	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
 	
-	// NEW CAMERA view matrix
-	//viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
-
 
 	return true;
 }
@@ -315,11 +312,10 @@ bool Scene5p::OnCreate() {
 
 void Scene5p::Update(const float deltaTime)
 {
-	// ----- Collisions
+	///							******************************** COLLISIONS ********************************
 	//std::cout << "test Body* " << Collision::SphereSphereCollisionDetected(sphereBody, sphereCollision0_Body) << "\n";
 
-
-	//										--------- GLOBALs ----- NORMAL ( PLANE ) & LOCAL POSITION
+	///							********************************  GLOBALs ----- NORMAL ( PLANE ) & LOCAL POSITION ********************************
 	planeNormal = QMath::rotate(Vec3(0.0f, 1.0f, 0.0f), planeBody->orientation);								//  Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
 	planeNormal = VMath::normalize(planeNormal);
 
@@ -327,7 +323,7 @@ void Scene5p::Update(const float deltaTime)
 	Vec3 localPos = sphereBody->pos - planeBody->pos;
 	localPos = QMath::inverse(planeBody->orientation) * localPos;
 
-	///										--------- GLOBALs ----- GRAVITY & BOUNDARIES
+	///							******************************** GLOBALs ----- GRAVITY & BOUNDARIES ********************************
 	/*
 	
 	Gravity
@@ -377,7 +373,7 @@ void Scene5p::Update(const float deltaTime)
 	float planeDist = VMath::dot(sphereBody->pos - planeBody->pos, planeNormal);					// how far is the ball off the plane
 	bool heightOK = planeDist <= sphereBody->radius + CONTACT_EPS;
 
-	///									--------- TORQUE PT I ( ROTATION , BEGIN ROTATION )
+	///							******************************** TORQUE PT I ( ROTATION , BEGIN ROTATION ) ********************************
 	// NOTES
 	/* UpVector is set in INIT - it is a const , should it be ?
 	 we know the perpendicular distance between pivot and force
@@ -418,7 +414,7 @@ void Scene5p::Update(const float deltaTime)
 
 	*/
 	
-	//	----------------- NEW PHYSICS FUNCTION DO NOT REMOVE - [ TORQUE - DISTANCE TO PIVOT :: DOT ]
+	///	----------------- NEW PHYSICS FUNCTION [ TORQUE - DISTANCE TO PIVOT :: DOT ]  **********  [ DO NOT REMOVE ]  **********        
 	//float distanceToPivot = sphereBody->radius * PHYSICS.Angle_DistanceToPivot(planeNormal, upVector);
 	//	NEW PHYSICS FUNCTION [ TORQUE DIRECTION :: CROSS]
 	//torqueDirection = PHYSICS.Torque_Direction(upVector, planeNormal);
@@ -426,19 +422,15 @@ void Scene5p::Update(const float deltaTime)
 	//torque = PHYSICS.Torque(torqueDirection, sphereBody->mass, distanceToPivot);
 	//sphereBody->ApplyTourque(torque);
 
-
-	// NEW
-
+	/// NEW - TORQUE
 	torque = PHYSICS.Torque(planeNormal, downhill , sphereBody->mass, sphereBody->radius);
 	sphereBody->ApplyTourque(torque);
-	//
 
-	/// UPDATE									--------- TORQUE PT II ( UPDATE ANGULAR MOTION )
+	/// UPDATE - TORQUE ( UPDATE ANGULAR MOTION )
 	sphereBody->UpdateAngularVelocity(deltaTime);
-	sphereBody->UpdateOrientation(deltaTime); // Change the orientation using quaternion.
+	sphereBody->UpdateOrientation(deltaTime);
 
-
-	// 4.A										--------- BOUNDRIES GO PT I [ Boundary test (local space) ]
+	///							******************************** BOUNDRIES GO PT I [ Boundary test (local space) ] ********************************
 	/*
 											Local X is still Left/Right.
 											Local Y is now pointing straight UP (Height).
@@ -495,12 +487,10 @@ void Scene5p::Update(const float deltaTime)
 	//	fabs(rel.x) <= halfX &&
 	//	fabs(rel.z) <= halfZ;
 
-
 	//std::cout << "BOUNDARIES CHECK :: " << "\n";
 	//printf("localPos: %f %f %f\n", localPos.x, localPos.y, localPos.z);
 	//printf("halfX: %f halfZ: %f\n", halfX, halfZ);
 	//printf("localPos: %f %f\n", localPos.x, localPos.z);
-
 
 	/// ------------------------------------- DEBUG
 	/*
@@ -513,9 +503,9 @@ void Scene5p::Update(const float deltaTime)
 		//------------------------------------------------------------------------------------------------
 	*/
 
-	// 4.B										--------- BOUNDRIES PT III [ (Boundary on - PLANE - LOCAL space) ]
+	///							******************************** BOUNDRIES GO PT II [ Boundary on - PLANE - LOCAL space ] ********************************
 	//bool onPlane = heightOK && insideBounds;	// OLD
-		// NEW 
+	// NEW 
 	bool touchingPlane = heightOK;
 	bool withinBounds = insideBounds;
 	bool onPlane = touchingPlane && withinBounds;
@@ -543,8 +533,7 @@ void Scene5p::Update(const float deltaTime)
 	wasOnPlane = onPlane;
 	*/
 
-
-	/// 4.C										--------- BOUNDARIES & TORQUE CONSTRAINT PT IV ( KEEP SPHERE RESTING ON PLANE )  logic needs cleaning
+	///							******************************** BOUNDARIES & TORQUE CONSTRAINT [ KEEP SPHERE RESTING ON PLANE ] ********************************
 	// --- UPDATED GROUNDED LOGIC ---
 	if (!grounded && onPlane)
 	{
@@ -593,16 +582,11 @@ void Scene5p::Update(const float deltaTime)
 		grounded = false;
 	}
 
-
-
-
-	/// ----------------------------------------	ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
+	/// ASSIGN LINEAR VELOCITY AND INTEGRATE POSITION
 	sphereBody->vel = linearVelocity;
 	sphereBody->UpdatePos(deltaTime);
 
-
-
-	/// 4.E ---------------------------------------- BOUNDARIES ( CONTACT CONSTRAINT - PLANE )[ KEEP SPHERE RESTING ON PLANE ]
+	///						******************************** BOUNDARIES ( CONTACT CONSTRAINT - PLANE )[ KEEP SPHERE RESTING ON PLANE ] ********************************
 
 	if (onPlane)
 	{
@@ -622,12 +606,13 @@ void Scene5p::Update(const float deltaTime)
 		}
 	}
 
+	///						******************************** CAMERA ********************************
+	/// CAMERA - FOLLOW THE BALL & PAN
+	//rotatedOffset = trackball->getRot() * offset;							// Rotate the offset using your quaternion - set above LINE:: 195
+	//cameraPosition = sphereBody->pos + rotatedOffset;						// final camera position
 
-	/// NEW CAMERA FOLLOW & PAN - SPHERE -
-	rotatedOffset = trackball->getRot() * offset;							// Rotate the offset using your quaternion - set above LINE:: 195
-	cameraPosition = sphereBody->pos + rotatedOffset;						// final camera position
-
-	/// TRACKBALL
+	///						******************************** TRACKBALL ********************************
+	/// ----- TRACKBALL QUATERNION
 	/*
 	WHY INVERSE !...... looking down the neg z axis !
 	- initial is getQuat() in handle events, gets the inital position of the orientation of the quat
@@ -639,14 +624,13 @@ void Scene5p::Update(const float deltaTime)
 	Quaternion changeInTrackballOrientation = finalTrackballOrientation * QMath::inverse(initialTrackballOrientation);
 	cameraOrientation *= changeInTrackballOrientation;
 	cameraPosition = QMath::rotate(cameraPosition, changeInTrackballOrientation);
-
-	/// ----- MATRIX
+	/// ----- TRACKBALL MATRIX
 	Matrix4 T = MMath::translate(cameraPosition);
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
 
-	/// NEW CAMERA view matrix
-	//viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
+	/// FOLLOW THE BALL WHEN MOVING
+	viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
 
 
 }
