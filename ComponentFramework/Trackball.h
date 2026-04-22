@@ -8,7 +8,8 @@ union SDL_Event;
 	class Trackball {
 	private:
 		bool mouseDown;
-		Quaternion mouseRotationQuat;
+		Quaternion mouseRotationQuat;					// THIS IS TAKING THE ROTAATIONAL VALUES BASED ON THE MOUSE TO INTERPRATE THE CAMERA VIEW - THRE IS A GETTER FUNCTION - MOUSE:: Matrix4 rot = MMath::toMatrix4(mouseRotationQuat);
+		Matrix4 rot;
 		// UN - keep track of the orientation before we start rotating things
 		Quaternion prevQuat;
 		Matrix4 invNDC;			/// the inverse of the viewportNDC matrix
@@ -22,6 +23,8 @@ union SDL_Event;
 		Trackball& operator=(Trackball&&) = delete;
 
 		const Quaternion getQuat() const { return mouseRotationQuat; }
+		const Matrix4 getRot() const { return rot; }
+		const void setRot(Matrix4 _rot) { rot = _rot; }
 		void HandleEvents(const SDL_Event &sdlEvent);
 	private:
 		/// Just some functions for internal use only thus private

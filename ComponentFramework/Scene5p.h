@@ -62,11 +62,11 @@ private:
 	Vec3 upVector;				/// Up Vector - for rolling the ball
 	float angle;
 	float distancetoPivot;		/// force of the ball 
-	// TORQUE
+	/// TORQUE
 	float torqueMagnitude;		/// speed of the ball 
 	Vec3 torqueDirection;		/// direction of the ball
 	Vec3 torque;
-	// VELOCITY
+	/// VELOCITY
 	Vec3 velocityDirection;
 	float velocityMagnitutde;
 	Vec3 linearVelocity;
@@ -77,11 +77,15 @@ private:
 	Vec3 lightPos;
 	float normalScale;
 	float lightPosLoc;
+	
 	/// BOUNDARIES			--- MOVED TO A NEW CPP
 	float baseHalfSize;
 	const float CONTACT_EPS = 0.01f;;
 
-
+	/// CAMERA
+	Vec3 offset;		// = Vec3(0, 0, 30);
+	Vec3 target;		//  = sphereBody->pos;
+	Vec3 rotatedOffset; // = trackball->getRot() * offset;
 public:	/// again this up vector is set public for speed...
 
 	// Plane 

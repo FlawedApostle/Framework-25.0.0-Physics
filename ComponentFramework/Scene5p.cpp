@@ -190,8 +190,12 @@ bool Scene5p::OnCreate() {
 	baseHalfSize = 1.0f;	// Define the Boundary old# = [ 5 ]
 	upVector = { 0.0f,1.0f,0.0f };
 
-	/// Trackball
+	/// Trackball - CAMERA SETTINGS
 	trackball = new Trackball();
+	Matrix4 rot = MMath::toMatrix4(trackball->getQuat());
+	rot = MMath::inverse(rot);
+	trackball->setRot(rot);											// mouse = Matrix4 rot = MMath::toMatrix4(mouseRotationQuat);
+
 
 	/// UNIFORMS --- phongVert , phongFrag [shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl] 
 	lightPos = Vec3(0.0f, 10.0f, 0.0f);															// lightpos shader PhoneVert
@@ -208,10 +212,9 @@ bool Scene5p::OnCreate() {
 	//plane_plane1->GetPlane_Body()->scale = Vec3(10.0f, 10.0f, 10.0f);
 
 
-
 	planeBody = new Body();
 	planeBody->OnCreate();
-	planeNormal = Vec3(0.0f, 1.0f, 0.0f);															// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
+	planeNormal = Vec3(0.0f, 1.0f, 0.0f);																// Plane_Blender , changed normal from z = 1.0f TO y = 1.0f
 	planeNormal.print("planeNormal");
 	planeBody->scale = Vec3(10.0f, 10.0f, 10.0f);														// CHECK:: baseHalfScale defines the true space - leave at 1.0f - this scale is to defin the plane size
 	/*
@@ -271,17 +274,39 @@ bool Scene5p::OnCreate() {
 	shader_normals_line->CheckShader(shader_normals_line);				// ----- DEBUG SHADER NORMALS LINES
 
 
-	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 35.0f);
-	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 
+
+	/// CAMERA	- SET THE POSITION - NOTE WHICH VIEWMATRIX IS BEING USED IN UPDATE
+	/* 
+	New camera is defined by the following
+	- target  → what you're looking at (your ball)
+	- offset  → how far the camera is from the target
+	- rotation → how that offset is rotated
+	*/
+	target = sphereBody->pos;										// what you look at
+	offset = Vec3(0, 5, 30);										// camera distance
+	 //rotatedOffset = trackball->getRot() * offset;				// Rotate the offset using your quaternion - set above LINE:: 195
+	//cameraPosition = target + offset;								// final camera position
+	
+	//Vec3 desiredPos = target + rotatedOffset;
+	//float smooth = 0.1f; // smaller = smoother
+	//cameraPosition = VMath::lerp(cameraPosition, desiredPos, smooth);
+
+
+	/// ----- CAMERA STARTING POSITIONING
+	/*
+	* This is the initial settings of the camera - static
+	* Render contains the non-static 'following' camera settings.
+	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 35.0f);
+	cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
+	*/
 	// ----- CAMERA
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
-	Matrix4 T = MMath::translate(cameraPosition);
-	Matrix4 R = MMath::toMatrix4(cameraOrientation);
-	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
+	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	
+	// NEW CAMERA view matrix
+	//viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
 
 
 	return true;
@@ -598,13 +623,11 @@ void Scene5p::Update(const float deltaTime)
 	}
 
 
+	/// NEW CAMERA FOLLOW & PAN - SPHERE -
+	rotatedOffset = trackball->getRot() * offset;							// Rotate the offset using your quaternion - set above LINE:: 195
+	cameraPosition = sphereBody->pos + rotatedOffset;						// final camera position
 
-
-
-	// ------ TRACKBALL ------ SYNTHETIC CAMERA - [Starting camera position]
-	//cameraPosition = cameraPosition - sphereBody->pos;
-	cameraPosition = cameraPosition - planeBody->pos;
-
+	/// TRACKBALL
 	/*
 	WHY INVERSE !...... looking down the neg z axis !
 	- initial is getQuat() in handle events, gets the inital position of the orientation of the quat
@@ -621,6 +644,9 @@ void Scene5p::Update(const float deltaTime)
 	Matrix4 T = MMath::translate(cameraPosition);
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
+
+	/// NEW CAMERA view matrix
+	//viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
 
 
 }
