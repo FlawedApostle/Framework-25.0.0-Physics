@@ -1,9 +1,99 @@
-Wed Apr 22 09:54:47 2026
+Wed Apr 22 23:18:45 2026
 [INFO]: Starting the SceneManager
 [INFO]: OpenGL version: 4.6.0 NVIDIA 591.86
 [INFO]: Graphics card vendor NVIDIA Corporation
 [INFO]: Graphics card name NVIDIA GeForce RTX 3060/PCIe/SSE2
 [INFO]: GLSL Version 4.60 NVIDIA
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"color_ambient_exponent" loc:0
+"color_diffuse" loc:1
+"color_specular" loc:2
+"lightPos" loc:3
+"modelMatrix" loc:4
+"projectionMatrix" loc:5
+"viewMatrix" loc:6
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene0: 
+[INFO]: Loading assets Scene0: 
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+
+[INFO]: Deleting assets Scene0: 
+[INFO]: Deleted Scene0: 
+[INFO]: Created Scene1p: 
+[INFO]: Loading assets Scene1p: 
+[INFO]: Uniforms:
+"color_ambient_exponent" loc:0
+"color_diffuse" loc:1
+"color_specular" loc:2
+"lightPos" loc:3
+"modelMatrix" loc:4
+"projectionMatrix" loc:5
+"viewMatrix" loc:6
+
+[INFO]: Deleting assets Scene1p: 
+[INFO]: Deleted Scene1p: 
+[INFO]: Created Scene2p: 
+[INFO]: Loading assets Scene2p: 
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+
+[INFO]: Deleting assets Scene2p: 
+[INFO]: Deleted Scene2p: 
+[INFO]: Created Scene3p: 
+[INFO]: Loading assets Scene3p: 
+[INFO]: Uniforms:
+"color_ambient_exponent" loc:0
+"color_diffuse" loc:1
+"color_specular" loc:2
+"lightPos" loc:3
+"modelMatrix" loc:4
+"projectionMatrix" loc:5
+"viewMatrix" loc:6
+
+[INFO]: Uniforms:
+"modelMatrix" loc:0
+"projectionMatrix" loc:1
+"viewMatrix" loc:2
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+
+[INFO]: Deleting assets Scene3p: 
+[INFO]: Deleted Scene3p: 
+[INFO]: Created Scene4p: 
+[INFO]: Loading assets Scene4p: 
+[INFO]: Uniforms:
+"color_ambient_exponent" loc:0
+"color_diffuse" loc:1
+"color_specular" loc:2
+"lightPos" loc:3
+"modelMatrix" loc:4
+"projectionMatrix" loc:5
+"viewMatrix" loc:6
+
+[INFO]: Uniforms:
+"modelMatrix" loc:0
+"projectionMatrix" loc:1
+"viewMatrix" loc:2
+
+[INFO]: Uniforms:
+"modelMatrix" loc:2
+"projectionMatrix" loc:0
+"viewMatrix" loc:1
+
+[INFO]: Deleting assets Scene4p: 
+[INFO]: Deleted Scene4p: 
 [INFO]: Created Scene5p: 
 [INFO]: Loading assets Scene5p: 
 [INFO]: Uniforms:

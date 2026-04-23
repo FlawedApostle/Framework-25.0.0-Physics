@@ -32,6 +32,10 @@ class Scene1p : public Scene
 
 		/// UNIFORMS LIGHTS POSITIONS
 		Vec3 Light_Position0;
+		Vec3 lightPos;
+		Vec4 color_specular;
+		Vec4 color_diffuse;
+		float color_ambient_exponent = 0.1f;
 		
 		/// Toruqe
 		Vec3 upVector;		// Up Vector -> for rolling the ball

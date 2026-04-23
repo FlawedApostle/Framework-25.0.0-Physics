@@ -67,9 +67,11 @@ private:
 
 	/// Uniforms
 	Vec3 lightPos;
+	Vec4 color_specular;
+	Vec4 color_diffuse;
+	float color_ambient_exponent;
 	float normalScale;
 	float lightPosLoc;
-
 
 public:	/// again this up vector is set public for speed...
 

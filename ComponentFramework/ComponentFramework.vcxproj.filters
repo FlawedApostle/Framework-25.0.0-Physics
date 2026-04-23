@@ -109,6 +109,9 @@
     <Filter Include="Source Files\Scenes_Physics\Physics">
       <UniqueIdentifier>{0ba23b27-b177-43d9-bfcb-acdf200d7cc3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\CameraController">
+      <UniqueIdentifier>{7ae6e4e8-4fa7-49ed-bedf-ff488efa671e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -203,6 +206,9 @@
     </ClCompile>
     <ClCompile Include="Physics.cpp">
       <Filter>Source Files\Scenes_Physics\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="CameraController.cpp">
+      <Filter>Source Files\CameraController</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -301,6 +307,9 @@
     </ClInclude>
     <ClInclude Include="Physics.h">
       <Filter>Source Files\Scenes_Physics\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraController.h">
+      <Filter>Source Files\CameraController</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

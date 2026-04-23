@@ -9,6 +9,7 @@
 #include "Plane.h"
 
 #include "Physics.h"
+#include "CameraController.h"
 
 using namespace MATH;
 
@@ -71,10 +72,10 @@ private:
 	float velocityMagnitutde;
 	Vec3 linearVelocity;
 	/// Uniforms
+	Vec3 lightPos;
 	Vec4 color_specular;
 	Vec4 color_diffuse;
 	float color_ambient_exponent = 0.1f;
-	Vec3 lightPos;
 	float normalScale;
 	float lightPosLoc;
 	
@@ -92,6 +93,7 @@ public:	/// again this up vector is set public for speed...
 	Plane* plane_plane1;
 	//Physics physics;
 	Physics PHYSICS;
+	CameraController _cameraController;
 
 public:
 	explicit Scene5p();

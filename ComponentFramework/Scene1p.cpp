@@ -27,78 +27,6 @@ Scene1p::Scene1p() :
 Scene1p::~Scene1p() {
 	Debug::Info("Deleted Scene1p: ", __FILE__, __LINE__);
 }
-
-bool Scene1p::OnCreate() {
-	Debug::Info("Loading assets Scene1p: ", __FILE__, __LINE__);
-
-	/// UNIFORMS - LIGHTS
-	Light_Position0 = Vec3(-15.0f, 15.0f,0.0f);
-	
-	/// Plane
-	planeBody = new Body();
-	planeBody->OnCreate();
-	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(1, 0, 0));
-	planeBody->orientation *= QMath::angleAxisRotation(45, Vec3(0, 0, 1));
-	planeNormal = Vec3(0, 0, -1);
-	planeNormal = QMath::rotate(planeNormal, planeBody->orientation);
-	printf("Plane Normal \n"); planeNormal.print();	/// Handle Events -> p to print the planeNormal
-
-	/// Sphere
-	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
-	sphereBody = new Body();
-	sphereBody->OnCreate();
-	sphereBody->pos = Vec3(0, 1.3, 0);
-	sphereBody->angularVelocity = Vec3(0, 0, 0);
-	sphereBody->radius = 1;
-	// Speed of the ball
-	sphereBody->angularAcceleration = Vec3(0, 0, 1);
-
-	/// Mesh(s)
-	// Mesh -> plane
-	planeMesh = new Mesh("meshes/Plane.obj");
-	planeMesh->OnCreate();
-	// Mesh -> sphere
-	sphereMesh = new Mesh("meshes/Sphere.obj");
-	sphereMesh->OnCreate();
-	/// Shader
-	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
-	if (shader->OnCreate() == false) {
-		std::cout << "Shader failed ... we have a problem\n";
-	}
-
-	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 12.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-
-	//projectionMatrix_sphere = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);;
-	//viewMatrix_sphere = MMath::lookAt(Vec3(0.0f, 0.0f, 5.5f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	//rotate_sphere = MMath::rotate(0.0f, Vec3(0.0f, 0.0f, 0.0f));
-	//translate_sphere = MMath::translate(Vec3(0.0f,0.0f,0.0f));
-	//modelMatrix_sphere = translate_sphere * rotate_sphere * scale_sphere;
-
-	return true;
-
-	/*
-	/// Physics obj manipulation
-	// when rotating the obj rotate the normal
-	// check class notes , Discord , email Umer || book appointment
-	// force = mass * Accel
-
-	/// Physics Equations
-	// Equation 1 Torque = Force * Dist to Pivot == Torque = Force * Weight
-	// Equation 2 Torque = Rotational Inertia * Angular Accel
-
-	// finalV = initialV + acc * t
-	// FinalW = initialW * angularAccel * t		// -> w == Angular Velocity
-
-	// find the Angle theta
-	// find the distance
-	// find the Torque (magnitude)
-
-	// Torquedir = Up x Normal (cross product)
-	*/
-
-}
-/// Clean Up
 void Scene1p::OnDestroy() {
 	Debug::Info("Deleting assets Scene1p: ", __FILE__, __LINE__);
 	/// sphere
@@ -115,6 +43,7 @@ void Scene1p::OnDestroy() {
 	shader->OnDestroy();
 	delete shader;
 }
+
 /// Help on the rotation , and the normals, getting the correct readings
 void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 	switch (sdlEvent.type) {
@@ -169,6 +98,83 @@ void Scene1p::HandleEvents(const SDL_Event& sdlEvent) {
 	default:
 		break;
 	}
+}
+
+bool Scene1p::OnCreate() {
+	Debug::Info("Loading assets Scene1p: ", __FILE__, __LINE__);
+
+	/// UNIFORMS - LIGHTS
+	Light_Position0 = Vec3(0.0f, 5.0f,0.0f);
+	lightPos = Vec3(0.0f, 10.0f, 0.0f);															// lightpos shader PhoneVert
+	color_specular = Vec4(0.0, 0.0, 1.0, 0.0);
+	color_diffuse = Vec4(0.0, 0.0, 0.5, 0.0);
+	color_ambient_exponent = 0.5f;
+
+	/// Plane
+	planeBody = new Body();
+	planeBody->OnCreate();
+	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(1, 0, 0));
+	planeBody->orientation *= QMath::angleAxisRotation(45, Vec3(0, 0, 1));
+	planeBody->scale = Vec3(1.0f, 1.0f, 1.0f);
+	planeNormal = Vec3(0, 0, -1);
+	planeNormal = QMath::rotate(planeNormal, planeBody->orientation);
+	printf("Plane Normal \n"); planeNormal.print();	/// Handle Events -> p to print the planeNormal
+
+	/// Sphere
+	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
+	sphereBody = new Body();
+	sphereBody->OnCreate();
+	sphereBody->pos = Vec3(0, 1.3, 0);
+	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
+	sphereBody->angularVelocity = Vec3(0, 0, 0);
+	sphereBody->radius = 1;
+	// Speed of the ball
+	sphereBody->angularAcceleration = Vec3(0, 0, 1);
+
+	/// Mesh(s)
+	// Mesh -> plane
+	planeMesh = new Mesh("meshes/Plane.obj");
+	planeMesh->OnCreate();
+	// Mesh -> sphere
+	sphereMesh = new Mesh("meshes/Sphere.obj");
+	sphereMesh->OnCreate();
+	/// Shader "shaders/default/defaultVert.glsl", "shaders/default/defaultFrag.glsl"		"shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl"
+	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
+	if (shader->OnCreate() == false) {
+		std::cout << "Shader failed ... we have a problem\n";
+	}
+
+	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
+	viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 12.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+
+	//projectionMatrix_sphere = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);;
+	//viewMatrix_sphere = MMath::lookAt(Vec3(0.0f, 0.0f, 5.5f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
+	//rotate_sphere = MMath::rotate(0.0f, Vec3(0.0f, 0.0f, 0.0f));
+	//translate_sphere = MMath::translate(Vec3(0.0f,0.0f,0.0f));
+	//modelMatrix_sphere = translate_sphere * rotate_sphere * scale_sphere;
+
+	return true;
+
+	/*
+	/// Physics obj manipulation
+	// when rotating the obj rotate the normal
+	// check class notes , Discord , email Umer || book appointment
+	// force = mass * Accel
+
+	/// Physics Equations
+	// Equation 1 Torque = Force * Dist to Pivot == Torque = Force * Weight
+	// Equation 2 Torque = Rotational Inertia * Angular Accel
+
+	// finalV = initialV + acc * t
+	// FinalW = initialW * angularAccel * t		// -> w == Angular Velocity
+
+	// find the Angle theta
+	// find the distance
+	// find the Torque (magnitude)
+
+	// Torquedir = Up x Normal (cross product)
+	*/
+
 }
 
 void Scene1p::Update(const float deltaTime) 
@@ -239,12 +245,14 @@ void Scene1p::Render() const {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
 
-	/// have to edit the shader for the plane !!!!
-	/// Fragcolor = {1.0,1.0,1.0,0.0}; -> FragShader
-
 	/// Render Shader
 	glUseProgram(shader->GetProgram());
-	glUniform3fv(shader->GetUniformID("Light_Position0"), 1, Light_Position0);
+	//glUniform3fv(shader->GetUniformID("Light_Position0"), 1, Light_Position0);
+	glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
+	glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color_specular"), 1, color_specular);
+	glUniform4fv(glGetUniformLocation(shader->GetProgram(), "color_diffuse"), 1, color_diffuse);
+	glUniform1f(glGetUniformLocation(shader->GetProgram(), "color_ambient_exponent"), color_ambient_exponent);
+
 	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, modelMatrix);

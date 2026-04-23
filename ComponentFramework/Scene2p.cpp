@@ -15,18 +15,24 @@
 
 Scene2p::Scene2p() :
 
-	  drawInWireMode	{ false }
-	, drawInNormalsFace	{ false }
+	  drawInWireMode		{ false }
+	, drawInNormalsFace		{ false }
 	, shader				{ nullptr }
 	, shader_normals_face	{ nullptr }
 	, shader_normals_line	{ nullptr }
-	, sphereMesh	{ nullptr }
-	, sphereBody	{ nullptr }
-	, planeBody		{ nullptr }
-	, planeMesh		{ nullptr }
-	, planeNormal	{ 0,1,0 }															// Normal
-	, trackball		{nullptr}
-	//upVector{ 0, 1, 0 }																// Up Vector
+	, sphereMesh			{ nullptr }
+	, sphereBody			{ nullptr }
+	, planeBody				{ nullptr }
+	, planeMesh				{ nullptr }
+	, planeNormal			{ 0,1,0 }			// Normal
+	, trackball				{nullptr}
+	, angle					{}
+	, distancetoPivot		{}
+	, lightPosLoc			{}
+	, normalScale			{}
+	, torqueMagnitude		{}
+	, velocityMagnitutde	{}
+	//upVector{ 0, 1, 0 }																
 {
 	Debug::Info("Created Scene2p: ", __FILE__, __LINE__);
 }
@@ -44,13 +50,15 @@ bool Scene2p::OnCreate() {
 	trackball = new Trackball();
 
 	/// UNIFORMS
-	lightPos = Vec3(10.0f, 10.0f, 0.0f);														// light position for shader
-	normalScale = 2.0f;																			// normal scale for shader
+	lightPos = Vec3(0.0f, 5.0f, 0.0f);														// light position for shader
+	normalScale = 2.0f;
+	// normal scale for shader
 
 	/// Plane
 	planeBody = new Body();
 	planeBody->OnCreate();
 	planeBody->radius = 2.0f;
+	planeBody->scale = Vec3(1.0f, 1.0f, 1.0f);
 	planeBody->orientation = QMath::angleAxisRotation(90, Vec3(-1, 0, 0)); 
 	planeNormal = Vec3(0.0f, 0.0f, 1.0f);
 	planeNormal = QMath::rotate(Vec3(0.0f,0.0f,1.0f), planeBody->orientation);					// No Drift - Fixed Base to start off
@@ -59,8 +67,9 @@ bool Scene2p::OnCreate() {
 	// V = W X N (velocity = angular velocity cross normal -> (assume each letter is a vector)
 	sphereBody = new Body();
 	sphereBody->OnCreate();
-	sphereBody->pos = Vec3(0.0f, 1.0, 0.0f);
-	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 1.0f);										// starts at 0 for rest
+	sphereBody->pos = Vec3(0.0f, 0.0, 0.0f);
+	sphereBody->scale = Vec3(1.0f, 1.0f, 1.0f);
+	sphereBody->angularVelocity = Vec3(0.0f, 0.0f, 0.0f);										// starts at 0 for rest
 	sphereBody->radius = 1;
 	sphereBody->angularAcceleration = Vec3(1.0f, 0.0f, 0.0f);									// SPEED  - starts at 0 for rest
 
@@ -73,29 +82,29 @@ bool Scene2p::OnCreate() {
 	sphereMesh->OnCreate();
 	
 	/// ----- SHADER
-	shader = new Shader("shaders/defaultPhong/phongVert.glsl", "shaders/defaultPhong/phongFrag.glsl");
+	// "shaders/default/defaultVert.glsl", "shaders/default/defaultFrag.glsl"
+	shader = new Shader("shaders/default/defaultVert.glsl", "shaders/default/defaultFrag.glsl");
 	shader->CheckShader(shader);						// added shader CHECK function to Shader.h
+	
 	// SHADER - NORMALS 
-	shader_normals_face = new Shader("shaders/Normals/normalsVert.glsl", "shaders/Normals/normalsFrag.glsl");
-	shader_normals_face->CheckShader(shader_normals_face);		// added shader CHECK function to Shader.h
-	// SHADER - NORMAL LINES
-	shader_normals_line = new Shader(
-		"shaders/NormalsDraw/drawNormals.vert" , 
-		"shaders/NormalsDraw/drawNormals.frag" ,
-		nullptr, nullptr,								
-		"shaders/NormalsDraw/drawNormals.geom"
-	);
-	shader_normals_line->CheckShader(shader_normals_line);
+	//shader_normals_face = new Shader("shaders/Normals/normalsVert.glsl", "shaders/Normals/normalsFrag.glsl");
+	//shader_normals_face->CheckShader(shader_normals_face);		// added shader CHECK function to Shader.h
+	//// SHADER - NORMAL LINES
+	//shader_normals_line = new Shader(
+	//	"shaders/NormalsDraw/drawNormals.vert" , 
+	//	"shaders/NormalsDraw/drawNormals.frag" ,
+	//	nullptr, nullptr,								
+	//	"shaders/NormalsDraw/drawNormals.geom"
+	//);
+	//shader_normals_line->CheckShader(shader_normals_line);
 
 	// ----- CAMERA
+
+	//cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 10.0f);
+	cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 25.0f); 
+
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
-	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 10.0f);
-	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
-	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
-	Matrix4 T = MMath::translate(cameraPosition);
-	Matrix4 R = MMath::toMatrix4(cameraOrientation);
-	viewMatrix = MMath::inverse(R) * MMath::inverse(T);	
+	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 10.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
 	
 	return true;
 }
@@ -119,9 +128,11 @@ void Scene2p::OnDestroy() {
 	shader->OnDestroy();
 	delete shader;									// Shader 1
 	
+	if(shader_normals_face)
 	shader_normals_face->OnDestroy();				// Shader 2
 	delete shader_normals_face;
 	
+	if(shader_normals_line)
 	shader_normals_line->OnDestroy();				// Shader 3
 	delete shader_normals_line;
 }
@@ -141,6 +152,7 @@ void Scene2p::HandleEvents(const SDL_Event& sdlEvent) {
 		// WIREFRAME
 		case SDL_SCANCODE_M:
 			drawInWireMode = !drawInWireMode;
+			printf("wireframe\n");
 			break;
 
 		// NORMALS - FACE
@@ -296,7 +308,7 @@ void Scene2p::Update(const float deltaTime)
 
 	// TRACKBALL - SYNTHETIC CAMERA - Starting camera position
 	//cameraPosition = cameraPosition - sphereBody->pos;
-	cameraPosition = cameraPosition - planeBody->pos;
+	//cameraPosition = cameraPosition - planeBody->pos;
 
 	/* WHY INVERSE !...... looking down the neg z axis !
 	// initial is getQuat() in handle events, gets the inital position of the orientation of the quat
@@ -318,12 +330,12 @@ void Scene2p::Update(const float deltaTime)
 }
 
 void Scene2p::Render() const {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 
 	// -- FACE WINDING
-	glFrontFace(GL_CCW);
+	//glFrontFace(GL_CCW);
 	// glFrontFace(GL_CW);
 
 	/// Set the background color then clear the screen
@@ -339,61 +351,23 @@ void Scene2p::Render() const {
 	else {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+//
+//	// ============================
+//	// PASS 1 — COLOR
+//	// ============================
 
-	// ============================
-	// PASS 1 — BASE GEOMETRY
-	// ============================
+	glUseProgram(shader->GetProgram());
+	glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
+	glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
+	sphereMesh->Render(GL_TRIANGLES);
 
-	if (drawInNormalsFace) {
-		glUseProgram(shader_normals_face->GetProgram());
-		// 2. Send matrices to Face Shader
-		glUniformMatrix4fv(shader_normals_face->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-		glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-		// 3. Render Plane with Face Shader
-		glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES);
-
-	}
-	else 
-	{
-		// Default Shader
-		glUseProgram(shader->GetProgram());
-		glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
-
-		glUniformMatrix4fv(shader->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-		glUniformMatrix4fv(shader->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-		
-		// PLANE
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES);
-
-		// SPHERE
-		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
-		sphereMesh->Render(GL_TRIANGLES);
-
-	}
-	// ============================
-	// PASS 2 — NORMAL LINES
-	// ============================
-
-	if (drawInNormalsLine) {
-		glUseProgram(shader_normals_line->GetProgram());
-
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-
-		// PLANE NORMALS
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES);
-
-		// SPHERE NORMALS
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
-		sphereMesh->Render(GL_TRIANGLES);
-	}
-
+	glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
+	planeMesh->Render(GL_TRIANGLES);
 	glUseProgram(0);
-}
 
+}
+	
 
 
 

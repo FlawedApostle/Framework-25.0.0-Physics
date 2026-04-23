@@ -14,6 +14,8 @@
 #include "Collision.h"
 #include "Plane.h"
 
+#include "CameraController.h"
+
 
 /// Notes are Written in Repo Jargon - check NOTES_PHYSICS FOR FORMULA BREAKDOWNS
 //Local X is still Left / Right.
@@ -51,7 +53,8 @@ Scene5p::Scene5p() :
 	, linearVelocity{ 0,0,0 }
 	, planeNormal{ 0,1,0 }
 	, upVector{ 0.0f,1.0f,0.0f }
-	, plane_plane1{ nullptr }
+	, plane_plane1			{ nullptr }
+	
 
 {
 	Debug::Info("Created Scene5p: ", __FILE__, __LINE__);
@@ -103,7 +106,7 @@ void Scene5p::OnDestroy() {
 void Scene5p::HandleEvents(const SDL_Event& sdlEvent) {
 	/// Trackball
 	initialTrackballOrientation = trackball->getQuat();
-	trackball->HandleEvents(sdlEvent);
+	//trackball->HandleEvents(sdlEvent);										// cmt for cameraController
 	finalTrackballOrientation = trackball->getQuat();
 
 
@@ -171,6 +174,12 @@ void Scene5p::HandleEvents(const SDL_Event& sdlEvent) {
 		break;
 
 	case SDL_MOUSEBUTTONDOWN:
+		if (SDL_GetMouseState(NULL, NULL) & SDL_BUTTON(SDL_BUTTON_LEFT)) {
+			_cameraController.OnMouseMove(
+				(float)sdlEvent.motion.xrel,
+				(float)sdlEvent.motion.yrel
+			);
+		}
 		break;
 
 	case SDL_MOUSEBUTTONUP:
@@ -278,6 +287,10 @@ bool Scene5p::OnCreate() {
 
 
 	///										******************************** CAMERA ********************************
+	/// 
+	_cameraController.SetTarget(sphereBody->pos);
+	_cameraController.SetDistance(30.0f);
+	
 	/// CAMERA - DEFAULT SETTINGS
 	/* 
 	New camera is defined by the following
@@ -288,22 +301,25 @@ bool Scene5p::OnCreate() {
 	target = sphereBody->pos;										// what you look at
 	offset = Vec3(0, 5, 30);										// camera distance
 	//rotatedOffset = trackball->getRot() * offset;					// Rotate the offset using your quaternion - set above LINE:: 195
-	/// CAMERA - PAN SMOOTHING SETTINGS
-	//Vec3 desiredPos = target + rotatedOffset;
-	//float smooth = 0.1f; // smaller = smoother
-	//cameraPosition = VMath::lerp(cameraPosition, desiredPos, smooth);
-	/// CAMERA - ORBIT  
-	cameraPosition = target + offset;
+	/// CAMERA - ORBIT  (static)
+	//cameraPosition = target + offset;
 	/*
 	* This is the initial settings of the camera - static
 	* Render contains the non-static 'following' camera settings.
 	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 35.0f);
 	cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 	*/
+	
+	/// CAMERA - PAN SMOOTHING SETTINGS [TESTING PHASE - ( NEEDS rotatedOffset toggles ON ) ]
+	//Vec3 desiredPos = target + rotatedOffset;
+	//float smooth = 0.1f; // smaller = smoother
+	//cameraPosition = VMath::lerp(cameraPosition, desiredPos, smooth);
+	
+	/// Matrix - Default Settings
 	projectionMatrix = MMath::perspective(45.0f, (16.0f / 9.0f), 0.5f, 100.0f);
 	cameraOrientation = QMath::angleAxisRotation(0, Vec3(1.0f, 0.0f, 0.0f));
+	//viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
 	//viewMatrix = MMath::lookAt(Vec3(0.0f, 0.0f, 20.0f), Vec3(0.0f, 0.0f, 0.0f), Vec3(0.0f, 1.0f, 0.0f));
-	viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
 	
 
 	return true;
@@ -611,6 +627,10 @@ void Scene5p::Update(const float deltaTime)
 	//rotatedOffset = trackball->getRot() * offset;							// Rotate the offset using your quaternion - set above LINE:: 195
 	//cameraPosition = sphereBody->pos + rotatedOffset;						// final camera position
 
+	_cameraController.SetTarget(sphereBody->pos);
+	_cameraController.Update(deltaTime);
+
+
 	///						******************************** TRACKBALL ********************************
 	/// ----- TRACKBALL QUATERNION
 	/*
@@ -622,15 +642,17 @@ void Scene5p::Update(const float deltaTime)
 	then correct the rotate of the cam position in relation to the change in trackball orientaion
 	*/
 	Quaternion changeInTrackballOrientation = finalTrackballOrientation * QMath::inverse(initialTrackballOrientation);
-	cameraOrientation *= changeInTrackballOrientation;
-	cameraPosition = QMath::rotate(cameraPosition, changeInTrackballOrientation);
+	//cameraOrientation *= changeInTrackballOrientation;										// cmt for cameraController
+	//cameraPosition = QMath::rotate(cameraPosition, changeInTrackballOrientation);			// cmt for cameraController
 	/// ----- TRACKBALL MATRIX
 	Matrix4 T = MMath::translate(cameraPosition);
 	Matrix4 R = MMath::toMatrix4(cameraOrientation);
 	viewMatrix = MMath::inverse(R) * MMath::inverse(T);
 
 	/// FOLLOW THE BALL WHEN MOVING
-	viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
+	//viewMatrix = MMath::lookAt(cameraPosition, sphereBody->pos, Vec3(0, 1, 0));
+
+	viewMatrix = _cameraController.GetViewMatrix();
 
 
 }

@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClCompile Include="Body.cpp" />
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="CameraController.cpp" />
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="Debug.cpp" />
     <ClCompile Include="Mesh.cpp" />
@@ -167,6 +168,7 @@
   <ItemGroup>
     <ClInclude Include="Body.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="CameraController.h" />
     <ClInclude Include="Collision.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Mesh.h" />
@@ -219,7 +221,16 @@
     <None Include="shaders\phongFrag - Copy - Copy.glsl" />
     <None Include="shaders\phongVert - Copy - Copy.glsl" />
     <None Include="shaders\phongVert.glsl" />
-    <None Include="shaders\phong\phongFrag.glsl" />
+    <None Include="shaders\phong\phongFrag.glsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </ExcludedFromBuild>
+    </None>
     <None Include="shaders\phong\phongVert.glsl" />
     <None Include="shaders\Scene3g\phongFrag3g.glsl" />
     <None Include="shaders\Scene3g\phongVert3g.glsl" />
