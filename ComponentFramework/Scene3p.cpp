@@ -119,7 +119,7 @@ bool Scene3p::OnCreate() {
 
 	
 	/// ----- CAMERA STARTING POSITIONING
-	cameraPosition = sphereBody->pos + Vec3(0.0f, 0.0f, 25.0f);
+	cameraPosition = sphereBody->pos + Vec3(10.0f, 0.0f, 25.0f);
 	//cameraPosition = planeBody->pos + Vec3(0.0f, 0.0f, 10.0f); 
 	
 	// ----- CAMERA
@@ -457,18 +457,18 @@ void Scene3p::Render() const {
 	// PASS 1 — BASE GEOMETRY
 	// ============================
 
-	if (drawInNormalsFace) {
-		glUseProgram(shader_normals_face->GetProgram());
-		// 2. Send matrices to Face Shader
-		glUniformMatrix4fv(shader_normals_face->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-		glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
-		// 3. Render Plane with Face Shader
-		glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES);
+	//if (drawInNormalsFace) {
+	//	glUseProgram(shader_normals_face->GetProgram());
+	//	// 2. Send matrices to Face Shader
+	//	glUniformMatrix4fv(shader_normals_face->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
+	//	glUniformMatrix4fv(shader_normals_face->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+	//	// 3. Render Plane with Face Shader
+	//	glUniformMatrix4fv(shader_normals_face->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
+	//	planeMesh->Render(GL_TRIANGLES);
 
-	}
-	else
-	{
+	//}
+	//else
+	//{
 		// Default Shader
 		glUseProgram(shader->GetProgram());
 		glUniform3fv(glGetUniformLocation(shader->GetProgram(), "lightPos"), 1, &lightPos.x);
@@ -488,28 +488,30 @@ void Scene3p::Render() const {
 		glUniformMatrix4fv(shader->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereCollision0_Body->getModelMatrix());
 		sphereCollision0_Mesh->Render(GL_TRIANGLES);
 
+		glUseProgram(0);
+
 	}
 	// ============================
 	// PASS 2 — NORMAL LINES
 	// ============================
 
-	if (drawInNormalsLine) {
-		glUseProgram(shader_normals_line->GetProgram());
+	//if (drawInNormalsLine) {
+	//	glUseProgram(shader_normals_line->GetProgram());
 
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
+	//	glUniformMatrix4fv(shader_normals_line->GetUniformID("projectionMatrix"), 1, GL_FALSE, projectionMatrix);
+	//	glUniformMatrix4fv(shader_normals_line->GetUniformID("viewMatrix"), 1, GL_FALSE, viewMatrix);
 
-		// PLANE NORMALS
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
-		planeMesh->Render(GL_TRIANGLES);
+	//	// PLANE NORMALS
+	//	glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, planeBody->getModelMatrix());
+	//	planeMesh->Render(GL_TRIANGLES);
 
-		// SPHERE NORMALS
-		glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
-		sphereMesh->Render(GL_TRIANGLES);
-	}
+	//	// SPHERE NORMALS
+	//	glUniformMatrix4fv(shader_normals_line->GetUniformID("modelMatrix"), 1, GL_FALSE, sphereBody->getModelMatrix());
+	//	sphereMesh->Render(GL_TRIANGLES);
+	//}
 
-	glUseProgram(0);
-}
+	//glUseProgram(0);
+//}
 
 
 
